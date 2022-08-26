@@ -96,6 +96,7 @@ namespace dd {
             // make sure to release cached numbers approximately zero, but not exactly zero
             if (cached) {
                 for (auto i = 0U; i < zero.size(); i++) {
+
                     if (zero.at(i) && edge.next_node->edges_.at(i).weight != Complex::zero) {
                         //TODO what is returnToCache
 
@@ -106,7 +107,7 @@ namespace dd {
             }
 
             // all equal to zero
-            if ( none_of(cbegin(zero), cend(zero), std::logical_not<bool>()) ) {
+            if ( none_of( cbegin(zero), cend(zero), std::logical_not<bool>() ) ) {
 
                 if (!cached && !edge.isTerminal()) {
                     // If it is not a cached computation, the node has to be put back into the chain
@@ -115,26 +116,28 @@ namespace dd {
                 return vEdge::zero;
             }
 
-            // exactly one is non zero
-            auto nonZero = 0U;
-            auto nZindex = 0U;
-            for(auto i = 0U; i < zero.size(); i++) {
-                if (!zero.at(i)) {
-                    nonZero++;
-                    nZindex = i;
+            // find
+            std::vector<int> non_zero_indices;
+            for(auto i = 0; i < zero.size(); i++) {
+                if(!zero.at(i)) {
+                    non_zero_indices.push_back(i);
                 }
             }
-            if ( nonZero == 1) {
+
+
+            if ( non_zero_indices.size() == 1) {
                 // search for first element different from zero
-                auto  r = edge;
-                auto& w = r.next_node->edges_[nZindex].weight;
-                if (cached && w != Complex::one) {
-                    r.weight = w;
+                auto  current_edge = edge;
+                auto& weight_from_child = current_edge.next_node->edges_[non_zero_indices.front()].weight;
+
+                if(cached && weight_from_child != Complex::one) {
+                    current_edge.weight = weight_from_child;
                 } else {
-                    r.weight = complex_number.lookup(w);
+                    current_edge.weight = complex_number.lookup(weight_from_child);
                 }
-                w = Complex::one;
-                return r;
+
+                weight_from_child = Complex::one;
+                return current_edge;
             }
 
             //calculate normalizing factor
