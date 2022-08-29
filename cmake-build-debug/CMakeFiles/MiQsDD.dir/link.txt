@@ -1,1 +1,1 @@
-/usr/bin/c++ -g CMakeFiles/MiQsDD.dir/main.cpp.o -o MiQsDD 
+/usr/bin/c++ -g CMakeFiles/MiQsDD.dir/main.cpp.o CMakeFiles/MiQsDD.dir/test/test_pkg.cpp.o -o MiQsDD 

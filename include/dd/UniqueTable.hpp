@@ -57,8 +57,8 @@ namespace dd {
 
         static std::size_t hash(const Node* p) {
             std::size_t key = 0;
-            for (std::size_t i = 0; i < p->e.size(); ++i) {
-                key = dd::combineHash(key, std::hash<Edge<Node>>{}(p->e[i]));
+            for (std::size_t i = 0; i < p->edges_.size(); ++i) {
+                key = dd::combineHash(key, std::hash<Edge<Node>>{}(p->edges_.at(i)));
                 // old hash function:
                 //     key += ((reinterpret_cast<std::size_t>(p->e[i].p)   >>  i) +
                 //             (reinterpret_cast<std::size_t>(p->e[i].w.r) >>  i) +
@@ -89,39 +89,39 @@ namespace dd {
                 return e;
 
             lookups++;
-            const auto key = hash(e.p);
-            const auto v   = e.p->v;
+            const auto key = hash(e.next_node);
+            const auto v   = e.next_node->var_indx;
 
             // successors of a node shall either have successive variable numbers or be terminals
-            for ([[maybe_unused]] const auto& edge: e.p->e)
-                assert(edge.p->v == v - 1 || edge.isTerminal());
+            for ([[maybe_unused]] const auto& edge: e.next_node->edges_)
+                assert(edge.next_node->var_indx == v - 1 || edge.isTerminal());
 
             Node* p = tables[v][key];
             while (p != nullptr) {
-                if (e.p->e == p->e) {
+                if (e.next_node->edges_ == p->edges_) {
                     // Match found
-                    if (e.p != p && !keepNode) {
+                    if (e.next_node != p && !keepNode) {
                         // put node pointed to by e.p on available chain
-                        returnNode(e.p);
+                        returnNode(e.next_node);
                     }
                     hits++;
 
                     // variables should stay the same
-                    assert(p->v == e.p->v);
+                    assert(p->var_indx == e.next_node->var_indx);
 
                     // successors of a node shall either have successive variable numbers or be terminals
-                    for ([[maybe_unused]] const auto& edge: e.p->e)
-                        assert(edge.p->v == v - 1 || edge.isTerminal());
+                    for ([[maybe_unused]] const auto& edge: e.next_node->edges_)
+                        assert(edge.next_node->var_indx == v - 1 || edge.isTerminal());
 
-                    return {p, e.w};
+                    return {p, e.weight};
                 }
                 collisions++;
-                p = p->next;
+                p = p->next_;
             }
 
             // node was not found -> add it to front of unique table bucket
-            e.p->next      = tables[v][key];
-            tables[v][key] = e.p;
+            e.next_node->next_      = tables[v][key];
+            tables[v][key] = e.next_node;
             nodeCount++;
             peakNodeCount = std::max(peakNodeCount, nodeCount);
 
@@ -132,9 +132,9 @@ namespace dd {
             // a node is available on the stack
             if (available != nullptr) {
                 Node* p   = available;
-                available = p->next;
+                available = p->next_;
                 // returned nodes could have a ref count != 0
-                p->ref = 0;
+                p->ref_count = 0;
                 return p;
             }
 

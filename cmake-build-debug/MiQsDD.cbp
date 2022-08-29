@@ -88,6 +88,9 @@
 		<Unit filename="/home/k3vn/Desktop/DD/MiQsDD/main.cpp">
 			<Option target="MiQsDD"/>
 		</Unit>
+		<Unit filename="/home/k3vn/Desktop/DD/MiQsDD/test/test_pkg.cpp">
+			<Option target="MiQsDD"/>
+		</Unit>
 		<Unit filename="/home/k3vn/Desktop/DD/MiQsDD/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

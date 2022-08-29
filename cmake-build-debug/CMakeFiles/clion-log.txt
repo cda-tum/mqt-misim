@@ -1,6 +1,4 @@
 /home/k3vn/Downloads/CLion-2021.2.2/clion-2021.2.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEPENDS_USE_COMPILER=FALSE -G "CodeBlocks - Unix Makefiles" /home/k3vn/Desktop/DD/MiQsDD
 -- Configuring done
-CMake Error: Cannot determine link language for target "MiQsDD".
-CMake Error: CMake can not determine linker language for target: MiQsDD
 -- Generating done
-CMake Generate step failed.  Build files cannot be regenerated correctly.
+-- Build files have been written to: /home/k3vn/Desktop/DD/MiQsDD/cmake-build-debug

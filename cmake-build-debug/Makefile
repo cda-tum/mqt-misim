@@ -153,6 +153,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MiQsDD.dir/build.make CMakeFiles/MiQsDD.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+test/test_pkg.o: test/test_pkg.cpp.o
+.PHONY : test/test_pkg.o
+
+# target to build an object file
+test/test_pkg.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MiQsDD.dir/build.make CMakeFiles/MiQsDD.dir/test/test_pkg.cpp.o
+.PHONY : test/test_pkg.cpp.o
+
+test/test_pkg.i: test/test_pkg.cpp.i
+.PHONY : test/test_pkg.i
+
+# target to preprocess a source file
+test/test_pkg.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MiQsDD.dir/build.make CMakeFiles/MiQsDD.dir/test/test_pkg.cpp.i
+.PHONY : test/test_pkg.cpp.i
+
+test/test_pkg.s: test/test_pkg.cpp.s
+.PHONY : test/test_pkg.s
+
+# target to generate assembly for a file
+test/test_pkg.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MiQsDD.dir/build.make CMakeFiles/MiQsDD.dir/test/test_pkg.cpp.s
+.PHONY : test/test_pkg.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -165,6 +189,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... test/test_pkg.o"
+	@echo "... test/test_pkg.i"
+	@echo "... test/test_pkg.s"
 .PHONY : help
 
 
