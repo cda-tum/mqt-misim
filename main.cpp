@@ -4,8 +4,10 @@
 int main() {
     //dd::MDDPackage mdd();
     auto mdd = dd::MDDPackage( 2, {2,3} );
-    auto zero_state = mdd.makeZeroState(1);
+    auto zero_state = mdd.makeZeroState(2); // number of particles in the rack
     mdd.printVector(zero_state);
-    std::cout << "Hello, World!" << std::endl;
+
+    auto x = mdd.getVector(zero_state);
+
     return 0;
 }

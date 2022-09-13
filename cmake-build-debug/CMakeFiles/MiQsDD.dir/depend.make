@@ -13,6 +13,7 @@ CMakeFiles/MiQsDD.dir/main.cpp.o: \
  ../include/dd/Edge.hpp \
  ../include/dd/GateMatrixDefinitions.hpp \
  ../include/dd/MDDPackage.hpp \
+ ../include/dd/UnaryComputeTable.hpp \
  ../include/dd/UniqueTable.hpp \
  ../main.cpp
 CMakeFiles/MiQsDD.dir/test/test_pkg.cpp.o: \

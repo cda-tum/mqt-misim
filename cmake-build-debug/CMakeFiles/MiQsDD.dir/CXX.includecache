@@ -175,6 +175,8 @@ GateMatrixDefinitions.hpp
 /home/k3vn/Desktop/DD/MiQsDD/include/dd/GateMatrixDefinitions.hpp
 UniqueTable.hpp
 /home/k3vn/Desktop/DD/MiQsDD/include/dd/UniqueTable.hpp
+UnaryComputeTable.hpp
+/home/k3vn/Desktop/DD/MiQsDD/include/dd/UnaryComputeTable.hpp
 algorithm
 -
 array
@@ -222,6 +224,18 @@ unordered_set
 utility
 -
 vector
+-
+
+/home/k3vn/Desktop/DD/MiQsDD/include/dd/UnaryComputeTable.hpp
+Definitions.hpp
+/home/k3vn/Desktop/DD/MiQsDD/include/dd/Definitions.hpp
+array
+-
+cstddef
+-
+iostream
+-
+utility
 -
 
 /home/k3vn/Desktop/DD/MiQsDD/include/dd/UniqueTable.hpp
