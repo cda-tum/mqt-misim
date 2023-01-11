@@ -47,42 +47,76 @@
 namespace dd {
     class MDDPackage {
         ///
-        /// Complex number handling
-        ///
+/// Complex number handling
+///
     public:
-        ComplexNumbers complex_number{};
+        ComplexNumbers complex_number{
+        };
 
-        ///
-        /// Construction, destruction, information and reset
-        ///
+///
+/// Construction, destruction, information and reset
+///
     public:
 
+        static constexpr std::size_t maxPossibleRegisters =
+                static_cast<std::make_unsigned_t<QuantumRegister>>(std::numeric_limits<QuantumRegister>::max()) + 1U;
+        static constexpr std::size_t defaultRegisters = 128;
 
-        explicit MDDPackage(std::size_t nqr, std::vector<size_t> sizes):
-        complex_number(ComplexNumbers()), number_of_quantum_registers(nqr), registers_sizes(std::move(sizes)) {};
+        explicit MDDPackage(std::size_t nqr, std::vector<size_t> sizes) :
+                complex_number(ComplexNumbers()), number_of_quantum_registers(nqr), registers_sizes(std::move(sizes)) {
+            resize(nqr);
+        };
 
-        ~MDDPackage()                      = default;
-        MDDPackage(const MDDPackage& MDDPackage) = delete; // no copy constructor
-        MDDPackage& operator=(const MDDPackage& MDDPackage) = delete; // no copy assignment constructor
+        ~MDDPackage() = default;
 
-        //TODO RESIZE
+        MDDPackage(const MDDPackage &MDDPackage) = delete; // no copy constructor
+        MDDPackage &operator=(const MDDPackage &MDDPackage) = delete; // no copy assignment constructor
 
-        //TODO CHECK SYNTAX OF SETTERS AND GETTERS
-        // getter for number qudits
-
-        [[nodiscard]] auto qregisters() const { return number_of_quantum_registers; }
-
-        // setter dimensionalisties
-        [[nodiscard]] auto register_dimensions( const std::vector<size_t>& regs ) {
-            registers_sizes =  regs;
+//TODO RESIZE
+// resize the package instance
+        void resize(std::size_t nq) {
+//TODO DISCUSS THIS FEATURE
+            if (nq > maxPossibleRegisters) {
+                throw std::invalid_argument(
+                        "Requested too many qubits from package. Qubit datatype only allows up to " +
+                        std::to_string(maxPossibleRegisters) + " qubits, while " +
+                        std::to_string(nq) + " were requested. Please recompile the package with a wider Qubit type!");
+            }
+            number_of_quantum_registers = nq;
+            vUniqueTable.resize(number_of_quantum_registers);
+            mUniqueTable.resize(number_of_quantum_registers);
+// dUniqueTable.resize(number_of_quantum_registers);
+// stochasticNoiseOperationCache.resize(number_of_quantum_registers);
+            IdTable.resize(number_of_quantum_registers);
         }
 
-        // getter for sizes
+// reset package state
+        void reset() {
+// TODO IMPLEMENT
+// clearUniqueTables();
+// clearComputeTables();
+            complex_number.clear();
+        }
+
+
+//TODO CHECK SYNTAX OF SETTERS AND GETTERS
+// getter for number qudits
+
+        [[nodiscard]] auto qregisters() const {
+            return number_of_quantum_registers;
+        }
+
+// setter dimensionalisties
+        [[nodiscard]] auto register_dimensions(const std::vector<size_t> &regs) {
+            registers_sizes = regs;
+        }
+
+// getter for sizes
         [[nodiscard]] auto regs_size() const { return registers_sizes; }
 
     private:
         std::size_t number_of_quantum_registers;
-        //TODO THIS IS NOT CONST RIGHT?
+//TODO THIS IS NOT CONST RIGHT?
         std::vector<size_t> registers_sizes;
 
         ///
@@ -90,15 +124,15 @@ namespace dd {
         ///
     public:
         struct vNode {
-            std::vector< Edge<vNode> >     edges_{};    // edges out of this node
-            vNode*                         next_{}; // used to link nodes in unique table
-            RefCount                       ref_count{};  // reference count, how many active dd are using the node
-            QuantumRegister                var_indx{};    // variable index (nonterminal) value (-1 for terminal), index in the circuit endianess 0 from below
+            std::vector<Edge<vNode> > edges_{};    // edges out of this node
+            vNode *next_{}; // used to link nodes in unique table
+            RefCount ref_count{};  // reference count, how many active dd are using the node
+            QuantumRegister var_indx{};    // variable index (nonterminal) value (-1 for terminal), index in the circuit endianess 0 from below
 
-            static vNode            terminalNode;
-            constexpr static vNode* terminal{&terminalNode};
+            static vNode terminalNode;
+            constexpr static vNode *terminal{&terminalNode};
 
-            static constexpr bool isTerminal(const vNode* node_point) { return node_point == terminal; }
+            static constexpr bool isTerminal(const vNode *node_point) { return node_point == terminal; }
         };
         using vEdge       = Edge<vNode>;
         using vCachedEdge = CachedEdge<vNode>;
@@ -375,12 +409,112 @@ namespace dd {
             }
             return current_edge;
         }
-        ///
-        /// Identity matrices
-        ///
+/*
+/// Make GATE DD
+// SIZE => EDGE (number of successors)
+// build matrix representation for a single gate on an n-qubit circuit
+
+template<std::uint_fast8_t SIZE>
+mEdge makeGateDD(const std::array<ComplexValue, SIZE>& mat, QuantumRegisterCount n,
+                 QuantumRegister target, std::size_t start = 0) {
+    return makeGateDD(mat, n, Controls{}, target, start);
+}
+
+template<std::uint_fast8_t SIZE>
+mEdge makeGateDD(const std::array<ComplexValue, SIZE>& mat, QuantumRegisterCount n,
+                 const Control& control, QuantumRegister target, std::size_t start = 0) {
+    return makeGateDD(mat, n, Controls{control}, target, start);
+}
+
+template<std::uint_fast8_t SIZE>
+mEdge makeGateDD(const std::array<ComplexValue, SIZE>& mat, QuantumRegisterCount n,
+                 const Controls& controls, QuantumRegister target, std::size_t start = 0) {
+    if (n + start > number_of_quantum_registers) {
+        throw std::runtime_error("Requested gate with " +
+                                 std::to_string(n + start) +
+                                 " qubits, but current package configuration only supports up to " +
+                                 std::to_string(number_of_quantum_registers) +
+                                 " qubits. Please allocate a larger package instance.");
+    }
+    std::vector<mEdge> edges_mat{};
+
+    auto current_control = controls.begin(); //TODO ???
+
+    for (auto i = 0U; i < SIZE; ++i) {
+        if (mat.at(i).real == 0 && mat.at(i).img == 0) {
+            edges_mat.at(i) = mEdge::zero;
+        } else {
+            edges_mat.at(i)  = mEdge::terminal(complex_number.lookup(mat.at(i)));
+        }
+    }
+
+    //process lines below target
+    auto current_reg = static_cast<QuantumRegister>(start);
+
+    for (; current_reg < target; current_reg ++) {
+
+        for (auto i1 = 0U; i1 < SIZE; i1++) {
+            for (auto i2 = 0U; i2 < SIZE; i2++) {
+
+                // TODO not clear if  row major helps we need dynamic
+                auto i = i1 * RADIX_2 + i2;
+
+                if (current_control != controls.end() && current_control->quantum_register == current_reg) {
+
+
+                    if (current_control->type == 0) { // neg. control - Control::Type::neg, control on zero level
+                        edges_mat[i] = makeDDNode(current_reg,
+                                                  std::array{edges_mat.at(i),
+                                                 mEdge::zero, mEdge::zero,
+                                                 (i1 == i2) ? makeIdent(static_cast<Qubit>(start),
+                                                static_cast<Qubit>(current_reg - 1)) : mEdge::zero});
+                    } else { // pos. control
+                        em[i] = makeDDNode(z, std::array{(i1 == i2) ? makeIdent(static_cast<Qubit>(start), static_cast<Qubit>(z - 1)) : mEdge::zero, mEdge::zero, mEdge::zero, em[i]});
+                    }
+
+                } else { // not connected
+                    em[i] = makeDDNode(z, std::array{em[i], mEdge::zero, mEdge::zero, em[i]});
+                }
+            }
+        }
+        if (current_control != controls.end() && current_control->quantum_register == current_reg) {
+            ++current_reg;
+        }
+    }
+
+    // target line
+    auto e = makeDDNode(z, em);
+
+    //process lines above target
+    for (; z < static_cast<Qubit>(n - 1 + start); z++) {
+        auto q = static_cast<Qubit>(z + 1);
+
+        if (it != controls.end() && it->qubit == q) {
+
+            if (it->type == Control::Type::neg) { // neg. control
+                e = makeDDNode(q, std::array{e, mEdge::zero, mEdge::zero, makeIdent(static_cast<Qubit>(start), static_cast<Qubit>(q - 1))});
+            } else { // pos. control
+                e = makeDDNode(q, std::array{makeIdent(static_cast<Qubit>(start), static_cast<Qubit>(q - 1)), mEdge::zero, mEdge::zero, e});
+            }
+            ++it;
+
+        } else { // not connected
+            e = makeDDNode(q, std::array{e, mEdge::zero, mEdge::zero, e});
+        }
+    }
+    return e;
+}
+ */
+
+
+///
+/// Identity matrices
+///
     public:
-        // create n-qudit identity DD. makeIdent(n) === makeIdent(0, n-1)
-        mEdge makeIdent(QuantumRegisterCount n) { return makeIdent(0, static_cast<QuantumRegister>(n - 1)); }
+// create n-qudit identity DD. makeIdent(n) === makeIdent(0, n-1)
+        mEdge makeIdent(QuantumRegisterCount n) {
+            return makeIdent(0, static_cast<QuantumRegister>(n - 1));
+        }
 
         mEdge makeIdent(QuantumRegisterCount leastSignificantQubit, QuantumRegisterCount mostSignificantQubit) {
             if (mostSignificantQubit < leastSignificantQubit)
@@ -390,21 +524,49 @@ namespace dd {
                 return IdTable.at(mostSignificantQubit);
             }
 
-            if (mostSignificantQubit >= 1 && (IdTable.at(mostSignificantQubit - 1) ).next_node != nullptr) {
 
-                IdTable.at(mostSignificantQubit) = makeDDNode(mostSignificantQubit,
-                                                           std::vector{IdTable[mostSignificantQubit - 1],
-                                                                      mEdge::zero,
-                                                                      mEdge::zero,
-                                                                      IdTable[mostSignificantQubit - 1]});
+            if (mostSignificantQubit >= 1 && (IdTable.at(mostSignificantQubit - 1)).next_node != nullptr) {
+                auto basic_dim_most = registers_sizes.at(mostSignificantQubit);
+                std::vector<mEdge> identity_edges{};
+
+                for (auto i = 0l; i < basic_dim_most; i++) {
+                    for (auto j = 0l; j < basic_dim_most; j++) {
+                        if (i == j) identity_edges.push_back(IdTable[mostSignificantQubit - 1]);
+                        else identity_edges.push_back(mEdge::zero);
+                    }
+                }
+                IdTable.at(mostSignificantQubit) = makeDDNode(static_cast<QuantumRegister>(mostSignificantQubit),
+                                                              identity_edges);
+
+
+//IdTable.at(mostSignificantQubit) = makeDDNode(mostSignificantQubit,std::vector{IdTable[mostSignificantQubit - 1],mEdge::zero,mEdge::zero,IdTable[mostSignificantQubit - 1]});
                 return IdTable.at(mostSignificantQubit);
             }
+            auto basic_dim_least = registers_sizes.at(leastSignificantQubit);
+            std::vector<mEdge> identity_edges_least{};
 
-            auto e = makeDDNode(leastSignificantQubit, std::vector{mEdge::one, mEdge::zero, mEdge::zero, mEdge::one});
+            for (auto i = 0l; i < basic_dim_least; i++) {
+                for (auto j = 0l; j < basic_dim_least; j++) {
+                    if (i == j) identity_edges_least.push_back(mEdge::one);
+                    else identity_edges_least.push_back(mEdge::zero);
+                }
+            }
 
-            for (std::size_t k = leastSignificantQubit + 1; k <= std::make_unsigned_t<QuantumRegister>(mostSignificantQubit); k++) {
+            auto e = makeDDNode(static_cast<QuantumRegister>(leastSignificantQubit), identity_edges_least);
 
-                e = makeDDNode(static_cast<QuantumRegister>(k), std::vector{e, mEdge::zero, mEdge::zero, e});
+            for (std::size_t intermediary_regs = leastSignificantQubit + 1; intermediary_regs <=
+                                                                            std::make_unsigned_t<QuantumRegister>(
+                                                                                    mostSignificantQubit); intermediary_regs++) {
+                auto basic_dim_int = registers_sizes.at(intermediary_regs);
+                std::vector<mEdge> identity_edges_int{};
+
+                for (auto i = 0l; i < basic_dim_int; i++) {
+                    for (auto j = 0l; j < basic_dim_int; j++) {
+                        if (i == j) identity_edges_int.push_back(e);
+                        else identity_edges_int.push_back(mEdge::zero);
+                    }
+                }
+                e = makeDDNode(static_cast<QuantumRegister>(intermediary_regs), identity_edges_int);
             }
 
             if (leastSignificantQubit == 0)
@@ -412,8 +574,10 @@ namespace dd {
             return e;
         }
 
-        // identity table access and reset
-        [[nodiscard]] const auto& getIdentityTable() const { return IdTable; }
+// identity table access and reset
+        [[nodiscard]] const auto &getIdentityTable() const {
+            return IdTable;
+        }
 
         void clearIdentityTable() {
             for (auto& entry: IdTable) entry.next_node = nullptr;
@@ -588,7 +752,8 @@ namespace dd {
 
 
         void printVector(const vEdge& edge) {
-            unsigned long long num_entries = std::accumulate(registers_sizes.begin(),registers_sizes.end(), 1, std::multiplies<>());
+            unsigned long long num_entries = std::accumulate(registers_sizes.begin(), registers_sizes.end(), 1,
+                                                             std::multiplies<>());
 
             auto nodes_in_tree = getTreeNodes(edge);
 
@@ -597,9 +762,9 @@ namespace dd {
                 auto repr_i = getReprOfIndex(nodes_in_tree, i);
                 //get amplitude
                 const auto amplitude = getValueByPath(edge, repr_i);
-
-                std::reverse(repr_i.begin(), repr_i.end());
-                for(const unsigned long & coeff : repr_i ) {
+                //TODO HOW SHALL WE REPRESENT??
+                //std::reverse(repr_i.begin(), repr_i.end());
+                for (const unsigned long &coeff: repr_i) {
                     std::cout << coeff;
                 }
                 repr_i.clear();
@@ -608,7 +773,8 @@ namespace dd {
                 // set fixed width to maximum of a printed number
                 // (-) 0.precision plus/minus 0.precision i
                 constexpr auto width = 1 + 2 + precision + 1 + 2 + precision + 1;
-                std::cout << ": " << std::setw(width) << ComplexValue::toString(amplitude.r, amplitude.i, false, precision) << "\n";
+                std::cout << ": " << std::setw(width)
+                          << ComplexValue::toString(amplitude.r, amplitude.i, false, precision) << "\n";
             }
             std::cout << std::flush;
         }
@@ -757,28 +923,60 @@ namespace dd {
     public:
         // unique tables
         template<class Node>
-        [[nodiscard]] UniqueTable<Node>& getUniqueTable();
+        [[nodiscard]] UniqueTable<Node> &getUniqueTable();
 
         template<class Node>
-        void incRef(const Edge<Node>& e) {
+        void incRef(const Edge<Node> &e) {
             getUniqueTable<Node>().incRef(e);
         }
+
         template<class Node>
-        void decRef(const Edge<Node>& e) {
+        void decRef(const Edge<Node> &e) {
             getUniqueTable<Node>().decRef(e);
         }
 
-        UniqueTable<vNode> vUniqueTable{number_of_quantum_registers};
+        UniqueTable<vNode> vUniqueTable{
+                number_of_quantum_registers
+        };
         UniqueTable<mNode> mUniqueTable{number_of_quantum_registers};
     };
 
-    inline MDDPackage::vNode MDDPackage::vNode::terminalNode{{{{nullptr, Complex::zero}, {nullptr, Complex::zero}}},
-                                                       nullptr,
-                                                       0,
-                                                       -1};
+    void clearUniqueTables() {
+        // TODO IMPLEMENT
+        //vUniqueTable.clear();
+        //mUniqueTable.clear();
+    }
+
+
+    inline MDDPackage::vNode MDDPackage::vNode::terminalNode{
+            {
+                    {
+                            {
+                                    nullptr, Complex::zero
+                            }, {
+                                    nullptr, Complex::zero
+                            }
+                    }
+            },
+            nullptr,
+            0,
+            -1
+    };
 
     inline MDDPackage::mNode MDDPackage::mNode::terminalNode{
-            {{{nullptr, Complex::zero}, {nullptr, Complex::zero}, {nullptr, Complex::zero}, {nullptr, Complex::zero}}},
+            {
+                    {
+                            {
+                                    nullptr, Complex::zero
+                            }, {
+                                    nullptr, Complex::zero
+                            }, {
+                                    nullptr, Complex::zero
+                            }, {
+                                    nullptr, Complex::zero
+                            }
+                    }
+            },
             nullptr,
             0,
             -1,
@@ -786,10 +984,10 @@ namespace dd {
             true};
 
     template<>
-    [[nodiscard]] inline UniqueTable<MDDPackage::vNode>& MDDPackage::getUniqueTable() { return vUniqueTable; }
+    [[nodiscard]] inline UniqueTable<MDDPackage::vNode> &MDDPackage::getUniqueTable() { return vUniqueTable; }
 
     template<>
-    [[nodiscard]] inline UniqueTable<MDDPackage::mNode>& MDDPackage::getUniqueTable() { return mUniqueTable; }
+    [[nodiscard]] inline UniqueTable<MDDPackage::mNode> &MDDPackage::getUniqueTable() { return mUniqueTable; }
     /*
     template<>
     [[nodiscard]] inline ComputeTable<MDDPackage::vCachedEdge, MDDPackage::vCachedEdge, MDDPackage::vCachedEdge>& MDDPackage::getAddComputeTable() { return vectorAdd; }
