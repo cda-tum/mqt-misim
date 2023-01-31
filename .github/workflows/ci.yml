@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUILD_TYPE: Release
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name:  Configure CMake
+        run:   |
+               if [ "$RUNNER_OS" == "Windows" ]; then
+                 cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl"
+               else
+                 cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+               fi
+      - name:  Build
+        run:   cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
+
+  test:
+    needs:   build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name:  Configure CMake
+        run:   |
+               if [ "$RUNNER_OS" == "Windows" ]; then
+                 cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl"
+               else
+                 cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+               fi
+      - name:  Build
+        run:   cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
+
+      - name:              Test
+        working-directory: ${{github.workspace}}/build
+        shell:             bash
+        run:               ctest -C $BUILD_TYPE --output-on-failure
