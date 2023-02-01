@@ -1,5 +1,6 @@
+#include "dd/MDDPackage.hpp"
+
 #include <iostream>
-#include "include/dd/MDDPackage.hpp"
 
 int main() {
     //dd::MDDPackage mdd();

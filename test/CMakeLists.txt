@@ -21,6 +21,10 @@ macro(PACKAGE_ADD_TEST testname linklibs)
     set_target_properties(${testname} PROPERTIES FOLDER tests)
 endmacro()
 
-
 # add unit tests
 package_add_test(${PROJECT_NAME}_test ${PROJECT_NAME} test_pkg.cpp)
+
+add_executable(${PROJECT_NAME}_example main.cpp)
+target_link_libraries(${PROJECT_NAME}_example PRIVATE ${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME}_example PROPERTIES FOLDER tests)
+add_test(NAME ${PROJECT_NAME}_example COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_example)
