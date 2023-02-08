@@ -1,15 +1,15 @@
-#include "dd/MDDPackage.hpp"
-
 #include <iostream>
 
+#include "dd/MDDPackage.hpp"
+
 int main() {
-    //dd::MDDPackage mdd();
-    auto mdd = dd::MDDPackage(3, {2, 3, 3});
-    auto zero_state = mdd.makeZeroState(3); // number of particles in the rack
-    mdd.printVector(zero_state);
-    auto id = mdd.makeIdent(3);
+  auto mdd = dd::MDDPackage(2, {2, 2});
+  auto zeroState = mdd.makeZeroState(2);  // number of particles in the rack
+  mdd.printVector(zeroState);
+  auto id = mdd.makeIdent(2);
 
-    auto x = mdd.getVector(zero_state);
+  auto x = mdd.getVector(zeroState);
+  auto hGate = mdd.makeGateDD<dd::GateMatrix>(dd::Hmat, 1, 0);
 
-    return 0;
+  return 0;
 }

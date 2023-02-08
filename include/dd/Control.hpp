@@ -11,21 +11,22 @@
 #include <set>
 
 namespace dd {
-    struct Control {
-        // make dd -> op you need -> polarized control, unsigned integer
-        using Type = std::uint_fast8_t;
+struct Control {
+  // make dd -> op you need -> polarized control, unsigned integer
+  using Type = std::uint_fast8_t;
 
-        QuantumRegister quantum_register{};
-        Type  type = 1; // default value of a control level
-    };
+  QuantumRegister quantumRegister{};
+  Type type = 1;  // default value of a control level
+};
 
     inline bool operator<(const Control& lhs, const Control& rhs) {
-        return lhs.quantum_register < rhs.quantum_register || (lhs.quantum_register == rhs.quantum_register && lhs.type < rhs.type);
-    }
+  return lhs.quantumRegister < rhs.quantumRegister ||
+         (lhs.quantumRegister == rhs.quantumRegister && lhs.type < rhs.type);
+}
 
-    inline bool operator==(const Control& lhs, const Control& rhs) {
-        return lhs.quantum_register == rhs.quantum_register && lhs.type == rhs.type;
-    }
+inline bool operator==(const Control& lhs, const Control& rhs) {
+  return lhs.quantumRegister == rhs.quantumRegister && lhs.type == rhs.type;
+}
 
     inline bool operator!=(const Control& lhs, const Control& rhs) {
         return !(lhs == rhs);
@@ -40,11 +41,11 @@ namespace dd {
         }
 
         inline bool operator()(QuantumRegister lhs, const Control& rhs) const {
-            return lhs < rhs.quantum_register;
+          return lhs < rhs.quantumRegister;
         }
 
         inline bool operator()(const Control& lhs, QuantumRegister rhs) const {
-            return lhs.quantum_register < rhs;
+          return lhs.quantumRegister < rhs;
         }
     };
     using Controls = std::set<Control, CompareControl>;

@@ -44,7 +44,7 @@ namespace dd {
             lookups++;
             const auto key   = hash(operand);
             auto&      entry = table[key];
-            if (entry.result.next_node == nullptr) return result;
+            if (entry.result.nextNode == nullptr) return result;
             if (entry.operand != operand) return result;
 
             hits++;
@@ -53,11 +53,10 @@ namespace dd {
 
         void clear() {
             if (count > 0) {
-                for (auto& entry: table)
-                    entry.result.next_node = nullptr;
-                count = 0;
-            }
-            hits    = 0;
+            for (auto& entry : table) entry.result.nextNode = nullptr;
+            count = 0;
+          }
+          hits    = 0;
             lookups = 0;
         }
 
