@@ -50,7 +50,7 @@ constexpr TritMatrix Z01{COMPLEX_ONE,  COMPLEX_ZERO, COMPLEX_ZERO,
                          COMPLEX_ZERO, COMPLEX_MONE, COMPLEX_ZERO,
                          COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
 
-inline TritMatrix U3embedded(fp lambda, fp phi, fp theta) {
+inline TritMatrix U301(fp lambda, fp phi, fp theta) {
   return TritMatrix{{{std::cos(theta / 2.), 0.},
                      {-std::cos(lambda) * std::sin(theta / 2.),
                       -std::sin(lambda) * std::sin(theta / 2.)},

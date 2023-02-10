@@ -488,13 +488,12 @@ complexNumber.clear();
           auto targetRadix =
               registersSizes.at(static_cast<unsigned long>(target));
           auto edges = targetRadix * targetRadix;
-          std::vector<mEdge> edgesMat{};
+          std::vector<mEdge> edgesMat(edges, mEdge::zero);
+
           auto currentControl = controls.begin();
 
           for (auto i = 0U; i < edges; ++i) {
-            if (mat.at(i).r == 0 && mat.at(i).i == 0) {
-              edgesMat.at(i) = mEdge::zero;
-            } else {
+            if (mat.at(i).r != 0 || mat.at(i).i != 0) {
               edgesMat.at(i) = mEdge::terminal(complexNumber.lookup(mat.at(i)));
             }
           }
@@ -703,58 +702,58 @@ complexNumber.clear();
         ///        If string is longer than required, the additional characters are ignored.
         /// \return the complex amplitude of the specified element
 
-        template<class Edge>
-        ComplexValue getValueByPath(const Edge& edge, const std::string& path_elements) {
-            if (edge.isTerminal()) {
-                return {CTEntry::val(edge.weight.real), CTEntry::val(edge.weight.img)};
-            }
-
-            auto temp_comp_numb = complexNumber.getTemporary(1, 0);
-            auto current_edge = edge;
-            do {
-              ComplexNumbers::mul(temp_comp_numb, temp_comp_numb,
-                                  current_edge.weight);
-              std::size_t tmp =
-                  path_elements.at(current_edge.nextNode->var_indx) - '0';
-              assert(tmp <= current_edge.nextNode->edges.size());
-              current_edge = current_edge.nextNode->edges.at(tmp);
-            } while (!current_edge.isTerminal());
-
-            ComplexNumbers::mul(temp_comp_numb, temp_comp_numb, current_edge.weight);
-
-            return {CTEntry::val(temp_comp_numb.real), CTEntry::val(temp_comp_numb.img)};
-        }
-
-
-
-        ComplexValue getValueByPath(const vEdge& edge, std::vector<unsigned long>& repr_i) {
-            if (edge.isTerminal()) {
-                return {CTEntry::val(edge.weight.real), CTEntry::val(edge.weight.img)};
-            }
-            return getValueByPath(edge, Complex::one, repr_i);
-        }
-
-
-
-        ComplexValue getValueByPath(const vEdge& edge, const Complex& amp, std::vector<unsigned long>& repr) {
-          auto c_numb = complexNumber.mulCached(edge.weight, amp);
-
+        template <class Edge>
+        ComplexValue getValueByPath(const Edge& edge,
+                                    const std::string& pathElements) {
           if (edge.isTerminal()) {
-            complexNumber.returnToCache(c_numb);
-            return {CTEntry::val(c_numb.real), CTEntry::val(c_numb.img)};
+            return {CTEntry::val(edge.weight.real),
+                    CTEntry::val(edge.weight.img)};
           }
 
-          ComplexValue return_amp{};
+          auto tempCompNumb = complexNumber.getTemporary(1, 0);
+          auto currentEdge = edge;
+          do {
+            ComplexNumbers::mul(tempCompNumb, tempCompNumb, currentEdge.weight);
+            std::size_t tmp =
+                pathElements.at(currentEdge.nextNode->varIndx) - '0';
+            assert(tmp <= currentEdge.nextNode->edges.size());
+            currentEdge = currentEdge.nextNode->edges.at(tmp);
+          } while (!currentEdge.isTerminal());
+
+          ComplexNumbers::mul(tempCompNumb, tempCompNumb, currentEdge.weight);
+
+          return {CTEntry::val(tempCompNumb.real),
+                  CTEntry::val(tempCompNumb.img)};
+        }
+
+        ComplexValue getValueByPath(const vEdge& edge,
+                                    std::vector<unsigned long>& reprI) {
+          if (edge.isTerminal()) {
+            return {CTEntry::val(edge.weight.real),
+                    CTEntry::val(edge.weight.img)};
+          }
+          return getValueByPath(edge, Complex::one, reprI);
+        }
+
+        ComplexValue getValueByPath(const vEdge& edge, const Complex& amp, std::vector<unsigned long>& repr) {
+          auto cNumb = complexNumber.mulCached(edge.weight, amp);
+
+          if (edge.isTerminal()) {
+            complexNumber.returnToCache(cNumb);
+            return {CTEntry::val(cNumb.real), CTEntry::val(cNumb.img)};
+          }
+
+          ComplexValue returnAmp{};
 
           if (!edge.nextNode->edges.at(repr.front())
                    .weight.approximatelyZero()) {
             std::vector<unsigned long> reprSlice(repr.begin() + 1, repr.end());
-            return_amp = getValueByPath(edge.nextNode->edges.at(repr.front()),
-                                        c_numb, reprSlice);
+            returnAmp = getValueByPath(edge.nextNode->edges.at(repr.front()),
+                                       cNumb, reprSlice);
           }
 
-          complexNumber.returnToCache(c_numb);
-          return return_amp;
+          complexNumber.returnToCache(cNumb);
+          return returnAmp;
         }
 
         ComplexValue getValueByPath(const mEdge& edge,
@@ -768,42 +767,37 @@ complexNumber.clear();
         }
 
         ComplexValue getValueByPath(const mEdge& edge, const Complex& amp,
-                                    std::vector<unsigned long>& repr_i,
-                                    std::vector<unsigned long>& repr_j) {
+                                    std::vector<unsigned long>& reprI,
+                                    std::vector<unsigned long>& reprJ) {
           // row major encoding
 
-          auto c_numb = complexNumber.mulCached(edge.weight, amp);
+          auto cNumb = complexNumber.mulCached(edge.weight, amp);
 
           if (edge.isTerminal()) {
-            complexNumber.returnToCache(c_numb);
-            return {CTEntry::val(c_numb.real), CTEntry::val(c_numb.img)};
+            complexNumber.returnToCache(cNumb);
+            return {CTEntry::val(cNumb.real), CTEntry::val(cNumb.img)};
           }
 
-          // for every qubit checks if you're in the correct row or correct
-          // column
-          // const bool row = i & (1ULL << edge.nextNode->var_indx); // adds one
-          // to var indx const bool col = j & (1ULL << edge.nextNode->var_indx);
-
-          const auto row = repr_i.front();
-          const auto col = repr_j.front();
+          const auto row = reprI.front();
+          const auto col = reprJ.front();
           const auto rowMajorIndex = row * edge.nextNode->edges.size() + col;
           ComplexValue returnAmp{};
 
           if (!edge.nextNode->edges.at(rowMajorIndex)
                    .weight.approximatelyZero()) {
-            std::vector<unsigned long> reprSliceI(repr_i.begin() + 1,
-                                                  repr_i.end());
-            std::vector<unsigned long> reprSliceJ(repr_j.begin() + 1,
-                                                  repr_j.end());
+            std::vector<unsigned long> reprSliceI(reprI.begin() + 1,
+                                                  reprI.end());
+            std::vector<unsigned long> reprSliceJ(reprJ.begin() + 1,
+                                                  reprJ.end());
             returnAmp = getValueByPath(edge.nextNode->edges.at(rowMajorIndex),
-                                       c_numb, reprSliceI, reprSliceJ);
+                                       cNumb, reprSliceI, reprSliceJ);
           }
-          complexNumber.returnToCache(c_numb);
+          complexNumber.returnToCache(cNumb);
           return returnAmp;
         }
 
         CVec getVector(const vEdge& edge) {
-          const std::size_t dim = static_cast<const size_t>(
+          const auto dim = static_cast<const size_t>(
               std::accumulate(registersSizes.begin(), registersSizes.end(), 1,
                               std::multiplies<>()));
           // allocate resulting vector
