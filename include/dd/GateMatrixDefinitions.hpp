@@ -31,18 +31,33 @@ constexpr ComplexValue COMPLEX_1MINUSI_2 = {0.5, -0.5};
 using GateMatrix = std::array<ComplexValue, EDGE2>;
 using TritMatrix = std::array<ComplexValue, EDGE3>;
 
-constexpr GateMatrix Hmat{COMPLEX_SQRT2_2, COMPLEX_SQRT2_2, COMPLEX_SQRT2_2,
-                          COMPLEX_MSQRT2_2};
+constexpr GateMatrix H2{COMPLEX_SQRT2_2, COMPLEX_SQRT2_2, COMPLEX_SQRT2_2,
+                        COMPLEX_MSQRT2_2};
 
-constexpr TritMatrix X{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
-                       COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO,
-                       COMPLEX_ONE,  COMPLEX_ZERO, COMPLEX_ZERO};
+// TODO FIX THE CONSTANTS
+constexpr ComplexValue COMPLEX_SQRT3_3 = {
+    0.57735026918962576450914878050195745565, 0.};
+
+constexpr TritMatrix H3{COMPLEX_SQRT3_3,
+                        COMPLEX_SQRT3_3,
+                        COMPLEX_SQRT3_3,
+                        COMPLEX_SQRT3_3,
+                        dd::ComplexValue{-0.28867513, 0.5},
+                        dd::ComplexValue{-0.28867513, -0.5},
+                        COMPLEX_SQRT3_3,
+                        dd::ComplexValue{-0.28867513, -0.5},
+                        dd::ComplexValue{-0.28867513, 0.5}};
+
+constexpr TritMatrix X3{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
+                        COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO,
+                        COMPLEX_ONE,  COMPLEX_ZERO, COMPLEX_ZERO};
+
 constexpr TritMatrix PI02{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_MONE,
                           COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO,
                           COMPLEX_ONE,  COMPLEX_ZERO, COMPLEX_ZERO};
-constexpr TritMatrix PI02dag{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
-                             COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO,
-                             COMPLEX_MONE, COMPLEX_ZERO, COMPLEX_ZERO};
+constexpr TritMatrix P_I02DAG{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
+                              COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO,
+                              COMPLEX_MONE, COMPLEX_ZERO, COMPLEX_ZERO};
 constexpr TritMatrix X01{COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO,
                          COMPLEX_ONE,  COMPLEX_ZERO, COMPLEX_ZERO,
                          COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
@@ -65,6 +80,7 @@ inline TritMatrix U301(fp lambda, fp phi, fp theta) {
                      COMPLEX_ONE}};
 }
 
+// TODO CHECK DEFINITIONS ARE WEIRD
 inline GateMatrix U3mat(fp lambda, fp phi, fp theta) {
         return GateMatrix{{{std::cos(theta / 2.), 0.},
                            {-std::cos(lambda) * std::sin(theta / 2.), -std::sin(lambda) * std::sin(theta / 2.)},

@@ -3,13 +3,14 @@
 #include "dd/MDDPackage.hpp"
 
 int main() {
-  auto mdd = dd::MDDPackage(3, {2, 2, 2});
-  auto zeroState = mdd.makeZeroState(3);  // number of particles in the rack
-  mdd.printVector(zeroState);
-  auto id = mdd.makeIdent(3);
+  auto mdd = dd::MDDPackage(1, {2});
+  // auto zeroState = mdd.makeZeroState(3);  // number of particles in the rack
 
-  auto x = mdd.getVector(zeroState);
-  auto hGate = mdd.makeGateDD<dd::GateMatrix>(dd::Hmat, 2, 1);
+  // mdd.printVector(zeroState);
+  // auto id = mdd.makeIdent(3);
+
+  // auto x = mdd.getVector(zeroState);
+  auto U3 = dd::U3mat(dd::PI_4, -dd::PI_2, dd::PI_2);
 
   return 0;
 }

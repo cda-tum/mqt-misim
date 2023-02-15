@@ -486,7 +486,8 @@ complexNumber.clear();
           }
 
           auto targetRadix =
-              registersSizes.at(static_cast<unsigned long>(target));
+              registersSizes.at(static_cast<QuantumRegister>(target));
+
           auto edges = targetRadix * targetRadix;
           std::vector<mEdge> edgesMat(edges, mEdge::zero);
 
@@ -501,11 +502,11 @@ complexNumber.clear();
           // process lines below target
           for (; currentReg < target; currentReg++) {
             auto radix =
-                registersSizes.at(static_cast<unsigned long>(currentReg));
+                registersSizes.at(static_cast<QuantumRegister>(currentReg));
 
             for (auto rowMat = 0U; rowMat < targetRadix; ++rowMat) {
               for (auto colMat = 0U; colMat < targetRadix; ++colMat) {
-                auto entryPos = rowMat + targetRadix * colMat;
+                auto entryPos = (rowMat * targetRadix) + colMat;
 
                 std::vector<mEdge> quadEdges(radix * radix, mEdge::zero);
 
@@ -517,7 +518,7 @@ complexNumber.clear();
                   if (rowMat == colMat) {
                     for (auto i = 0U; i < radix; i++) {
                       auto diagInd = i * radix + i;
-                      if (diagInd == currentControl->type) {
+                      if (i == currentControl->type) {
                         quadEdges.at(diagInd) = edgesMat.at(entryPos);
                       } else {
                         quadEdges.at(diagInd) = mEdge::one;
@@ -542,7 +543,7 @@ complexNumber.clear();
 
             if (currentControl != controls.end() &&
                 currentControl->quantumRegister == currentReg) {
-              ++currentReg;
+              ++currentControl;
             }
           }
 
@@ -554,31 +555,21 @@ complexNumber.clear();
                currentReg++) {
             auto nextReg = static_cast<QuantumRegister>(currentReg + 1);
             auto nextRadix =
-                registersSizes.at(static_cast<unsigned long>(currentReg));
+                registersSizes.at(static_cast<QuantumRegister>(nextReg));
             std::vector<mEdge> nextEdges(nextRadix * nextRadix, mEdge::zero);
 
             if (currentControl != controls.end() &&
                 currentControl->quantumRegister == nextReg) {
               for (auto i = 0U; i < nextRadix; i++) {
                 auto diagInd = i * nextRadix + i;
-                if (diagInd == currentControl->type) {
+                if (i == currentControl->type) {
                   nextEdges.at(diagInd) = targetNodeEdge;
                 } else {
-                  nextEdges.at(diagInd) = mEdge::one;
+                  nextEdges.at(diagInd) =
+                      makeIdent(static_cast<QuantumRegisterCount>(start),
+                                static_cast<QuantumRegisterCount>(nextReg - 1));
                 }
               }
-              /*
-              if (currentControl->type ) { // neg. control
-                targetNodeEdge = makeDDNode(nextReg, std::array{
-                        targetNodeEdge, mEdge::zero, mEdge::zero,
-              makeIdent(static_cast<QuantumRegister>(start),
-              static_cast<QuantumRegister>(nextReg - 1))}); } else { // pos.
-              control targetNodeEdge = makeDDNode(nextReg,
-              std::array{makeIdent(static_cast<QuantumRegister>(start),
-              static_cast<QuantumRegister>(nextReg - 1)), mEdge::zero,
-              mEdge::zero, targetNodeEdge});
-              }
-              */
 
               ++currentControl;
 
@@ -586,8 +577,8 @@ complexNumber.clear();
               for (auto iD = 0U; iD < nextRadix; iD++) {
                 nextEdges.at(iD * nextRadix + iD) = targetNodeEdge;
               }
-              targetNodeEdge = makeDDNode(nextReg, nextEdges);
             }
+            targetNodeEdge = makeDDNode(nextReg, nextEdges);
           }
           return targetNodeEdge;
         }
@@ -601,8 +592,8 @@ complexNumber.clear();
           return makeIdent(0, static_cast<QuantumRegister>(n - 1));
         }
 
-        mEdge makeIdent(QuantumRegisterCount leastSignificantQubit,
-                        QuantumRegisterCount mostSignificantQubit) {
+        mEdge makeIdent(QuantumRegister leastSignificantQubit,
+                        QuantumRegister mostSignificantQubit) {
           if (mostSignificantQubit < leastSignificantQubit) {
             return mEdge::one;
           }
