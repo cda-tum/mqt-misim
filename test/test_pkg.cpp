@@ -325,10 +325,29 @@ TEST(DDPackageTest, Identity) {
   auto id2 = dd->makeIdent(0, 1);  // should be found in idTable
   EXPECT_EQ(dd->makeIdent(2), id2);
 
-  auto id4 = dd->makeIdent(0, 3); // should use id3 and extend it
+  auto id4 = dd->makeIdent(0, 3);  // should use id3 and extend it
   EXPECT_EQ(dd->makeIdent(0, 3), id4);
   EXPECT_NE(table[3].nextNode, nullptr);
 
   auto idCached = dd->makeIdent(4);
   EXPECT_EQ(id4, idCached);
+}
+
+TEST(DDPackageTest, Multiplication) {
+  auto dd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{2});
+  EXPECT_EQ(dd->qregisters(), 2);
+
+  auto hGate1 = dd->makeGateDD<dd::GateMatrix>(dd::H2, 1, 0);
+
+  auto zeroState = dd->makeZeroState(1);
+  auto hState = dd->multiply(hGate1, zeroState);
+  auto x = 0;
+  /*
+  ASSERT_EQ(dd->fidelity(zeroState, oneState), 0.0);
+  // repeat the same calculation - triggering compute table hit
+  ASSERT_EQ(dd->fidelity(zeroState, oneState), 0.0);
+  ASSERT_NEAR(dd->fidelity(zeroState, hState), 0.5,
+  dd::ComplexTable<>::tolerance()); ASSERT_NEAR(dd->fidelity(oneState, hState),
+  0.5, dd::ComplexTable<>::tolerance());
+   */
 }
