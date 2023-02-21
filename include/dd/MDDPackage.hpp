@@ -149,105 +149,127 @@ complexNumber.clear();
 
   vEdge normalize(const vEdge& edge, bool cached) {
     std::vector<bool> zero;
-
+    // find indices that are not zero
+    std::vector<unsigned long> nonZeroIndices;
+    auto counter = 0UL;
     for (auto const& i : edge.nextNode->edges) {
-      zero.push_back(i.weight.approximatelyZero());
+      if (i.weight.approximatelyZero()) {
+        zero.push_back(true);
+      } else {
+        zero.push_back(false);
+        nonZeroIndices.push_back(counter);
+      }
+      counter++;
     }
 
     // make sure to release cached numbers approximately zero, but not exactly
     // zero
     if (cached) {
-      for (auto i = 0U; i < zero.size(); i++) {
+      for (auto i = 0UL; i < zero.size(); i++) {
         if (zero.at(i) && edge.nextNode->edges.at(i).weight != Complex::zero) {
-
           complexNumber.returnToCache(edge.nextNode->edges.at(i).weight);
           edge.nextNode->edges.at(i) = vEdge::zero;
         }
       }
     }
 
-            // all equal to zero
-            if ( none_of( cbegin(zero), cend(zero), std::logical_not<bool>() ) ) {
+    // all equal to zero
+    if (none_of(cbegin(zero), cend(zero), std::logical_not<bool>())) {
+      if (!cached && !edge.isTerminal()) {
+        // If it is not a cached computation, the node has to be put back into
+        // the chain
+        vUniqueTable.returnNode(edge.nextNode);
+      }
+      return vEdge::zero;
+    }
 
-                if (!cached && !edge.isTerminal()) {
-                    // If it is not a cached computation, the node has to be put back into the chain
-                    vUniqueTable.returnNode(edge.nextNode);
-                }
-                return vEdge::zero;
-            }
+    if (nonZeroIndices.size() == 1) {
+      // search for first element different from zero
+      auto currentEdge = edge;
+      auto& weightFromChild =
+          currentEdge.nextNode->edges
+              .at(static_cast<unsigned long>(nonZeroIndices.front()))
+              .weight;
 
-            // find indices that are not zero
-            std::vector<int> nonZeroIndices;
-            for (auto i = 0U; i < zero.size(); i++) {
-              if (!zero.at(i)) {
-                nonZeroIndices.push_back(static_cast<int>(i));
-              }
-            }
+      if (cached && weightFromChild != Complex::one) {
+        currentEdge.weight = weightFromChild;
+      } else {
+        currentEdge.weight = complexNumber.lookup(weightFromChild);
+      }
 
-            if (nonZeroIndices.size() == 1) {
-              // search for first element different from zero
-              auto currentEdge = edge;
-              auto& weightFromChild =
-                  currentEdge.nextNode->edges
-                      .at(static_cast<unsigned long>(nonZeroIndices.front()))
-                      .weight;
+      weightFromChild = Complex::one;
+      return currentEdge;
+    }
 
-              if (cached && weightFromChild != Complex::one) {
-                currentEdge.weight = weightFromChild;
-              } else {
-                currentEdge.weight = complexNumber.lookup(weightFromChild);
-              }
+    // calculate normalizing factor
+    auto sumNorm2 = ComplexNumbers::mag2(edge.nextNode->edges.at(0).weight);
+    auto mag2Max = ComplexNumbers::mag2(edge.nextNode->edges.at(0).weight);
+    auto argMax = 0UL;
 
-              weightFromChild = Complex::one;
-              return currentEdge;
-            }
+    // TODO FIX BECUASE AT THIS STAGE IT TRIES ALWAYS TO GET THE FIRST EDGE AND
+    // I WANT THE FIRST BEH BASED ON PREVIOUS CODE
+    for (auto i = 1UL; i < edge.nextNode->edges.size(); i++) {
+      sumNorm2 =
+          sumNorm2 + ComplexNumbers::mag2(edge.nextNode->edges.at(i).weight);
+    }
+    for (auto i = 1UL; i <= edge.nextNode->edges.size(); i++) {
+      auto counterBack = edge.nextNode->edges.size() - i;
+      if (ComplexNumbers::mag2(edge.nextNode->edges.at(counterBack).weight) +
+              ComplexTable<>::tolerance() >=
+          mag2Max) {
+        mag2Max =
+            ComplexNumbers::mag2(edge.nextNode->edges.at(counterBack).weight);
+        argMax = counterBack;
+      }
+    }
 
-            // calculate normalizing factor
-            auto sumNorm2 =
-                ComplexNumbers::mag2(edge.nextNode->edges.at(0).weight);
+    const auto norm = std::sqrt(sumNorm2);
+    const auto magMax = std::sqrt(mag2Max);
+    const auto commonFactor = norm / magMax;
 
-            for (auto i = 1UL; i < edge.nextNode->edges.size(); i++) {
-              sumNorm2 = sumNorm2 + ComplexNumbers::mag2(
-                                        edge.nextNode->edges.at(i).weight);
-            }
+    // set incoming edge weight to max
+    auto currentEdge = edge;
+    auto& max = currentEdge.nextNode->edges.at(argMax);
 
-            const auto commonFactor = std::sqrt(sumNorm2);
+    if (cached && max.weight != Complex::one) {
+      // if(cached && !currentEdge.weight.approximatelyOne()){
+      currentEdge.weight = max.weight;
+      currentEdge.weight.real->value *= commonFactor;
+      currentEdge.weight.img->value *= commonFactor;
+    } else {
+      auto realPart = CTEntry::val(currentEdge.weight.real) * commonFactor;
+      auto imgPart = CTEntry::val(currentEdge.weight.img) * commonFactor;
+      currentEdge.weight = complexNumber.lookup(realPart, imgPart);
+      if (currentEdge.weight.approximatelyZero()) {
+        return vEdge::zero;
+      }
+    }
 
-            // set incoming edge weight to max
-            auto currentEdge = edge;
+    max.weight = complexNumber.lookup(magMax / norm, 0.);
+    if (max.weight == Complex::zero) {
+      max = vEdge::zero;
+    }
 
-            // TODO CHECK EXACTLY THIS CACHING SYSTEM
-            // auto& max = r.nextNode->edges[argMax];
-            if (cached && currentEdge.weight != Complex::one) {
-              // current_edge.weight = max.weight;
-              currentEdge.weight.real->value *= commonFactor;
-              currentEdge.weight.img->value *= commonFactor;
-            } else {
-              currentEdge.weight = complexNumber.lookup(
-                  CTEntry::val(currentEdge.weight.real) * commonFactor,
-                  CTEntry::val(currentEdge.weight.img) * commonFactor);
-              if (currentEdge.weight.approximatelyZero()) {
-                return vEdge::zero;
-              }
-            }
+    // actual normalization of the edges
+    for (auto i = 0UL; i < edge.nextNode->edges.size(); ++i) {
+      if (i != argMax) {
+        auto& iEdge = edge.nextNode->edges.at(i);
+        if (cached) {
+          complexNumber.returnToCache(iEdge.weight);
+          ComplexNumbers::div(iEdge.weight, iEdge.weight, currentEdge.weight);
+          iEdge.weight = complexNumber.lookup(iEdge.weight);
+        } else {
+          auto c = complexNumber.getTemporary();
+          ComplexNumbers::div(c, iEdge.weight, currentEdge.weight);
+          iEdge.weight = complexNumber.lookup(c);
+        }
+        if (iEdge.weight == Complex::zero) {
+          iEdge = vEdge::zero;
+        }
+      }
+    }
 
-            // actual normalization of the edges
-            for (auto& i : edge.nextNode->edges) {
-              if (cached) {
-                complexNumber.returnToCache(i.weight);
-                ComplexNumbers::div(i.weight, i.weight, currentEdge.weight);
-                i.weight = complexNumber.lookup(i.weight);
-              } else {
-                auto c = complexNumber.getTemporary();
-                ComplexNumbers::div(c, i.weight, currentEdge.weight);
-                i.weight = complexNumber.lookup(c);
-              }
-              if (i.weight == Complex::zero) {
-                i = vEdge::zero;
-              }
-            }
-
-            return currentEdge;
+    return currentEdge;
   }
 
   // generate |0...0> with N quantum registers
@@ -838,6 +860,8 @@ complexNumber.clear();
           [[maybe_unused]] const auto before = complexNumber.cacheCount();
 
           QuantumRegister var = -1;
+          RightOperand e;
+
           if (!x.isTerminal()) {
             var = x.nextNode->varIndx;
           }
@@ -845,7 +869,7 @@ complexNumber.clear();
             var = y.nextNode->varIndx;
           }
 
-          auto e = multiply2(x, y, var, start);
+          e = multiply2(x, y, var, start);
 
           if (e.weight != Complex::zero && e.weight != Complex::one) {
             complexNumber.returnToCache(e.weight);
