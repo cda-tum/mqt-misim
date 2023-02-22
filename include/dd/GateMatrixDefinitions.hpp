@@ -31,8 +31,28 @@ constexpr ComplexValue COMPLEX_1MINUSI_2 = {0.5, -0.5};
 using GateMatrix = std::array<ComplexValue, EDGE2>;
 using TritMatrix = std::array<ComplexValue, EDGE3>;
 
-constexpr GateMatrix H2{COMPLEX_SQRT2_2, COMPLEX_SQRT2_2, COMPLEX_SQRT2_2,
-                        COMPLEX_MSQRT2_2};
+constexpr GateMatrix Imat{COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+constexpr GateMatrix Hmat{COMPLEX_SQRT2_2, COMPLEX_SQRT2_2, COMPLEX_SQRT2_2,
+                          COMPLEX_MSQRT2_2};
+constexpr GateMatrix Xmat{COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ONE, COMPLEX_ZERO};
+constexpr GateMatrix Ymat{COMPLEX_ZERO, COMPLEX_MI, COMPLEX_I, COMPLEX_ZERO};
+constexpr GateMatrix Zmat{COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                          COMPLEX_MONE};
+constexpr GateMatrix Smat{COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_I};
+constexpr GateMatrix Sdagmat{COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                             COMPLEX_MI};
+constexpr GateMatrix Tmat{COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                          COMPLEX_1PLUSI};
+constexpr GateMatrix Tdagmat{COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                             COMPLEX_1MINUSI};
+constexpr GateMatrix SXmat{COMPLEX_1PLUSI_2, COMPLEX_1MINUSI_2,
+                           COMPLEX_1MINUSI_2, COMPLEX_1PLUSI_2};
+constexpr GateMatrix SXdagmat{COMPLEX_1MINUSI_2, COMPLEX_1PLUSI_2,
+                              COMPLEX_1PLUSI_2, COMPLEX_1MINUSI_2};
+constexpr GateMatrix Vmat{COMPLEX_SQRT2_2, COMPLEX_MISQRT2_2, COMPLEX_MISQRT2_2,
+                          COMPLEX_SQRT2_2};
+constexpr GateMatrix Vdagmat{COMPLEX_SQRT2_2, COMPLEX_ISQRT2_2,
+                             COMPLEX_ISQRT2_2, COMPLEX_SQRT2_2};
 
 // TODO FIX THE CONSTANTS
 constexpr ComplexValue COMPLEX_SQRT3_3 = {

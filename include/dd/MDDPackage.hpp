@@ -1047,6 +1047,97 @@ complexNumber.clear();
           }
           return resultEdge;
         }
+        ///
+        /// Inner product, fidelity, expectation value
+        ///
+       public:
+        ComputeTable<vEdge, vEdge, vCachedEdge> vectorInnerProduct{};
+
+        ComplexValue innerProduct(const vEdge& x, const vEdge& y) {
+          if (x.nextNode == nullptr || y.nextNode == nullptr ||
+              x.weight.approximatelyZero() ||
+              y.weight.approximatelyZero()) {  // the 0 case
+            return {0, 0};
+          }
+
+          [[maybe_unused]] const auto before = complexNumber.cacheCount();
+
+          auto circWidth = x.nextNode->varIndx;
+          if (y.nextNode->varIndx > circWidth) {
+            circWidth = y.nextNode->varIndx;
+          }
+          const ComplexValue ip =
+              innerProduct(x, y, static_cast<QuantumRegister>(circWidth + 1));
+
+          [[maybe_unused]] const auto after = complexNumber.cacheCount();
+          assert(after == before);
+
+          return ip;
+        }
+
+        fp fidelity(const vEdge& x, const vEdge& y) {
+          const auto fid = innerProduct(x, y);
+          return fid.r * fid.r + fid.i * fid.i;
+        }
+
+       private:
+        ComplexValue innerProduct(const vEdge& x, const vEdge& y,
+                                  QuantumRegister var) {
+          if (x.nextNode == nullptr || y.nextNode == nullptr ||
+              x.weight.approximatelyZero() ||
+              y.weight.approximatelyZero()) {  // the 0 case
+            return {0.0, 0.0};
+          }
+
+          if (var == 0) {
+            auto c = complexNumber.getTemporary();
+            ComplexNumbers::mul(c, x.weight, y.weight);
+            return {c.real->value, c.img->value};
+          }
+
+          auto xCopy = x;
+          xCopy.weight = Complex::one;
+          auto yCopy = y;
+          yCopy.weight = Complex::one;
+
+          auto nodeLookup = vectorInnerProduct.lookup(xCopy, yCopy);
+          if (nodeLookup.nextNode != nullptr) {
+            auto c = complexNumber.getTemporary(nodeLookup.weight);
+            ComplexNumbers::mul(c, c, x.weight);
+            ComplexNumbers::mul(c, c, y.weight);
+            return {CTEntry::val(c.real), CTEntry::val(c.img)};
+          }
+
+          auto width = static_cast<QuantumRegister>(var - 1);
+
+          ComplexValue sum{0.0, 0.0};
+          for (auto i = 0U; i < registersSizes.at(width); i++) {
+            vEdge e1{};
+            if (!x.isTerminal() && x.nextNode->varIndx == width) {
+              e1 = x.nextNode->edges.at(i);
+            } else {
+              e1 = xCopy;
+            }
+            vEdge e2{};
+            if (!y.isTerminal() && y.nextNode->varIndx == width) {
+              e2 = y.nextNode->edges.at(i);
+              e2.weight = ComplexNumbers::conj(e2.weight);
+            } else {
+              e2 = yCopy;
+            }
+            auto cv = innerProduct(e1, e2, width);
+            sum.r += cv.r;
+            sum.i += cv.i;
+          }
+          nodeLookup.nextNode = vNode::terminal;
+          nodeLookup.weight = sum;
+
+          vectorInnerProduct.insert(xCopy, yCopy, nodeLookup);
+          auto c = complexNumber.getTemporary(sum);
+          ComplexNumbers::mul(c, c, x.weight);
+          ComplexNumbers::mul(c, c, y.weight);
+          return {CTEntry::val(c.real), CTEntry::val(c.img)};
+        }
 
         ///
         /// Vector and matrix extraction from DDs

@@ -96,7 +96,7 @@ TEST(DDPackageTest, TrivialTest) {
                   .approximatelyEquals(dd::ComplexValue{-0.28867513, 0.5}));
 
   // case with higher target
-  auto hGate1 = dd->makeGateDD<dd::GateMatrix>(dd::H2, 2, 1);
+  auto hGate1 = dd->makeGateDD<dd::GateMatrix>(dd::Hmat, 2, 1);
   ASSERT_EQ(dd->getValueByPath(hGate1, "00"),
             (dd::ComplexValue{dd::SQRT2_2, 0}));
   ASSERT_EQ(dd->getValueByPath(hGate1, "10"), (dd::ComplexValue{0, 0}));
@@ -229,7 +229,8 @@ TEST(DDPackageTest, TrivialTest) {
                   .approximatelyEquals(dd::ComplexValue{-0.28867513, 0.5}));
 
   dd::Controls controls0{{0, 1}};
-  auto controlled0H2 = dd->makeGateDD<dd::GateMatrix>(dd::H2, 2, controls0, 1);
+  auto controlled0H2 =
+      dd->makeGateDD<dd::GateMatrix>(dd::Hmat, 2, controls0, 1);
 
   ASSERT_TRUE(dd->getValueByPath(controlled0H2, "00")
                   .approximatelyEquals(dd::COMPLEX_ONE));
@@ -334,20 +335,22 @@ TEST(DDPackageTest, Identity) {
 }
 
 TEST(DDPackageTest, Multiplication) {
-  auto dd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{2});
-  EXPECT_EQ(dd->qregisters(), 2);
+  auto dd = std::make_unique<dd::MDDPackage>(1, std::vector<std::size_t>{2});
+  EXPECT_EQ(dd->qregisters(), 1);
 
-  auto hGate1 = dd->makeGateDD<dd::GateMatrix>(dd::H2, 1, 0);
+  auto hGate1 = dd->makeGateDD<dd::GateMatrix>(dd::Hmat, 1, 0);
+  auto xGate = dd->makeGateDD<dd::GateMatrix>(dd::Xmat, 1, 0);
 
   auto zeroState = dd->makeZeroState(1);
   auto hState = dd->multiply(hGate1, zeroState);
+  auto oneState = dd->multiply(xGate, zeroState);
   auto x = 0;
-  /*
+
   ASSERT_EQ(dd->fidelity(zeroState, oneState), 0.0);
   // repeat the same calculation - triggering compute table hit
   ASSERT_EQ(dd->fidelity(zeroState, oneState), 0.0);
   ASSERT_NEAR(dd->fidelity(zeroState, hState), 0.5,
-  dd::ComplexTable<>::tolerance()); ASSERT_NEAR(dd->fidelity(oneState, hState),
-  0.5, dd::ComplexTable<>::tolerance());
-   */
+              dd::ComplexTable<>::tolerance());
+  ASSERT_NEAR(dd->fidelity(oneState, hState), 0.5,
+              dd::ComplexTable<>::tolerance());
 }
