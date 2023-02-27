@@ -68,9 +68,13 @@ constexpr TritMatrix H3{COMPLEX_SQRT3_3,
                         dd::ComplexValue{-0.28867513, -0.5},
                         dd::ComplexValue{-0.28867513, 0.5}};
 
+constexpr TritMatrix X3dag{COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO,
+                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
+                           COMPLEX_ONE,  COMPLEX_ZERO, COMPLEX_ZERO};
+
 constexpr TritMatrix X3{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
-                        COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO,
-                        COMPLEX_ONE,  COMPLEX_ZERO, COMPLEX_ZERO};
+                        COMPLEX_ONE,  COMPLEX_ZERO, COMPLEX_ZERO,
+                        COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO};
 
 constexpr TritMatrix PI02{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_MONE,
                           COMPLEX_ZERO, COMPLEX_ONE,  COMPLEX_ZERO,

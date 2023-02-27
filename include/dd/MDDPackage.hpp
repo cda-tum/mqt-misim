@@ -298,28 +298,26 @@ complexNumber.clear();
           }
           return first;
         }
+
         // generate computational basis state |i> with n quantum registers
-  vEdge makeBasisState(QuantumRegisterCount n, const std::vector<bool>& state,
-                       std::size_t start = 0) {
-    if (n + start > numberOfQuantumRegisters) {
-      throw std::runtime_error(
-          "Requested state with " + std::to_string(n + start) +
-          " qubits, but current package configuration only supports up "
-          "to " +
-          std::to_string(numberOfQuantumRegisters) +
-          " qubits. Please allocate a larger package instance.");
-    }
-    auto f = vEdge::one;
-    for (std::size_t pos = start; pos < n + start; ++pos) {
-      if (static_cast<int>(state.at(pos)) == 0) {
-        f = makeDDNode(static_cast<QuantumRegister>(pos),
-                       std::vector{f, vEdge::zero});
-      } else {
-        f = makeDDNode(static_cast<QuantumRegister>(pos),
-                       std::vector{vEdge::zero, f});
-      }
-    }
-    return f;
+        vEdge makeBasisState(QuantumRegisterCount n,
+                             const std::vector<size_t>& state,
+                             std::size_t start = 0) {
+          if (n + start > numberOfQuantumRegisters) {
+            throw std::runtime_error(
+                "Requested state with " + std::to_string(n + start) +
+                " qubits, but current package configuration only supports up "
+                "to " +
+                std::to_string(numberOfQuantumRegisters) +
+                " qubits. Please allocate a larger package instance.");
+          }
+          auto f = vEdge::one;
+          for (std::size_t pos = start; pos < n + start; ++pos) {
+            std::vector<vEdge> edges(registersSizes.at(pos), vEdge::zero);
+            edges.at(state.at(pos)) = f;
+            f = makeDDNode(static_cast<QuantumRegister>(pos), edges);
+          }
+          return f;
   }
 
   // create a normalized DD node and return an edge pointing to it. The
