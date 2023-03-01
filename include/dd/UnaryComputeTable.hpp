@@ -53,10 +53,10 @@ namespace dd {
 
         void clear() {
             if (count > 0) {
-            for (auto& entry : table) entry.result.nextNode = nullptr;
-            count = 0;
-          }
-          hits    = 0;
+                for (auto& entry: table) entry.result.nextNode = nullptr;
+                count = 0;
+            }
+            hits    = 0;
             lookups = 0;
         }
 

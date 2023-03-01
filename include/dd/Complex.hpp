@@ -25,7 +25,7 @@ namespace dd {
 
         void setVal(const Complex& complex_num) const {
             real->value = CTEntry::val(complex_num.real);
-            img->value = CTEntry::val(complex_num.img);
+            img->value  = CTEntry::val(complex_num.img);
         }
 
         [[nodiscard]] inline bool approximatelyEquals(const Complex& complex_num) const {

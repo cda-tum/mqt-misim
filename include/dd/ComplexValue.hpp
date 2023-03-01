@@ -20,31 +20,31 @@
 #include <utility>
 
 namespace dd {
-struct ComplexValue {
-  fp r;
-  fp i;
+    struct ComplexValue {
+        fp r;
+        fp i;
 
-  [[nodiscard]] constexpr bool approximatelyEquals(
-      const ComplexValue& c) const {
-    return ComplexTable<>::Entry::approximatelyEquals(r, c.r) &&
-           ComplexTable<>::Entry::approximatelyEquals(i, c.i);
-  }
+        [[nodiscard]] constexpr bool approximatelyEquals(
+                const ComplexValue& c) const {
+            return ComplexTable<>::Entry::approximatelyEquals(r, c.r) &&
+                   ComplexTable<>::Entry::approximatelyEquals(i, c.i);
+        }
 
-  [[nodiscard]] constexpr bool approximatelyZero() const {
-    return ComplexTable<>::Entry::approximatelyZero(r) &&
-           ComplexTable<>::Entry::approximatelyZero(i);
-  }
+        [[nodiscard]] constexpr bool approximatelyZero() const {
+            return ComplexTable<>::Entry::approximatelyZero(r) &&
+                   ComplexTable<>::Entry::approximatelyZero(i);
+        }
 
-  [[nodiscard]] constexpr bool approximatelyOne() const {
-    return ComplexTable<>::Entry::approximatelyOne(r) &&
-           ComplexTable<>::Entry::approximatelyZero(i);
-  }
+        [[nodiscard]] constexpr bool approximatelyOne() const {
+            return ComplexTable<>::Entry::approximatelyOne(r) &&
+                   ComplexTable<>::Entry::approximatelyZero(i);
+        }
 
-  constexpr bool operator==(const ComplexValue& other) const {
-    return r == other.r && i == other.i;
-  }
+        constexpr bool operator==(const ComplexValue& other) const {
+            return r == other.r && i == other.i;
+        }
 
-  constexpr bool operator!=(const ComplexValue& other) const {
+        constexpr bool operator!=(const ComplexValue& other) const {
             return !operator==(other);
         }
 
