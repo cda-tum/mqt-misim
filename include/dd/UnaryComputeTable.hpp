@@ -52,12 +52,12 @@ namespace dd {
         }
 
         void clear() {
-            if (count > 0) {
-                for (auto& entry: table) entry.result.nextNode = nullptr;
-                count = 0;
-            }
-            hits    = 0;
-            lookups = 0;
+          if (count > 0) {
+            for (auto& entry : table) entry.result.nextNode = nullptr;
+            count = 0;
+          }
+          hits = 0;
+          lookups = 0;
         }
 
         [[nodiscard]] fp hitRatio() const { return static_cast<fp>(hits) / lookups; }

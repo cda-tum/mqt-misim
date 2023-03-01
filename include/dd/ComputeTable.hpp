@@ -50,22 +50,22 @@ namespace dd {
         }
 
         ResultType lookup(const LeftOperandType& leftOperand, const RightOperandType& rightOperand) {
-            ResultType result{};
-            lookups++;
-            const auto key   = hash(leftOperand, rightOperand);
-            auto&      entry = table[key];
-            if (entry.result.nextNode == nullptr) {
-                return result;
-            }
-            if (entry.leftOperand != leftOperand) {
-                return result;
-            }
-            if (entry.rightOperand != rightOperand) {
-                return result;
-            }
+          ResultType result{};
+          lookups++;
+          const auto key = hash(leftOperand, rightOperand);
+          auto& entry = table[key];
+          if (entry.result.nextNode == nullptr) {
+            return result;
+          }
+          if (entry.leftOperand != leftOperand) {
+            return result;
+          }
+          if (entry.rightOperand != rightOperand) {
+            return result;
+          }
 
-            hits++;
-            return entry.result;
+          hits++;
+          return entry.result;
         }
 
         void clear() {

@@ -92,9 +92,9 @@ namespace dd {
             assert(c != Complex::one);
             assert(c.real->refCount == 0);
             assert(c.img->refCount == 0);
-            c.img->next  = available;
+            c.img->next = available;
             c.real->next = c.img;
-            available    = c.real;
+            available = c.real;
             count -= 2;
         }
 

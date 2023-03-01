@@ -20,49 +20,50 @@
 #include <utility>
 
 namespace dd {
-    struct ComplexValue {
-        fp r;
-        fp i;
+struct ComplexValue {
+  fp r;
+  fp i;
 
-        [[nodiscard]] constexpr bool approximatelyEquals(
-                const ComplexValue& c) const {
-            return ComplexTable<>::Entry::approximatelyEquals(r, c.r) &&
-                   ComplexTable<>::Entry::approximatelyEquals(i, c.i);
-        }
+  [[nodiscard]] constexpr bool approximatelyEquals(
+      const ComplexValue& c) const {
+    return ComplexTable<>::Entry::approximatelyEquals(r, c.r) &&
+           ComplexTable<>::Entry::approximatelyEquals(i, c.i);
+  }
 
-        [[nodiscard]] constexpr bool approximatelyZero() const {
-            return ComplexTable<>::Entry::approximatelyZero(r) &&
-                   ComplexTable<>::Entry::approximatelyZero(i);
-        }
+  [[nodiscard]] constexpr bool approximatelyZero() const {
+    return ComplexTable<>::Entry::approximatelyZero(r) &&
+           ComplexTable<>::Entry::approximatelyZero(i);
+  }
 
-        [[nodiscard]] constexpr bool approximatelyOne() const {
-            return ComplexTable<>::Entry::approximatelyOne(r) &&
-                   ComplexTable<>::Entry::approximatelyZero(i);
-        }
+  [[nodiscard]] constexpr bool approximatelyOne() const {
+    return ComplexTable<>::Entry::approximatelyOne(r) &&
+           ComplexTable<>::Entry::approximatelyZero(i);
+  }
 
-        constexpr bool operator==(const ComplexValue& other) const {
-            return r == other.r && i == other.i;
-        }
+  constexpr bool operator==(const ComplexValue& other) const {
+    return r == other.r && i == other.i;
+  }
 
-        constexpr bool operator!=(const ComplexValue& other) const {
-            return !operator==(other);
-        }
+  constexpr bool operator!=(const ComplexValue& other) const {
+    return !operator==(other);
+  }
 
-        void readBinary(std::istream& is) {
-            is.read(reinterpret_cast<char*>(&r), sizeof(decltype(r)));
-            is.read(reinterpret_cast<char*>(&i), sizeof(decltype(i)));
-        }
+  void readBinary(std::istream& is) {
+    is.read(reinterpret_cast<char*>(&r), sizeof(decltype(r)));
+    is.read(reinterpret_cast<char*>(&i), sizeof(decltype(i)));
+  }
 
-        void writeBinary(std::ostream& os) const {
-            os.write(reinterpret_cast<const char*>(&r), sizeof(decltype(r)));
-            os.write(reinterpret_cast<const char*>(&i), sizeof(decltype(i)));
-        }
+  void writeBinary(std::ostream& os) const {
+    os.write(reinterpret_cast<const char*>(&r), sizeof(decltype(r)));
+    os.write(reinterpret_cast<const char*>(&i), sizeof(decltype(i)));
+  }
 
-        void from_string(const std::string& real_str, std::string imag_str) {
-            fp real = real_str.empty() ? 0. : std::stod(real_str);
+  void from_string(const std::string& real_str, std::string imag_str) {
+    fp real = real_str.empty() ? 0. : std::stod(real_str);
 
-            imag_str.erase(remove(imag_str.begin(), imag_str.end(), ' '), imag_str.end());
-            imag_str.erase(remove(imag_str.begin(), imag_str.end(), 'i'), imag_str.end());
+    imag_str.erase(remove(imag_str.begin(), imag_str.end(), ' '),
+                   imag_str.end());
+    imag_str.erase(remove(imag_str.begin(), imag_str.end(), 'i'), imag_str.end());
             if (imag_str == "+" || imag_str == "-") imag_str = imag_str + "1";
             fp imag = imag_str.empty() ? 0. : std::stod(imag_str);
             r       = {real};

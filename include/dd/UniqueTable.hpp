@@ -56,17 +56,17 @@ namespace dd {
         }
 
         static std::size_t hash(const Node* p) {
-            std::size_t key = 0;
-            for (std::size_t i = 0; i < p->edges.size(); ++i) {
-                key = dd::combineHash(key, std::hash<Edge<Node>>{}(p->edges.at(i)));
-                // old hash function:
-                //     key += ((reinterpret_cast<std::size_t>(p->e[i].p)   >>  i) +
-                //             (reinterpret_cast<std::size_t>(p->e[i].w.r) >>  i) +
-                //             (reinterpret_cast<std::size_t>(p->e[i].w.i) >> (i +
-                //             1))) & MASK;
-            }
-            key &= MASK;
-            return key;
+          std::size_t key = 0;
+          for (std::size_t i = 0; i < p->edges.size(); ++i) {
+            key = dd::combineHash(key, std::hash<Edge<Node>>{}(p->edges.at(i)));
+            // old hash function:
+            //     key += ((reinterpret_cast<std::size_t>(p->e[i].p)   >>  i) +
+            //             (reinterpret_cast<std::size_t>(p->e[i].w.r) >>  i) +
+            //             (reinterpret_cast<std::size_t>(p->e[i].w.i) >> (i +
+            //             1))) & MASK;
+          }
+          key &= MASK;
+          return key;
         }
 
         // access functions
@@ -85,49 +85,49 @@ namespace dd {
         // lookup a node in the unique table for the appropriate variable; insert it, if it has not been found
         // NOTE: reference counting is to be adjusted by function invoking the table lookup and only normalized nodes shall be stored.
         Edge<Node> lookup(const Edge<Node>& e, bool keepNode = false) {
-            // there are unique terminal nodes
-            if (e.isTerminal()) return e;
+          // there are unique terminal nodes
+          if (e.isTerminal()) return e;
 
-            lookups++;
-            const auto key = hash(e.nextNode);
-            const auto v   = e.nextNode->varIndx;
+          lookups++;
+          const auto key = hash(e.nextNode);
+          const auto v = e.nextNode->varIndx;
 
-            // successors of a node shall either have successive variable numbers
-            // or be terminals
-            for ([[maybe_unused]] const auto& edge: e.nextNode->edges)
+          // successors of a node shall either have successive variable numbers
+          // or be terminals
+          for ([[maybe_unused]] const auto& edge : e.nextNode->edges)
+            assert(edge.nextNode->varIndx == v - 1 || edge.isTerminal());
+
+          Node* p = tables[v][key];
+          while (p != nullptr) {
+            if (e.nextNode->edges == p->edges) {
+              // Match found
+              if (e.nextNode != p && !keepNode) {
+                // put node pointed to by e.p on available chain
+                returnNode(e.nextNode);
+              }
+              hits++;
+
+              // variables should stay the same
+              assert(p->varIndx == e.nextNode->varIndx);
+
+              // successors of a node shall either have successive variable
+              // numbers or be terminals
+              for ([[maybe_unused]] const auto& edge : e.nextNode->edges)
                 assert(edge.nextNode->varIndx == v - 1 || edge.isTerminal());
 
-            Node* p = tables[v][key];
-            while (p != nullptr) {
-                if (e.nextNode->edges == p->edges) {
-                    // Match found
-                    if (e.nextNode != p && !keepNode) {
-                        // put node pointed to by e.p on available chain
-                        returnNode(e.nextNode);
-                    }
-                    hits++;
-
-                    // variables should stay the same
-                    assert(p->varIndx == e.nextNode->varIndx);
-
-                    // successors of a node shall either have successive variable
-                    // numbers or be terminals
-                    for ([[maybe_unused]] const auto& edge: e.nextNode->edges)
-                        assert(edge.nextNode->varIndx == v - 1 || edge.isTerminal());
-
-                    return {p, e.weight};
-                }
-                collisions++;
-                p = p->next;
+              return {p, e.weight};
             }
+            collisions++;
+            p = p->next;
+          }
 
-            // node was not found -> add it to front of unique table bucket
-            e.nextNode->next = tables[v][key];
-            tables[v][key]   = e.nextNode;
-            nodeCount++;
-            peakNodeCount = std::max(peakNodeCount, nodeCount);
+          // node was not found -> add it to front of unique table bucket
+          e.nextNode->next = tables[v][key];
+          tables[v][key] = e.nextNode;
+          nodeCount++;
+          peakNodeCount = std::max(peakNodeCount, nodeCount);
 
-            return e;
+          return e;
         }
 
         [[nodiscard]] Node* getNode() {
@@ -156,8 +156,8 @@ namespace dd {
         }
 
         void returnNode(Node* p) {
-            p->next   = available;
-            available = p;
+          p->next = available;
+          available = p;
         }
 
         // increment reference counter for node e points to
