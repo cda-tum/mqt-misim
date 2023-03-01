@@ -10,10 +10,10 @@ set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 
 # project definition
 project(
-        MiQsDD
-        LANGUAGES CXX
-        VERSION 0.1
-        DESCRIPTION "MQT decision diagram package for mixed dimensional systems")
+  MiQsDD
+  LANGUAGES CXX
+  VERSION 0.1
+  DESCRIPTION "MQT decision diagram package for mixed dimensional systems")
 
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
@@ -40,22 +40,22 @@ enable_sanitizers(project_options)
 
 # add main library code
 add_library(
-        ${PROJECT_NAME}
-        INTERFACE
-        include/dd/Complex.hpp
-        include/dd/ComplexCache.hpp
-        include/dd/ComplexNumbers.hpp
-        include/dd/ComplexTable.hpp
-        include/dd/ComplexValue.hpp
-        include/dd/ComputeTable.hpp
-        include/dd/Control.hpp
-        include/dd/Definitions.hpp
-        include/dd/Edge.hpp
-        include/dd/Export.hpp
-        include/dd/GateMatrixDefinitions.hpp
-        include/dd/MDDPackage.hpp
-        include/dd/UnaryComputeTable.hpp
-        include/dd/UniqueTable.hpp)
+  ${PROJECT_NAME}
+  INTERFACE
+  include/dd/Complex.hpp
+  include/dd/ComplexCache.hpp
+  include/dd/ComplexNumbers.hpp
+  include/dd/ComplexTable.hpp
+  include/dd/ComplexValue.hpp
+  include/dd/ComputeTable.hpp
+  include/dd/Control.hpp
+  include/dd/Definitions.hpp
+  include/dd/Edge.hpp
+  include/dd/Export.hpp
+  include/dd/GateMatrixDefinitions.hpp
+  include/dd/MDDPackage.hpp
+  include/dd/UnaryComputeTable.hpp
+  include/dd/UniqueTable.hpp)
 
 # add options and warnings to library
 target_link_libraries(${PROJECT_NAME} INTERFACE project_options project_warnings)
@@ -69,8 +69,8 @@ add_library(MQT::DDPackage ALIAS ${PROJECT_NAME})
 # add test code
 option(BUILD_DD_PACKAGE_TESTS "Also build tests for DD package")
 if(BUILD_DD_PACKAGE_TESTS)
-    check_submodule_present(googletest)
-    enable_testing()
-    include(GoogleTest)
-    add_subdirectory(test)
+  check_submodule_present(googletest)
+  enable_testing()
+  include(GoogleTest)
+  add_subdirectory(test)
 endif()
