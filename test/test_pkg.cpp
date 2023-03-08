@@ -379,44 +379,161 @@ TEST(DDPackageTest, Multiplication) {
   // hState), 0.5, dd::ComplexTable<>::tolerance());
 }
 
-/*
-TEST(DDPackageTest, QutritGHZ) {
+TEST(DDPackageTest, QutritBellState) {
+  auto dd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{3, 3});
+  EXPECT_EQ(dd->qregisters(), 2);
+  // Gates
+  auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3, 2, 0);
 
-  auto dd = std::make_unique<dd::MDDPackage>(3,
-std::vector<std::size_t>{3,3,3}); EXPECT_EQ(dd->qregisters(), 3);
+  dd::Controls control01{{0, 1}};
+  auto ctrlx1Gate = dd->makeGateDD<dd::TritMatrix>(dd::X3, 2, control01, 1);
 
-  auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3, 3, 0);
+  dd::Controls control02{{0, 2}};
+  auto ctrlx2Gate = dd->makeGateDD<dd::TritMatrix>(dd::X3, 2, control02, 1);
 
-  dd::Controls control0{{0, 1}};
-  auto ctrlx1Gate = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control0 , 1);
+  // Final Unitary
+  auto op = dd->multiply(ctrlx1Gate, h3Gate);
+  op = dd->multiply(ctrlx2Gate, op);
+  op = dd->multiply(ctrlx2Gate, op);
 
-  dd::Controls control1{{1, 1}};
-  auto ctrlx2Gate = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control1 , 2);
+  // Evolution
+  auto evolution = dd->makeZeroState(2);
 
-  auto zeroState = dd->makeZeroState(3);
-
-  auto evolution = dd->multiply(h3Gate, zeroState);
-
-  std::cout<<"\n"<<std::endl;
+  std::cout << "\n" << std::endl;
   dd->printVector(evolution);
 
+  evolution = dd->multiply(op, evolution);
+
+  std::cout << "\n" << std::endl;
+  dd->printVector(evolution);
+
+  auto basis00State = dd->makeBasisState(2, {0, 0});
+  auto basis11State = dd->makeBasisState(2, {1, 1});
+  auto basis22State = dd->makeBasisState(2, {2, 2});
+
+  ASSERT_NEAR(dd->fidelity(basis00State, evolution), 0.3333333333333333,
+              dd::ComplexTable<>::tolerance());
+  ASSERT_NEAR(dd->fidelity(basis11State, evolution), 0.3333333333333333,
+              dd::ComplexTable<>::tolerance());
+  ASSERT_NEAR(dd->fidelity(basis22State, evolution), 0.3333333333333333,
+              dd::ComplexTable<>::tolerance());
+
+  // Evolution gate times state
+
+  evolution = dd->makeZeroState(2);
+
+  evolution = dd->multiply(h3Gate, evolution);
   evolution = dd->multiply(ctrlx1Gate, evolution);
-
-  std::cout<<"\n"<<std::endl;
-  dd->printVector(evolution);
-
+  evolution = dd->multiply(ctrlx2Gate, evolution);
   evolution = dd->multiply(ctrlx2Gate, evolution);
 
-
-  auto basis111State = dd->makeBasisState(3, {1,1,1});
-
-  ASSERT_EQ(dd->fidelity(zeroState, evolution), 0.33333);
-  //ASSERT_EQ(dd->fidelity(evolution, basis110State), 1.0);
-  // repeat the same calculation - triggering compute table hit
-  //ASSERT_EQ(dd->fidelity(zeroState, oneState), 0.0);
-  //ASSERT_NEAR(dd->fidelity(zeroState, hState), 0.5,
-dd::ComplexTable<>::tolerance());
-  //ASSERT_NEAR(dd->fidelity(oneState, hState), 0.5,
-dd::ComplexTable<>::tolerance());
+  ASSERT_NEAR(dd->fidelity(basis00State, evolution), 0.3333333333333333,
+              dd::ComplexTable<>::tolerance());
+  ASSERT_NEAR(dd->fidelity(basis11State, evolution), 0.3333333333333333,
+              dd::ComplexTable<>::tolerance());
+  ASSERT_NEAR(dd->fidelity(basis22State, evolution), 0.3333333333333333,
+              dd::ComplexTable<>::tolerance());
 }
- */
+
+TEST(DDPackageTest, GHZQutritState) {
+  auto dd =
+      std::make_unique<dd::MDDPackage>(3, std::vector<std::size_t>{3, 3, 3});
+  EXPECT_EQ(dd->qregisters(), 3);
+  // Gates
+  auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3, 3, 0);
+
+  dd::Controls control01{{0, 1}};
+  auto cX011 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control01, 1);
+  dd::Controls control02{{0, 2}};
+  auto cX021 = dd->makeGateDD<dd::TritMatrix>(dd::X3dag, 3, control02, 1);
+
+  dd::Controls control011{{0, 1}, {1, 1}};
+  auto cXc01l1t2 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control011, 2);
+  dd::Controls control012{{0, 2}, {1, 2}};
+  auto cX0122 = dd->makeGateDD<dd::TritMatrix>(dd::X3dag, 3, control012, 2);
+
+  auto testvec = dd->getVectorizedMatrix(cX0122);
+
+  // Evolution
+  auto evolution = dd->makeZeroState(3);
+
+  std::cout << "\n" << std::endl;
+  dd->printVector(evolution);
+
+  evolution = dd->multiply(h3Gate, evolution);
+
+  evolution = dd->multiply(cX011, evolution);
+  evolution = dd->multiply(cX021, evolution);
+
+  std::cout << "\n" << std::endl;
+  dd->printVector(evolution);
+
+  evolution = dd->multiply(cXc01l1t2, evolution);
+  std::cout << "\n" << std::endl;
+  dd->printVector(evolution);
+
+  evolution = dd->multiply(cX0122, evolution);
+
+  std::cout << "\n" << std::endl;
+  dd->printVector(evolution);
+
+  auto basis00State = dd->makeBasisState(3, {0, 0, 0});
+  auto basis11State = dd->makeBasisState(3, {1, 1, 1});
+  auto basis22State = dd->makeBasisState(3, {2, 2, 2});
+
+  ASSERT_NEAR(dd->fidelity(basis00State, evolution), 0.3333333333333333,
+              dd::ComplexTable<>::tolerance());
+  ASSERT_NEAR(dd->fidelity(basis11State, evolution), 0.3333333333333333,
+              dd::ComplexTable<>::tolerance());
+  ASSERT_NEAR(dd->fidelity(basis22State, evolution), 0.3333333333333333,
+              dd::ComplexTable<>::tolerance());
+}
+
+TEST(DDPackageTest, GHZQutritStateScaled) {
+  for (auto i = 2U; i < 129U; i++) {
+    std::vector<std::size_t> init(i, 3);
+    auto dd = std::make_unique<dd::MDDPackage>(i, init);
+    EXPECT_EQ(dd->qregisters(), i);
+
+    // Gates
+    auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3, i, 0);
+    std::vector<dd::MDDPackage::mEdge> gates = {};
+
+    for (auto target = 1U; target < i; target++) {
+      dd::Controls target1{};
+      dd::Controls target2{};
+
+      for (auto control = 0U; control < target; control++) {
+        const dd::Control c1{static_cast<dd::QuantumRegister>(control), 1};
+        const dd::Control c2{static_cast<dd::QuantumRegister>(control), 2};
+        target1.insert(c1);
+        target2.insert(c2);
+      }
+
+      gates.push_back(
+          dd->makeGateDD<dd::TritMatrix>(dd::X3, i, target1, target));
+      gates.push_back(
+          dd->makeGateDD<dd::TritMatrix>(dd::X3dag, i, target2, target));
+    }
+
+    auto evolution = dd->makeZeroState(i);
+    evolution = dd->multiply(h3Gate, evolution);
+
+    for (auto& gate : gates) {
+      evolution = dd->multiply(gate, evolution);
+    }
+    // std::cout<<"\n"<<std::endl;
+    // dd->printVector(evolution);
+
+    auto basis00State = dd->makeBasisState(i, std::vector<size_t>(i, 0));
+    auto basis11State = dd->makeBasisState(i, std::vector<size_t>(i, 1));
+    auto basis22State = dd->makeBasisState(i, std::vector<size_t>(i, 2));
+
+    ASSERT_NEAR(dd->fidelity(basis00State, evolution), 0.3333333333333333,
+                dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(basis11State, evolution), 0.3333333333333333,
+                dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(basis22State, evolution), 0.3333333333333333,
+                dd::ComplexTable<>::tolerance());
+  }
+}

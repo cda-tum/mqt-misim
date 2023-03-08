@@ -249,10 +249,13 @@ class MDDPackage {
     }
 
     // actual normalization of the edges
+    // TODO CHECK IF CHANGE MADE IN THE CACHED IF IS CORRECT
     for (auto i = 0UL; i < edge.nextNode->edges.size(); ++i) {
       if (i != argMax) {
         auto& iEdge = edge.nextNode->edges.at(i);
-        if (cached) {
+
+        if (cached &&
+            iEdge.weight != Complex::zero) {  // TODO CHECK EXACTLY HERE
           complexNumber.returnToCache(iEdge.weight);
           ComplexNumbers::div(iEdge.weight, iEdge.weight, currentEdge.weight);
           iEdge.weight = complexNumber.lookup(iEdge.weight);
@@ -523,19 +526,21 @@ class MDDPackage {
 
           if (currentControl != controls.end() &&
               currentControl->quantumRegister == currentReg) {
-            // TODO TAKE CARE OF PATTERNS, OR LIMIT WHERE THEY CAN PUT
-            // CONTROLS
-
             if (rowMat == colMat) {
               for (auto i = 0U; i < radix; i++) {
                 auto diagInd = i * radix + i;
+
                 if (i == currentControl->type) {
                   quadEdges.at(diagInd) = edgesMat.at(entryPos);
                 } else {
-                  quadEdges.at(diagInd) = mEdge::one;
+                  quadEdges.at(diagInd) =
+                      makeIdent(static_cast<QuantumRegister>(start),
+                                static_cast<QuantumRegister>(currentReg - 1));
                 }
               }
-            } else {
+            }
+
+            else {
               quadEdges.at(currentControl->type +
                            radix * currentControl->type) =
                   edgesMat.at(entryPos);
@@ -774,7 +779,9 @@ class MDDPackage {
     }
 
     // constexpr std::size_t     N = std::tuple_size_v<decltype(x.p->e)>;
-    std::vector<Edge<Node>> edgeSum{};
+    // TODO CHECK HERE IF MAKES SENSE
+    std::vector<Edge<Node>> edgeSum(x.nextNode->edges.size(),
+                                    dd::Edge<Node>::zero);
 
     for (auto i = 0U; i < x.nextNode->edges.size(); i++) {
       Edge<Node> e1{};
@@ -905,8 +912,10 @@ class MDDPackage {
 
       auto resEdgeInit = ResultEdge{
           lookupResult.nextNode, complexNumber.getCached(lookupResult.weight)};
+
       ComplexNumbers::mul(resEdgeInit.weight, resEdgeInit.weight, x.weight);
       ComplexNumbers::mul(resEdgeInit.weight, resEdgeInit.weight, y.weight);
+
       if (resEdgeInit.weight.approximatelyZero()) {
         complexNumber.returnToCache(resEdgeInit.weight);
         return ResultEdge::zero;
@@ -945,7 +954,7 @@ class MDDPackage {
       if constexpr (std::is_same_v<RightOperandNode, mNode>) {
         // additionally check if y is the identity in case of matrix
         // multiplication
-        if (y.nextNode->ident) {
+        if (y.nextNode->identity) {
           resultEdge = xCopy;
           computeTable.insert(xCopy, yCopy,
                               {resultEdge.nextNode, resultEdge.weight});
@@ -961,19 +970,26 @@ class MDDPackage {
     }
 
     // TODO CHECK AGAIN THIS COULD BE WRONG
-    const std::size_t rows = registersSizes.at(x.nextNode->varIndx);
-    const std::size_t cols = (std::is_same_v<RightOperandNode, mNode>)
-                                 ? registersSizes.at(y.nextNode->varIndx)
-                                 : 1U;
+    const std::size_t rows =
+        x.isTerminal() ? 1U : registersSizes.at(x.nextNode->varIndx);
+    const std::size_t cols =
+        (std::is_same_v<RightOperandNode, mNode>)
+            ? y.isTerminal() ? 1U : registersSizes.at(y.nextNode->varIndx)
+            : 1U;
+    const std::size_t multiplicationBoundary =
+        x.isTerminal()
+            ? (y.isTerminal() ? 1U : registersSizes.at(y.nextNode->varIndx))
+            : registersSizes.at(x.nextNode->varIndx);
 
-    std::vector<ResultEdge> edge(rows * cols, ResultEdge::zero);
+    std::vector<ResultEdge> edge(multiplicationBoundary * cols,
+                                 ResultEdge::zero);
 
     for (auto i = 0U; i < rows; i++) {
       for (auto j = 0U; j < cols; j++) {
         auto idx = cols * i + j;
         // edge.at(idx) = ResultEdge::zero;
 
-        for (auto k = 0U; k < rows; k++) {
+        for (auto k = 0U; k < multiplicationBoundary; k++) {
           LEdge e1{};
           if (!x.isTerminal() && x.nextNode->varIndx == var) {
             e1 = x.nextNode->edges.at(rows * i + k);
@@ -1221,27 +1237,56 @@ class MDDPackage {
     return vec;
   }
 
-  void getVector(const vEdge& edge, const Complex& amp, std::size_t i, CVec& vec, std::size_t next) {
-            // calculate new accumulated amplitude
-            auto cNumb = complexNumber.mulCached(edge.weight, amp);
+  CVec getVectorizedMatrix(const mEdge& edge) {
+    unsigned long dim = 1U;
 
-            // base case
-            if (edge.isTerminal()) {
-              vec.at(i) = {CTEntry::val(cNumb.real), CTEntry::val(cNumb.img)};
-              complexNumber.returnToCache(cNumb);
-              return;
-            }
+    for (auto i = 0U; i < registersSizes.size(); i++) {
+      dim = dim * registersSizes.at(i) * registersSizes.at(i);
+    }
+    // allocate resulting vector
+    auto vec = CVec(dim, {0.0, 0.0});
+    getVector(edge, Complex::one, 0, vec, dim);
+    return vec;
+  }
 
-            auto offset = (next - i) / edge.nextNode->edges.size();
+  template <class Node>
+  void getVector(const Edge<Node>& edge, const Complex& amp, std::size_t i,
+                 CVec& vec, std::size_t next,
+                 std::vector<unsigned long long> pathTracker = {}) {
+    // calculate new accumulated amplitude
+    auto cNumb = complexNumber.mulCached(edge.weight, amp);
+
+    // base case
+    if (edge.isTerminal()) {
+      if (std::is_same<Node, mNode>::value) {
+        for (auto i = 0ULL; i < pathTracker.size(); i++) {
+          std::cout << pathTracker.at(i);
+        }
+        std::cout << ": ";
+        std::cout << cNumb << std::endl;
+      }
+      vec.at(i) = {CTEntry::val(cNumb.real), CTEntry::val(cNumb.img)};
+      complexNumber.returnToCache(cNumb);
+      return;
+    }
+
+    auto offset = (next - i) / edge.nextNode->edges.size();
 
             for (auto k = 0L; k < edge.nextNode->edges.size(); k++) {
-              if (!edge.nextNode->edges.at(k).weight.approximatelyZero()) {
-                getVector(edge.nextNode->edges.at(k), cNumb, i + (k * offset),
-                          vec, i + ((k + 1) * offset));
-              }
-            }
+      if (std::is_same<Node, mNode>::value) {
+        pathTracker.push_back(k);
+        getVector(edge.nextNode->edges.at(k), cNumb, i + (k * offset), vec,
+                  i + ((k + 1) * offset), pathTracker);
+        pathTracker.pop_back();
+      } else {
+        if (!edge.nextNode->edges.at(k).weight.approximatelyZero()) {
+          getVector(edge.nextNode->edges.at(k), cNumb, i + (k * offset), vec,
+                    i + ((k + 1) * offset));
+        }
+      }
+    }
 
-            complexNumber.returnToCache(cNumb);
+    complexNumber.returnToCache(cNumb);
         }
 
         std::vector<unsigned long> getReprOfIndex(
@@ -1293,6 +1338,19 @@ class MDDPackage {
                       << ComplexValue::toString(amplitude.r, amplitude.i, false,
                                                 precision)
                       << "\n";
+          }
+          std::cout << std::flush;
+        }
+
+        void printComplexVector(const CVec vector) {
+          for (auto i = 0ULL; i < vector.size(); i++) {
+            std::cout << i;
+
+            constexpr auto precision = 3;
+            // set fixed width to maximum of a printed number
+            // (-) 0.precision plus/minus 0.precision i
+            constexpr auto width = 1 + 2 + precision + 1 + 2 + precision + 1;
+            std::cout << ": " << std::setw(width) << vector.at(i) << "\n";
           }
           std::cout << std::flush;
         }
