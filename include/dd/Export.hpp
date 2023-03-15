@@ -164,21 +164,21 @@ static std::ostream &header(const Edge &e, std::ostream &os, bool edgeLabels,
   os << "t [label=<<font "
         "point-size=\"20\">1</"
         "font>>,shape=box,tooltip=\"1\",width=0.3,height=0.3]\n";
-  auto toplabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >> 1U;
+  auto toplabel = (reinterpret_cast<std::uintptr_t>(e.nextNode) & 0x001fffffU) >> 1U;
   os << "root->";
   if (e.isTerminal()) {
-    os << "t";
+      os << "t";
   } else {
-    os << toplabel;
+      os << toplabel;
   }
-  os << "[penwidth=\"" << thicknessFromMagnitude(e.w) << "\",tooltip=\""
-     << conditionalFormat(e.w, formatAsPolar) << "\"";
-  if (!e.w.approximatelyOne()) {
-    os << ",style=dashed";
+  os << "[penwidth=\"" << thicknessFromMagnitude(e.weight) << "\",tooltip=\""
+     << conditionalFormat(e.weight, formatAsPolar) << "\"";
+  if (!e.weight.approximatelyOne()) {
+      os << ",style=dashed";
   }
   if (edgeLabels) {
-    os << ",label=<<font point-size=\"8\">&nbsp;"
-       << conditionalFormat(e.w, formatAsPolar) << "</font>>";
+      os << ",label=<<font point-size=\"8\">&nbsp;"
+         << conditionalFormat(e.weight, formatAsPolar) << "</font>>";
   }
 
   os << "]\n";
@@ -189,115 +189,115 @@ static std::ostream &header(const Edge &e, std::ostream &os, bool edgeLabels,
 template <class Edge>
 static std::ostream &coloredHeader(const Edge &e, std::ostream &os,
                                    bool edgeLabels, bool formatAsPolar = true) {
-  os << "digraph \"DD\" {graph[];node[shape=plain];edge[arrowhead=none]\n";
-  os << "root [label=\"\",shape=point,style=invis]\n";
-  os << "t [label=<<font "
-        "point-size=\"20\">1</"
-        "font>>,shape=box,tooltip=\"1\",width=0.3,height=0.3]\n";
+    os << "digraph \"DD\" {graph[];node[shape=plain];edge[arrowhead=none]\n";
+    os << "root [label=\"\",shape=point,style=invis]\n";
+    os << "t [label=<<font "
+          "point-size=\"20\">1</"
+          "font>>,shape=box,tooltip=\"1\",width=0.3,height=0.3]\n";
 
-  auto toplabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >> 1U;
-  auto mag = thicknessFromMagnitude(e.w);
-  auto color = colorFromPhase(e.w);
-  os << "root->";
-  if (e.isTerminal()) {
-    os << "t";
-  } else {
-    os << toplabel;
-  }
-  os << "[penwidth=\"" << mag << "\",tooltip=\""
-     << conditionalFormat(e.w, formatAsPolar) << "\",color=\"" << color << "\"";
-  if (edgeLabels) {
-    os << ",label=<<font point-size=\"8\">&nbsp;"
-       << conditionalFormat(e.w, formatAsPolar) << "</font>>";
-  }
-  os << "]\n";
-  return os;
+    auto toplabel = (reinterpret_cast<std::uintptr_t>(e.nextNode) & 0x001fffffU) >> 1U;
+    auto mag      = thicknessFromMagnitude(e.weight);
+    auto color    = colorFromPhase(e.weight);
+    os << "root->";
+    if (e.isTerminal()) {
+        os << "t";
+    } else {
+        os << toplabel;
+    }
+    os << "[penwidth=\"" << mag << "\",tooltip=\""
+       << conditionalFormat(e.weight, formatAsPolar) << "\",color=\"" << color << "\"";
+    if (edgeLabels) {
+        os << ",label=<<font point-size=\"8\">&nbsp;"
+           << conditionalFormat(e.weight, formatAsPolar) << "</font>>";
+    }
+    os << "]\n";
+    return os;
 }
 
 template <class Edge>
 static std::ostream &memoryHeader(const Edge &e, std::ostream &os,
                                   bool edgeLabels) {
-  os << "digraph \"DD\" {graph[];node[shape=plain];edge[arrowhead=none]\n";
-  os << "root [label=\"\",shape=point,style=invis]\n";
-  os << "t [label=<<font "
-        "point-size=\"20\">1</"
-        "font>>,shape=box,tooltip=\"1\",width=0.3,height=0.3]\n";
+    os << "digraph \"DD\" {graph[];node[shape=plain];edge[arrowhead=none]\n";
+    os << "root [label=\"\",shape=point,style=invis]\n";
+    os << "t [label=<<font "
+          "point-size=\"20\">1</"
+          "font>>,shape=box,tooltip=\"1\",width=0.3,height=0.3]\n";
 
-  auto toplabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >> 1U;
-  auto mag = thicknessFromMagnitude(e.w);
-  auto color = colorFromPhase(e.w);
-  os << "root->";
-  if (e.isTerminal()) {
-    os << "t";
-  } else {
-    os << toplabel;
-  }
-  os << "[penwidth=\"" << mag << "\",tooltip=\"" << e.w.toString(false, 4)
-     << "\" color=\"" << color << "\"";
-  if (edgeLabels) {
-    os << ",label=<<font point-size=\"8\">&nbsp;[";
-    if (e.w == Complex::zero) {
-      os << "0";
-    } else if (e.w == Complex::one) {
-      os << "1";
+    auto toplabel = (reinterpret_cast<std::uintptr_t>(e.nextNode) & 0x001fffffU) >> 1U;
+    auto mag      = thicknessFromMagnitude(e.weight);
+    auto color    = colorFromPhase(e.weight);
+    os << "root->";
+    if (e.isTerminal()) {
+        os << "t";
     } else {
-      if (e.w.r == &ComplexTable<>::zero) {
-        os << "0";
-      } else if (e.w.r == &ComplexTable<>::sqrt2_2) {
-        os << u8"\u221a\u00bd";
-      } else if (e.w.r == &ComplexTable<>::one) {
-        os << "1";
-      } else {
-        os << std::hex << reinterpret_cast<std::uintptr_t>(e.w.r) << std::dec;
-                }
-                os << " ";
-                if (e.w.i == &ComplexTable<>::zero) {
-                    os << "0";
-                } else if (e.w.i == &ComplexTable<>::sqrt2_2) {
-                  os << u8"\u221a\u00bd";
-                } else if (e.w.i == &ComplexTable<>::one) {
-                  os << "1";
-                } else {
-                  os << std::hex << reinterpret_cast<std::uintptr_t>(e.w.i)
-                     << std::dec;
-                }
+        os << toplabel;
     }
-    os << "]</font>>";
-  }
-  os << "]\n";
-  return os;
+    os << "[penwidth=\"" << mag << "\",tooltip=\"" << e.weight.toString(false, 4)
+       << "\" color=\"" << color << "\"";
+    if (edgeLabels) {
+        os << ",label=<<font point-size=\"8\">&nbsp;[";
+        if (e.weight == Complex::zero) {
+            os << "0";
+        } else if (e.weight == Complex::one) {
+            os << "1";
+        } else {
+            if (e.weight.real == &ComplexTable<>::zero) {
+                os << "0";
+            } else if (e.weight.real == &ComplexTable<>::sqrt2_2) {
+                os << u8"\u221a\u00bd";
+            } else if (e.weight.real == &ComplexTable<>::one) {
+                os << "1";
+            } else {
+                os << std::hex << reinterpret_cast<std::uintptr_t>(e.weight.real) << std::dec;
+            }
+            os << " ";
+            if (e.weight.img == &ComplexTable<>::zero) {
+                os << "0";
+            } else if (e.weight.img == &ComplexTable<>::sqrt2_2) {
+                os << u8"\u221a\u00bd";
+            } else if (e.weight.img == &ComplexTable<>::one) {
+                os << "1";
+            } else {
+                os << std::hex << reinterpret_cast<std::uintptr_t>(e.weight.img)
+                   << std::dec;
+            }
+        }
+        os << "]</font>>";
+    }
+    os << "]\n";
+    return os;
 }
 
 [[maybe_unused]] static std::ostream& modernNode(const MDDPackage::mEdge& e,
                                                  std::ostream&            os,
                                                  bool                     formatAsPolar = true) {
-    auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >>
+    auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.nextNode) & 0x001fffffU) >>
                      1U; // this allows for 2^20 (roughly 1e6) unique nodes
     os << nodelabel << "[label=<";
     os << R"(<font point-size="10"><table border="1" cellspacing="0" cellpadding="2" style="rounded">)";
     os << R"(<tr><td colspan="2" rowspan="2" port="0" href="javascript:;" border="0" tooltip=")"
-       << conditionalFormat(e.p->e[0].w, formatAsPolar) << "\">"
-       << (e.p->e[0].w.approximatelyZero() ? "&nbsp;0 " : "<font color=\"white\">&nbsp;0 </font>")
+       << conditionalFormat(e.nextNode->edges[0].weight, formatAsPolar) << "\">"
+       << (e.nextNode->edges[0].weight.approximatelyZero() ? "&nbsp;0 " : "<font color=\"white\">&nbsp;0 </font>")
        << R"(</td><td sides="R"></td><td sides="L"></td>)"
        << R"(<td colspan="2" rowspan="2" port="1" href="javascript:;" border="0" tooltip=")"
-       << conditionalFormat(e.p->e[1].w, formatAsPolar) << "\">"
-       << (e.p->e[1].w.approximatelyZero() ? "&nbsp;0 " : "<font color=\"white\">&nbsp;0 </font>")
+       << conditionalFormat(e.nextNode->edges[1].weight, formatAsPolar) << "\">"
+       << (e.nextNode->edges[1].weight.approximatelyZero() ? "&nbsp;0 " : "<font color=\"white\">&nbsp;0 </font>")
        << R"(</td></tr>)";
     os << R"(<tr><td sides="R"></td><td sides="L"></td></tr>)";
     os << R"(<tr><td colspan="2" sides="B"></td><td colspan="2" rowspan="2" border="0"><font point-size="24">q<sub><font point-size="16">)"
-       << static_cast<std::size_t>(e.p->v)
+       << static_cast<std::size_t>(e.nextNode->varIndx)
        << R"(</font></sub></font></td><td colspan="2" sides="B"></td></tr>)";
     os << R"(<tr><td sides="T" colspan="2"></td><td sides="T" colspan="2"></td></tr>)";
     os << R"(<tr><td colspan="2" rowspan="2" port="2" href="javascript:;" border="0" tooltip=")"
-       << conditionalFormat(e.p->e[2].w, formatAsPolar) << "\">"
-       << (e.p->e[2].w.approximatelyZero() ? "&nbsp;0 " : "<font color=\"white\">&nbsp;0 </font>")
+       << conditionalFormat(e.nextNode->edges[2].weight, formatAsPolar) << "\">"
+       << (e.nextNode->edges[2].weight.approximatelyZero() ? "&nbsp;0 " : "<font color=\"white\">&nbsp;0 </font>")
        << R"(</td><td sides="R"></td><td sides="L"></td>)"
        << R"(<td colspan="2" rowspan="2" port="3" href="javascript:;" border="0" tooltip=")"
-       << conditionalFormat(e.p->e[3].w, formatAsPolar) << "\">"
-       << (e.p->e[3].w.approximatelyZero() ? "&nbsp;0 " : "<font color=\"white\">&nbsp;0 </font>")
+       << conditionalFormat(e.nextNode->edges[3].weight, formatAsPolar) << "\">"
+       << (e.nextNode->edges[3].weight.approximatelyZero() ? "&nbsp;0 " : "<font color=\"white\">&nbsp;0 </font>")
        << "</td></tr>";
     os << R"(<tr><td sides="R"></td><td sides="L"></td></tr>)";
-    os << "</table></font>>,tooltip=\"q" << static_cast<std::size_t>(e.p->v)
+    os << "</table></font>>,tooltip=\"q" << static_cast<std::size_t>(e.nextNode->varIndx)
        << "\"]\n";
     return os;
 }
@@ -305,24 +305,24 @@ static std::ostream &memoryHeader(const Edge &e, std::ostream &os,
 [[maybe_unused]] static std::ostream& modernNode(const MDDPackage::vEdge& e,
                                                  std::ostream&            os,
                                                  bool                     formatAsPolar = true) {
-    auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >>
+    auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.nextNode) & 0x001fffffU) >>
                      1U; // this allows for 2^20 (roughly 1e6) unique nodes
     os << nodelabel << "[label=<";
     os << R"(<font point-size="8"><table border="1" cellspacing="0" cellpadding="0" style="rounded">)";
     os << R"(<tr><td colspan="2" border="0" cellpadding="1"><font point-size="20">q<sub><font point-size="12">)"
-       << static_cast<std::size_t>(e.p->v)
+       << static_cast<std::size_t>(e.nextNode->varIndx)
        << R"(</font></sub></font></td></tr><tr>)";
     os << R"(<td height="6" width="14" port="0" tooltip=")"
-       << conditionalFormat(e.p->e[0].w, formatAsPolar)
+       << conditionalFormat(e.nextNode->edges[0].weight, formatAsPolar)
        << R"(" href="javascript:;" sides="RT">)"
-       << (e.p->e[0].w.approximatelyZero() ? "&nbsp;0 " : R"(<font color="white">&nbsp;0 </font>)")
+       << (e.nextNode->edges[0].weight.approximatelyZero() ? "&nbsp;0 " : R"(<font color="white">&nbsp;0 </font>)")
        << "</td>";
     os << R"(<td height="6" width="14" port="1" tooltip=")"
-       << conditionalFormat(e.p->e[1].w, formatAsPolar)
+       << conditionalFormat(e.nextNode->edges[1].weight, formatAsPolar)
        << R"(" href="javascript:;" sides="LT">)"
-       << (e.p->e[1].w.approximatelyZero() ? "&nbsp;0 " : R"(<font color="white">&nbsp;0 </font>)")
+       << (e.nextNode->edges[1].weight.approximatelyZero() ? "&nbsp;0 " : R"(<font color="white">&nbsp;0 </font>)")
        << "</td>";
-    os << "</tr></table></font>>,tooltip=\"q" << static_cast<std::size_t>(e.p->v)
+    os << "</tr></table></font>>,tooltip=\"q" << static_cast<std::size_t>(e.nextNode->varIndx)
        << "\"]\n";
     return os;
 }
@@ -330,17 +330,17 @@ static std::ostream &memoryHeader(const Edge &e, std::ostream &os,
 [[maybe_unused]] static std::ostream& classicNode(const MDDPackage::mEdge& e,
                                                   std::ostream&            os,
                                                   bool                     formatAsPolar = true) {
-    auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >>
+    auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.nextNode) & 0x001fffffU) >>
                      1U; // this allows for 2^20 (roughly 1e6) unique nodes
     os << nodelabel << "[shape=circle, width=0.53, fixedsize=true, label=<";
     os << R"(<font point-size="6"><table border="0" cellspacing="0" cellpadding="0">)";
     os << R"(<tr><td colspan="4"><font point-size="18">q<sub><font point-size="10">)"
-       << static_cast<std::size_t>(e.p->v)
+       << static_cast<std::size_t>(e.nextNode->varIndx)
        << R"(</font></sub></font></td></tr><tr>)";
     os << R"(<td port="0" tooltip=")"
-       << conditionalFormat(e.p->e[0].w, formatAsPolar)
+       << conditionalFormat(e.nextNode->edges[0].weight, formatAsPolar)
        << R"(" href="javascript:;">)";
-    if (e.p->e[0].w.approximatelyZero()) {
+    if (e.nextNode->edges[0].weight.approximatelyZero()) {
         os << R"(<font point-size="8">&nbsp;0 </font>)";
     } else {
         os << R"(<font color="white">&nbsp;0 </font>)";
@@ -348,97 +348,97 @@ static std::ostream &memoryHeader(const Edge &e, std::ostream &os,
     os << "</td>";
     os << "<td></td><td></td>";
     os << R"(<td port="3" tooltip=")"
-       << conditionalFormat(e.p->e[3].w, formatAsPolar)
+       << conditionalFormat(e.nextNode->edges[3].weight, formatAsPolar)
        << R"(" href="javascript:;">)";
-    if (e.p->e[3].w.approximatelyZero()) {
+    if (e.nextNode->edges[3].weight.approximatelyZero()) {
         os << R"(<font point-size="8">&nbsp;0 </font>)";
     } else {
         os << R"(<font color="white">&nbsp;0 </font>)";
     }
     os << "</td>";
     os << "</tr><tr><td></td>";
-    os << R"(<td port="1" tooltip=")" << conditionalFormat(e.p->e[1].w, formatAsPolar)
+    os << R"(<td port="1" tooltip=")" << conditionalFormat(e.nextNode->edges[1].weight, formatAsPolar)
        << R"(" href="javascript:;">)";
-    if (e.p->e[1].w.approximatelyZero()) {
+    if (e.nextNode->edges[1].weight.approximatelyZero()) {
         os << R"(<font point-size="8">&nbsp;0 </font>)";
     } else {
         os << R"(<font color="white">&nbsp;0 </font>)";
     }
     os << "</td>";
     os << R"(<td port="2" tooltip=")"
-       << conditionalFormat(e.p->e[2].w, formatAsPolar)
+       << conditionalFormat(e.nextNode->edges[2].weight, formatAsPolar)
        << R"(" href="javascript:;">)";
-    if (e.p->e[2].w.approximatelyZero()) {
+    if (e.nextNode->edges[2].weight.approximatelyZero()) {
         os << R"(<font point-size="8">&nbsp;0 </font>)";
     } else {
         os << R"(<font color="white">&nbsp;0 </font>)";
     }
     os << "</td>";
     os << "<td></td></tr></table></font>>,tooltip=\"q"
-       << static_cast<std::size_t>(e.p->v) << "\"]\n";
+       << static_cast<std::size_t>(e.nextNode->varIndx) << "\"]\n";
     return os;
 }
 
 [[maybe_unused]] static std::ostream& classicNode(const MDDPackage::vEdge& e,
                                                   std::ostream&            os,
                                                   bool                     formatAsPolar = true) {
-    auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >>
+    auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.nextNode) & 0x001fffffU) >>
                      1U; // this allows for 2^20 (roughly 1e6) unique nodes
     os << nodelabel << "[shape=circle, width=0.46, fixedsize=true, label=<";
     os << R"(<font point-size="6"><table border="0" cellspacing="0" cellpadding="0">)";
     os << R"(<tr><td colspan="2"><font point-size="18">q<sub><font point-size="10">)"
-       << static_cast<std::size_t>(e.p->v)
+       << static_cast<std::size_t>(e.nextNode->varIndx)
        << R"(</font></sub></font></td></tr><tr>)";
     os << R"(<td port="0" tooltip=")"
-       << conditionalFormat(e.p->e[0].w, formatAsPolar)
+       << conditionalFormat(e.nextNode->edges[0].weight, formatAsPolar)
        << R"(" href="javascript:;">)";
-    if (e.p->e[0].w.approximatelyZero()) {
+    if (e.nextNode->edges[0].weight.approximatelyZero()) {
         os << R"(<font point-size="10">&nbsp;0 </font>)";
     } else {
         os << R"(<font color="white">&nbsp;0 </font>)";
     }
     os << "</td>";
     os << R"(<td port="1" tooltip=")"
-       << conditionalFormat(e.p->e[1].w, formatAsPolar)
+       << conditionalFormat(e.nextNode->edges[1].weight, formatAsPolar)
        << R"(" href="javascript:;">)";
-    if (e.p->e[1].w.approximatelyZero()) {
+    if (e.nextNode->edges[1].weight.approximatelyZero()) {
         os << R"(<font point-size="10">&nbsp;0 </font>)";
     } else {
         os << R"(<font color="white">&nbsp;0 </font>)";
     }
     os << "</td>";
-    os << "</tr></table></font>>,tooltip=\"q" << static_cast<std::size_t>(e.p->v)
+    os << "</tr></table></font>>,tooltip=\"q" << static_cast<std::size_t>(e.nextNode->varIndx)
        << "\"]\n";
     return os;
 }
 
 template <class Edge>
 static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
-  constexpr std::size_t N = std::tuple_size_v<decltype(e.p->e)>;
-  auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >>
-                   1U;  // this allows for 2^20 (roughly 1e6) unique nodes
-  os << nodelabel << "[label=<";
-  os << R"(<font point-size="10"><table border="1" cellspacing="0" cellpadding="2" style="rounded">)";
-  os << R"(<tr><td colspan=")" << N << R"(" border="1" sides="B">)" << std::hex
-     << reinterpret_cast<std::uintptr_t>(e.p) << std::dec
-     << " ref: " << e.p->ref << "</td></tr>";
-  os << "<tr>";
-  for (std::size_t i = 0; i < N; ++i) {
-    os << "<td port=\"" << i << R"(" href="javascript:;" border="0" tooltip=")"
-       << e.p->e[i].w.toString(false, 4) << "\">";
-    if (e.p->e[i] == Edge::zero) {
-      os << "&nbsp;0 "
-            "";
-    } else {
-      os << "<font color=\"white\">&nbsp;0 </font>";
+    constexpr std::size_t N         = std::tuple_size_v<decltype(e.nextNode->edges)>;
+    auto                  nodelabel = (reinterpret_cast<std::uintptr_t>(e.nextNode) & 0x001fffffU) >>
+                     1U; // this allows for 2^20 (roughly 1e6) unique nodes
+    os << nodelabel << "[label=<";
+    os << R"(<font point-size="10"><table border="1" cellspacing="0" cellpadding="2" style="rounded">)";
+    os << R"(<tr><td colspan=")" << N << R"(" border="1" sides="B">)" << std::hex
+       << reinterpret_cast<std::uintptr_t>(e.nextNode) << std::dec
+       << " ref: " << e.nextNode->ref << "</td></tr>";
+    os << "<tr>";
+    for (std::size_t i = 0; i < N; ++i) {
+        os << "<td port=\"" << i << R"(" href="javascript:;" border="0" tooltip=")"
+           << e.nextNode->edges[i].weight.toString(false, 4) << "\">";
+        if (e.nextNode->edges[i] == Edge::zero) {
+            os << "&nbsp;0 "
+                  "";
+        } else {
+            os << "<font color=\"white\">&nbsp;0 </font>";
+        }
+        os << "</td>";
     }
-    os << "</td>";
-  }
-  os << "</tr>";
-  os << "</table></font>>,tooltip=\"" << std::hex
-     << reinterpret_cast<std::uintptr_t>(e.p) << "\"]\n"
-     << std::dec;
-  return os;
+    os << "</tr>";
+    os << "</table></font>>,tooltip=\"" << std::hex
+       << reinterpret_cast<std::uintptr_t>(e.nextNode) << "\"]\n"
+       << std::dec;
+    return os;
 }
 
 [[maybe_unused]] static std::ostream& bwEdge(const MDDPackage::mEdge& from,
@@ -448,8 +448,8 @@ static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
                                              bool classic       = false,
                                              bool formatAsPolar = true) {
     auto fromlabel =
-            (reinterpret_cast<std::uintptr_t>(from.p) & 0x001fffffU) >> 1U;
-    auto tolabel = (reinterpret_cast<std::uintptr_t>(to.p) & 0x001fffffU) >> 1U;
+            (reinterpret_cast<std::uintptr_t>(from.nextNode) & 0x001fffffU) >> 1U;
+    auto tolabel = (reinterpret_cast<std::uintptr_t>(to.nextNode) & 0x001fffffU) >> 1U;
 
     os << fromlabel << ":" << idx << ":";
     if (classic) {
@@ -474,14 +474,14 @@ static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
         os << tolabel;
     }
 
-    auto mag = thicknessFromMagnitude(to.w);
-    os << "[penwidth=\"" << mag << "\",tooltip=\"" << conditionalFormat(to.w, formatAsPolar) << "\"";
-    if (!to.w.approximatelyOne()) {
+    auto mag = thicknessFromMagnitude(to.weight);
+    os << "[penwidth=\"" << mag << "\",tooltip=\"" << conditionalFormat(to.weight, formatAsPolar) << "\"";
+    if (!to.weight.approximatelyOne()) {
         os << ",style=dashed";
     }
     if (edgeLabels) {
         os << ",label=<<font point-size=\"8\">&nbsp;"
-           << conditionalFormat(to.w, formatAsPolar) << "</font>>";
+           << conditionalFormat(to.weight, formatAsPolar) << "</font>>";
     }
     os << "]\n";
 
@@ -493,8 +493,8 @@ static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
         std::ostream& os, bool edgeLabels = false,
         [[maybe_unused]] bool classic = false, bool formatAsPolar = true) {
     auto fromlabel =
-            (reinterpret_cast<std::uintptr_t>(from.p) & 0x001fffffU) >> 1U;
-    auto tolabel = (reinterpret_cast<std::uintptr_t>(to.p) & 0x001fffffU) >> 1U;
+            (reinterpret_cast<std::uintptr_t>(from.nextNode) & 0x001fffffU) >> 1U;
+    auto tolabel = (reinterpret_cast<std::uintptr_t>(to.nextNode) & 0x001fffffU) >> 1U;
 
     os << fromlabel << ":" << idx << ":";
     os << (idx == 0 ? "sw" : "se") << "->";
@@ -504,15 +504,15 @@ static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
         os << tolabel;
     }
 
-    auto mag = thicknessFromMagnitude(to.w);
+    auto mag = thicknessFromMagnitude(to.weight);
     os << "[penwidth=\"" << mag << "\",tooltip=\""
-       << conditionalFormat(to.w, formatAsPolar) << "\"";
-    if (!to.w.approximatelyOne()) {
+       << conditionalFormat(to.weight, formatAsPolar) << "\"";
+    if (!to.weight.approximatelyOne()) {
         os << ",style=dashed";
     }
     if (edgeLabels) {
         os << ",label=<<font point-size=\"8\">&nbsp;"
-           << conditionalFormat(to.w, formatAsPolar) << "</font>>";
+           << conditionalFormat(to.weight, formatAsPolar) << "</font>>";
     }
     os << "]\n";
 
@@ -526,8 +526,8 @@ static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
                                                   bool classic       = false,
                                                   bool formatAsPolar = true) {
     auto fromlabel =
-            (reinterpret_cast<std::uintptr_t>(from.p) & 0x001fffffU) >> 1U;
-    auto tolabel = (reinterpret_cast<std::uintptr_t>(to.p) & 0x001fffffU) >> 1U;
+            (reinterpret_cast<std::uintptr_t>(from.nextNode) & 0x001fffffU) >> 1U;
+    auto tolabel = (reinterpret_cast<std::uintptr_t>(to.nextNode) & 0x001fffffU) >> 1U;
 
     os << fromlabel << ":" << idx << ":";
     if (classic) {
@@ -552,14 +552,14 @@ static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
         os << tolabel;
     }
 
-    auto mag   = thicknessFromMagnitude(to.w);
-    auto color = colorFromPhase(to.w);
+    auto mag   = thicknessFromMagnitude(to.weight);
+    auto color = colorFromPhase(to.weight);
     os << "[penwidth=\"" << mag << "\",tooltip=\""
-       << conditionalFormat(to.w, formatAsPolar) << "\" color=\"" << color
+       << conditionalFormat(to.weight, formatAsPolar) << "\" color=\"" << color
        << "\"";
     if (edgeLabels) {
         os << ",label=<<font point-size=\"8\">&nbsp;"
-           << conditionalFormat(to.w, formatAsPolar) << "</font>>";
+           << conditionalFormat(to.weight, formatAsPolar) << "</font>>";
     }
     os << "]\n";
 
@@ -571,8 +571,8 @@ static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
         std::ostream& os, bool edgeLabels = false,
         [[maybe_unused]] bool classic = false, bool formatAsPolar = true) {
     auto fromlabel =
-            (reinterpret_cast<std::uintptr_t>(from.p) & 0x001fffffU) >> 1U;
-    auto tolabel = (reinterpret_cast<std::uintptr_t>(to.p) & 0x001fffffU) >> 1U;
+            (reinterpret_cast<std::uintptr_t>(from.nextNode) & 0x001fffffU) >> 1U;
+    auto tolabel = (reinterpret_cast<std::uintptr_t>(to.nextNode) & 0x001fffffU) >> 1U;
 
     os << fromlabel << ":" << idx << ":";
     os << (idx == 0 ? "sw" : "se") << "->";
@@ -582,14 +582,14 @@ static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
         os << tolabel;
     }
 
-    auto mag   = thicknessFromMagnitude(to.w);
-    auto color = colorFromPhase(to.w);
+    auto mag   = thicknessFromMagnitude(to.weight);
+    auto color = colorFromPhase(to.weight);
     os << "[penwidth=\"" << mag << "\",tooltip=\""
-       << conditionalFormat(to.w, formatAsPolar) << "\" color=\"" << color
+       << conditionalFormat(to.weight, formatAsPolar) << "\" color=\"" << color
        << "\"";
     if (edgeLabels) {
         os << ",label=<<font point-size=\"8\">&nbsp;"
-           << conditionalFormat(to.w, formatAsPolar) << "</font>>";
+           << conditionalFormat(to.weight, formatAsPolar) << "</font>>";
     }
     os << "]\n";
 
@@ -599,54 +599,54 @@ static std::ostream &memoryNode(const Edge &e, std::ostream &os) {
 template <class Edge>
 static std::ostream &memoryEdge(const Edge &from, const Edge &to, short idx,
                                 std::ostream &os, bool edgeLabels = false) {
-  auto fromlabel =
-      (reinterpret_cast<std::uintptr_t>(from.p) & 0x001fffffU) >> 1U;
-  auto tolabel = (reinterpret_cast<std::uintptr_t>(to.p) & 0x001fffffU) >> 1U;
+    auto fromlabel =
+            (reinterpret_cast<std::uintptr_t>(from.nextNode) & 0x001fffffU) >> 1U;
+    auto tolabel = (reinterpret_cast<std::uintptr_t>(to.nextNode) & 0x001fffffU) >> 1U;
 
-  os << fromlabel << ":" << idx << ":s->";
-  if (to.isTerminal()) {
-    os << "t";
-  } else {
-    os << tolabel;
-  }
-
-  auto mag = thicknessFromMagnitude(to.w);
-  auto color = colorFromPhase(to.w);
-  os << "[penwidth=\"" << mag << "\",tooltip=\"" << to.w.toString(false, 4)
-     << "\" color=\"" << color << "\"";
-  if (edgeLabels) {
-    os << ",label=<<font point-size=\"8\">&nbsp;[";
-    if (to.w == Complex::one) {
-      os << "1";
+    os << fromlabel << ":" << idx << ":s->";
+    if (to.isTerminal()) {
+        os << "t";
     } else {
-      if (to.w.r == &ComplexTable<>::zero) {
-        os << "0";
-      } else if (to.w.r == &ComplexTable<>::sqrt2_2) {
-        os << u8"\u221a\u00bd";
-      } else if (to.w.r == &ComplexTable<>::one) {
-        os << "1";
-                } else {
-                    os << std::hex << reinterpret_cast<std::uintptr_t>(to.w.r) << std::dec;
-                }
-                os << " ";
-                if (to.w.i == &ComplexTable<>::zero) {
-                    os << "0";
-                } else if (to.w.i == &ComplexTable<>::sqrt2_2) {
-                    os << u8"\u221a\u00bd";
-                } else if (to.w.i == &ComplexTable<>::one) {
-                    os << "1";
-                } else {
-                    os << std::hex << reinterpret_cast<std::uintptr_t>(to.w.i) << std::dec;
-                }
-            }
-            os << "]</font>>";
-        }
-        os << "]\n";
-
-        return os;
+        os << tolabel;
     }
 
-    template <class Edge>
+    auto mag   = thicknessFromMagnitude(to.weight);
+    auto color = colorFromPhase(to.weight);
+    os << "[penwidth=\"" << mag << "\",tooltip=\"" << to.weight.toString(false, 4)
+       << "\" color=\"" << color << "\"";
+    if (edgeLabels) {
+        os << ",label=<<font point-size=\"8\">&nbsp;[";
+        if (to.weight == Complex::one) {
+            os << "1";
+        } else {
+            if (to.weight.real == &ComplexTable<>::zero) {
+                os << "0";
+            } else if (to.weight.real == &ComplexTable<>::sqrt2_2) {
+                os << u8"\u221a\u00bd";
+            } else if (to.weight.real == &ComplexTable<>::one) {
+                os << "1";
+            } else {
+                os << std::hex << reinterpret_cast<std::uintptr_t>(to.weight.real) << std::dec;
+            }
+            os << " ";
+            if (to.weight.img == &ComplexTable<>::zero) {
+                os << "0";
+            } else if (to.weight.img == &ComplexTable<>::sqrt2_2) {
+                os << u8"\u221a\u00bd";
+            } else if (to.weight.img == &ComplexTable<>::one) {
+                os << "1";
+            } else {
+                os << std::hex << reinterpret_cast<std::uintptr_t>(to.weight.img) << std::dec;
+            }
+        }
+        os << "]</font>>";
+    }
+    os << "]\n";
+
+    return os;
+}
+
+template <class Edge>
     static void toDot(const Edge &e, std::ostream &os, bool colored = true,
                       bool edgeLabels = false, bool classic = false,
                       bool memory = false, bool formatAsPolar = true) {
@@ -661,10 +661,10 @@ static std::ostream &memoryEdge(const Edge &from, const Edge &to, short idx,
         header(e, oss, edgeLabels, formatAsPolar);
       }
 
-      std::unordered_set<decltype(e.p)> nodes{};
+      std::unordered_set<decltype(e.nextNode)> nodes{};
 
       auto priocmp = [](const Edge *left, const Edge *right) {
-        return left->p->v < right->p->v;
+          return left->nextNode->varIndx < right->nextNode->varIndx;
       };
 
       std::priority_queue<const Edge *, std::vector<const Edge *>,
@@ -674,46 +674,46 @@ static std::ostream &memoryEdge(const Edge &from, const Edge &to, short idx,
 
       // bfs until finished
       while (!q.empty()) {
-        auto node = q.top();
-        q.pop();
+          auto node = q.top();
+          q.pop();
 
-        // base case
-        if (node->isTerminal()) continue;
+          // base case
+          if (node->isTerminal()) continue;
 
-        // check if node has already been processed
-            auto ret = nodes.emplace(node->p);
-            if (!ret.second) continue;
+          // check if node has already been processed
+          auto ret = nodes.emplace(node->nextNode);
+          if (!ret.second) continue;
 
-            // node definition as HTML-like label (href="javascript:;" is used as workaround to make tooltips work)
-            if (memory) {
-                memoryNode(*node, oss);
-            } else if (classic) {
-                classicNode(*node, oss, formatAsPolar);
-            } else {
-                modernNode(*node, oss, formatAsPolar);
-            }
+          // node definition as HTML-like label (href="javascript:;" is used as workaround to make tooltips work)
+          if (memory) {
+              memoryNode(*node, oss);
+          } else if (classic) {
+              classicNode(*node, oss, formatAsPolar);
+          } else {
+              modernNode(*node, oss, formatAsPolar);
+          }
 
-            // iterate over edges in reverse to guarantee correct proceossing order
-            for (auto i = static_cast<Qubit>(node->p->e.size() - 1); i >= 0; --i) {
-              auto &edge = node->p->e[i];
-              if ((!memory && edge.w.approximatelyZero()) ||
-                  edge.w == Complex::zero) {
-                // potentially add zero stubs here
-                continue;
+          // iterate over edges in reverse to guarantee correct proceossing order
+          for (auto i = static_cast<Qubit>(node->nextNode->edges.size() - 1); i >= 0; --i) {
+              auto& edge = node->nextNode->edges[i];
+              if ((!memory && edge.weight.approximatelyZero()) ||
+                  edge.weight == Complex::zero) {
+                  // potentially add zero stubs here
+                  continue;
               }
 
               // non-zero edge to be included
               q.push(&edge);
 
               if (memory) {
-                memoryEdge(*node, edge, i, oss, edgeLabels);
+                  memoryEdge(*node, edge, i, oss, edgeLabels);
               } else if (colored) {
-                coloredEdge(*node, edge, i, oss, edgeLabels, classic, formatAsPolar);
-                } else {
-                    bwEdge(*node, edge, i, oss, edgeLabels, classic, formatAsPolar);
-                }
-            }
-        }
+                  coloredEdge(*node, edge, i, oss, edgeLabels, classic, formatAsPolar);
+              } else {
+                  bwEdge(*node, edge, i, oss, edgeLabels, classic, formatAsPolar);
+              }
+          }
+      }
         oss << "}\n";
 
         os << oss.str() << std::flush;
@@ -751,10 +751,10 @@ static std::ostream &memoryEdge(const Edge &from, const Edge &to, short idx,
         if (writeBinary) {
             os.write(reinterpret_cast<const char*>(&SERIALIZATION_VERSION),
                      sizeof(decltype(SERIALIZATION_VERSION)));
-            basic.w.writeBinary(os);
+            basic.weight.writeBinary(os);
         } else {
             os << SERIALIZATION_VERSION << "\n";
-            os << basic.w.toString(false, 16) << "\n";
+            os << basic.weight.toString(false, 16) << "\n";
         }
         std::int_least64_t                                         next_index = 0;
         std::unordered_map<MDDPackage::vNode*, std::int_least64_t> node_index{};
@@ -768,26 +768,26 @@ static std::ostream &memoryEdge(const Edge &from, const Edge &to, short idx,
             do {
                 while (node != nullptr && !node->isTerminal()) {
                     for (short i = RADIX_2 - 1; i > 0; --i) {
-                        auto& edge = node->p->e[i];
+                        auto& edge = node->nextNode->edges[i];
                         if (edge.isTerminal()) continue;
-                        if (edge.w.approximatelyZero()) continue;
-                        if (node_index.find(edge.p) != node_index.end()) continue;
+                        if (edge.weight.approximatelyZero()) continue;
+                        if (node_index.find(edge.nextNode) != node_index.end()) continue;
 
                         // non-zero edge to be included
                         stack.push(&edge);
                     }
                     stack.push(node);
-                    node = &node->p->e[0];
+                    node = &node->nextNode->edges[0];
                 }
                 node = stack.top();
                 stack.pop();
 
                 bool hasChild = false;
                 for (auto i = 1U; i < RADIX_2 && !hasChild; ++i) {
-                    auto& edge = node->p->e[i];
-                    if (edge.w.approximatelyZero()) continue;
-                    if (node_index.find(edge.p) != node_index.end()) continue;
-                    if (!stack.empty()) hasChild = edge.p == stack.top()->p;
+                    auto& edge = node->nextNode->edges[i];
+                    if (edge.weight.approximatelyZero()) continue;
+                    if (node_index.find(edge.nextNode) != node_index.end()) continue;
+                    if (!stack.empty()) hasChild = edge.p == stack.top()->nextNode;
                 }
 
                 if (hasChild) {
@@ -796,42 +796,42 @@ static std::ostream &memoryEdge(const Edge &from, const Edge &to, short idx,
                     stack.push(node);
                     node = temp;
                 } else {
-                    if (node_index.find(node->p) != node_index.end()) {
+                    if (node_index.find(node->nextNode) != node_index.end()) {
                         node = nullptr;
                         continue;
                     }
-                    node_index[node->p] = next_index;
+                    node_index[node->nextNode] = next_index;
                     next_index++;
 
                     if (writeBinary) {
-                      os.write(
-                          reinterpret_cast<const char *>(&node_index[node->p]),
-                          sizeof(decltype(node_index[node->p])));
-                      os.write(reinterpret_cast<const char *>(&node->p->v),
-                               sizeof(decltype(node->p->v)));
+                        os.write(
+                                reinterpret_cast<const char*>(&node_index[node->nextNode]),
+                                sizeof(decltype(node_index[node->nextNode])));
+                        os.write(reinterpret_cast<const char*>(&node->nextNode->varIndx),
+                                 sizeof(decltype(node->nextNode->varIndx)));
 
-                      // iterate over edges in reverse to guarantee correct
-                      // processing order
-                      for (auto i = 0U; i < RADIX_2; ++i) {
-                        auto &edge = node->p->e[i];
-                        std::int_least64_t edge_idx =
-                            edge.isTerminal() ? -1 : node_index[edge.p];
-                        os.write(reinterpret_cast<const char *>(&edge_idx),
-                                 sizeof(decltype(edge_idx)));
-                        edge.w.writeBinary(os);
-                      }
+                        // iterate over edges in reverse to guarantee correct
+                        // processing order
+                        for (auto i = 0U; i < RADIX_2; ++i) {
+                            auto&              edge = node->nextNode->edges[i];
+                            std::int_least64_t edge_idx =
+                                    edge.isTerminal() ? -1 : node_index[edge.nextNode];
+                            os.write(reinterpret_cast<const char*>(&edge_idx),
+                                     sizeof(decltype(edge_idx)));
+                            edge.weight.writeBinary(os);
+                        }
                     } else {
-                        os << node_index[node->p] << " " << static_cast<std::size_t>(node->p->v);
+                        os << node_index[node->nextNode] << " " << static_cast<std::size_t>(node->nextNode->varIndx);
 
                         // iterate over edges in reverse to guarantee correct processing order
                         for (auto i = 0U; i < RADIX_2; ++i) {
                             os << " (";
-                            auto &edge = node->p->e[i];
-                            if (!edge.w.approximatelyZero()) {
-                              std::int_least64_t edge_idx =
-                                  edge.isTerminal() ? -1 : node_index[edge.p];
-                              os << edge_idx << " "
-                                 << edge.w.toString(false, 16);
+                            auto& edge = node->nextNode->edges[i];
+                            if (!edge.weight.approximatelyZero()) {
+                                std::int_least64_t edge_idx =
+                                        edge.isTerminal() ? -1 : node_index[edge.nextNode];
+                                os << edge_idx << " "
+                                   << edge.weight.toString(false, 16);
                             }
                             os << ")";
                         }
@@ -849,42 +849,42 @@ static std::ostream &memoryEdge(const Edge &from, const Edge &to, short idx,
             std::unordered_set<MDDPackage::mNode*>& visited, std::ostream& os,
             bool writeBinary = false) {
         if (!basic.isTerminal()) {
-            for (auto& e: basic.p->e) {
-                if (auto [iter, success] = visited.insert(e.p); success) {
+            for (auto& e: basic.nextNode->edges) {
+                if (auto [iter, success] = visited.insert(e.nextNode); success) {
                     serializeMatrix(e, idx, node_index, visited, os, writeBinary);
                 }
             }
 
-            if (node_index.find(basic.p) == node_index.end()) {
-                node_index[basic.p] = idx;
+            if (node_index.find(basic.nextNode) == node_index.end()) {
+                node_index[basic.nextNode] = idx;
                 ++idx;
             }
 
             if (writeBinary) {
-                os.write(reinterpret_cast<const char*>(&node_index[basic.p]),
-                         sizeof(decltype(node_index[basic.p])));
-                os.write(reinterpret_cast<const char*>(&basic.p->v),
-                         sizeof(decltype(basic.p->v)));
+                os.write(reinterpret_cast<const char*>(&node_index[basic.nextNode]),
+                         sizeof(decltype(node_index[basic.nextNode])));
+                os.write(reinterpret_cast<const char*>(&basic.nextNode->varIndx),
+                         sizeof(decltype(basic.nextNode->varIndx)));
 
                 // iterate over edges in reverse to guarantee correct processing order
-                for (auto& edge: basic.p->e) {
+                for (auto& edge: basic.nextNode->edges) {
                     std::int_least64_t edge_idx =
-                            edge.isTerminal() ? -1 : node_index[edge.p];
+                            edge.isTerminal() ? -1 : node_index[edge.nextNode];
                     os.write(reinterpret_cast<const char*>(&edge_idx),
                              sizeof(decltype(edge_idx)));
-                    edge.w.writeBinary(os);
+                    edge.weight.writeBinary(os);
                 }
             } else {
-                os << node_index[basic.p] << " "
-                   << static_cast<std::size_t>(basic.p->v);
+                os << node_index[basic.nextNode] << " "
+                   << static_cast<std::size_t>(basic.nextNode->varIndx);
 
                 // iterate over edges in reverse to guarantee correct processing order
-                for (auto& edge: basic.p->e) {
+                for (auto& edge: basic.nextNode->edges) {
                     os << " (";
-                    if (!edge.w.approximatelyZero()) {
+                    if (!edge.weight.approximatelyZero()) {
                         std::int_least64_t edge_idx =
-                                edge.isTerminal() ? -1 : node_index[edge.p];
-                        os << edge_idx << " " << edge.w.toString(false, 16);
+                                edge.isTerminal() ? -1 : node_index[edge.nextNode];
+                        os << edge_idx << " " << edge.weight.toString(false, 16);
                     }
                     os << ")";
                 }
@@ -899,10 +899,10 @@ static std::ostream &memoryEdge(const Edge &from, const Edge &to, short idx,
         if (writeBinary) {
             os.write(reinterpret_cast<const char*>(&SERIALIZATION_VERSION),
                      sizeof(decltype(SERIALIZATION_VERSION)));
-            basic.w.writeBinary(os);
+            basic.weight.writeBinary(os);
         } else {
             os << SERIALIZATION_VERSION << "\n";
-            os << basic.w.toString(false, std::numeric_limits<dd::fp>::max_digits10)
+            os << basic.weight.toString(false, std::numeric_limits<dd::fp>::max_digits10)
                << "\n";
         }
         std::int_least64_t                                         idx = 0;
@@ -927,42 +927,42 @@ static std::ostream &memoryEdge(const Edge &from, const Edge &to, short idx,
     static void exportEdgeWeights(const Edge &edge, std::ostream &stream) {
       struct priocmp {
         bool operator()(const Edge *left, const Edge *right) {
-          return left->p->v < right->p->v;
+            return left->nextNode->varIndx < right->nextNode->varIndx;
         }
       };
-      stream << std::showpos << CTEntry::val(edge.w.r) << CTEntry::val(edge.w.i)
+      stream << std::showpos << CTEntry::val(edge.weight.real) << CTEntry::val(edge.weight.img)
              << std::noshowpos << "i\n";
 
-      std::unordered_set<decltype(edge.p)> nodes{};
+      std::unordered_set<decltype(edge.nextNode)> nodes{};
 
       std::priority_queue<const Edge *, std::vector<const Edge *>, priocmp> q;
       q.push(&edge);
 
       // bfs until finished
       while (!q.empty()) {
-        auto edgePtr = q.top();
-        q.pop();
+          auto edgePtr = q.top();
+          q.pop();
 
-        // base case
-        if (edgePtr->isTerminal()) continue;
+          // base case
+          if (edgePtr->isTerminal()) continue;
 
-        // check if edgePtr has already been processed
-            auto ret = nodes.emplace(edgePtr->p);
-            if (!ret.second) continue;
+          // check if edgePtr has already been processed
+          auto ret = nodes.emplace(edgePtr->nextNode);
+          if (!ret.second) continue;
 
-            // iterate over edges in reverse to guarantee correct proceossing order
-            for (auto i = static_cast<Qubit>(edgePtr->p->e.size() - 1); i >= 0; --i) {
-              auto &child = edgePtr->p->e[i];
-              if (child.w.approximatelyZero()) {
-                // potentially add zero stubs here
-                continue;
+          // iterate over edges in reverse to guarantee correct proceossing order
+          for (auto i = static_cast<Qubit>(edgePtr->nextNode->edges.size() - 1); i >= 0; --i) {
+              auto& child = edgePtr->nextNode->edges[i];
+              if (child.weight.approximatelyZero()) {
+                  // potentially add zero stubs here
+                  continue;
               }
 
               // non-zero child to be included
               q.push(&child);
-              stream << std::showpos << CTEntry::val(child.w.r)
-                     << CTEntry::val(child.w.i) << std::noshowpos << "i\n";
-            }
+              stream << std::showpos << CTEntry::val(child.weight.real)
+                     << CTEntry::val(child.weight.img) << std::noshowpos << "i\n";
+          }
       }
     }
 

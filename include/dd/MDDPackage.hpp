@@ -1315,31 +1315,34 @@ class MDDPackage {
         }
 
         void printVector(const vEdge& edge) {
-          unsigned long long numEntries = static_cast<unsigned long long int>(
-              std::accumulate(registersSizes.begin(), registersSizes.end(), 1,
-                              std::multiplies<>()));
+            //unsigned long long numEntries = static_cast<unsigned long long int>(std::accumulate(registersSizes.begin(), registersSizes.end(), 1,std::multiplies<>()));
 
-          for (auto i = 0ULL; i < numEntries; i++) {
-            auto reprI = getReprOfIndex(i, numEntries);
-            // get amplitude
-            const auto amplitude = getValueByPath(edge, reprI);
-            // TODO HOW SHALL WE REPRESENT??
-            //
-            for (const unsigned long& coeff : reprI) {
-              std::cout << coeff;
+            unsigned long long numEntries = 1ULL;
+            for (auto h = 0U; h < registersSizes.size(); h++) {
+                numEntries = numEntries * registersSizes.at(h);
             }
-            reprI.clear();
 
-            constexpr auto precision = 3;
-            // set fixed width to maximum of a printed number
-            // (-) 0.precision plus/minus 0.precision i
-            constexpr auto width = 1 + 2 + precision + 1 + 2 + precision + 1;
-            std::cout << ": " << std::setw(width)
-                      << ComplexValue::toString(amplitude.r, amplitude.i, false,
-                                                precision)
-                      << "\n";
-          }
-          std::cout << std::flush;
+            for (auto i = 0ULL; i < numEntries; i++) {
+                auto reprI = getReprOfIndex(i, numEntries);
+                // get amplitude
+                const auto amplitude = getValueByPath(edge, reprI);
+                // TODO HOW SHALL WE REPRESENT??
+                //
+                for (const unsigned long& coeff: reprI) {
+                    std::cout << coeff;
+                }
+                reprI.clear();
+
+                constexpr auto precision = 3;
+                // set fixed width to maximum of a printed number
+                // (-) 0.precision plus/minus 0.precision i
+                constexpr auto width = 1 + 2 + precision + 1 + 2 + precision + 1;
+                std::cout << ": " << std::setw(width)
+                          << ComplexValue::toString(amplitude.r, amplitude.i, false,
+                                                    precision)
+                          << "\n";
+            }
+            std::cout << std::flush;
         }
 
         void printComplexVector(const CVec vector) {
