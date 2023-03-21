@@ -39,13 +39,13 @@ namespace dd {
             assert(r != Complex::zero);
             assert(r != Complex::one);
             r.real->value = CTEntry::val(a.real) + CTEntry::val(b.real);
-            r.img->value = CTEntry::val(a.img) + CTEntry::val(b.img);
+            r.img->value  = CTEntry::val(a.img) + CTEntry::val(b.img);
         }
         static void sub(Complex& r, const Complex& a, const Complex& b) {
             assert(r != Complex::zero);
             assert(r != Complex::one);
             r.real->value = CTEntry::val(a.real) - CTEntry::val(b.real);
-            r.img->value = CTEntry::val(a.img) - CTEntry::val(b.img);
+            r.img->value  = CTEntry::val(a.img) - CTEntry::val(b.img);
         }
         static void mul(Complex& r, const Complex& a, const Complex& b) {
             assert(r != Complex::zero);
@@ -55,8 +55,8 @@ namespace dd {
             } else if (b.approximatelyOne()) {
                 r.setVal(a);
             } else if (a.approximatelyZero() || b.approximatelyZero()) {
-              r.real->value = 0.;
-              r.img->value = 0.;
+                r.real->value = 0.;
+                r.img->value  = 0.;
             } else {
                 const auto ar = CTEntry::val(a.real);
                 const auto ai = CTEntry::val(a.img);
@@ -64,15 +64,15 @@ namespace dd {
                 const auto bi = CTEntry::val(b.img);
 
                 r.real->value = ar * br - ai * bi;
-                r.img->value = ar * bi + ai * br;
+                r.img->value  = ar * bi + ai * br;
             }
         }
         static void div(Complex& r, const Complex& a, const Complex& b) {
             assert(r != Complex::zero);
             assert(r != Complex::one);
             if (a.approximatelyEquals(b)) {
-              r.real->value = 1.;
-              r.img->value = 0.;
+                r.real->value = 1.;
+                r.img->value  = 0.;
             } else if (b.approximatelyOne()) {
                 r.setVal(a);
             } else {
@@ -84,7 +84,7 @@ namespace dd {
                 const auto cmag = br * br + bi * bi;
 
                 r.real->value = (ar * br + ai * bi) / cmag;
-                r.img->value = (ai * br - ar * bi) / cmag;
+                r.img->value  = (ai * br - ar * bi) / cmag;
             }
         }
         static inline fp mag2(const Complex& a) {
@@ -214,10 +214,10 @@ namespace dd {
         }
 
         inline Complex getTemporary(const fp& r, const fp& i) {
-          auto c = complexCache.getTemporaryComplex();
-          c.real->value = r;
-          c.img->value = i;
-          return c;
+            auto c        = complexCache.getTemporaryComplex();
+            c.real->value = r;
+            c.img->value  = i;
+            return c;
         }
 
         inline Complex getTemporary(const ComplexValue& c) {
@@ -229,10 +229,10 @@ namespace dd {
         }
 
         inline Complex getCached(const fp& r, const fp& i) {
-          auto c = complexCache.getCachedComplex();
-          c.real->value = r;
-          c.img->value = i;
-          return c;
+            auto c        = complexCache.getCachedComplex();
+            c.real->value = r;
+            c.img->value  = i;
+            return c;
         }
 
         inline Complex getCached(const ComplexValue& c) {

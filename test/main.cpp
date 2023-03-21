@@ -1,13 +1,14 @@
-#include <iostream>
-
 #include "dd/MDDPackage.hpp"
 
-int main() {
-  auto mdd = dd::MDDPackage(3, {2, 2, 3});
+#include <memory>
+#include <vector>
 
-  auto oneState = mdd.makeBasisState(3, {1, 1, 1});
+int main() { // NOLINT(bugprone-exception-escape)
+    auto mdd = std::make_unique<dd::MDDPackage>(3, std::vector<std::size_t>{2, 2, 3});
 
-  mdd.printVector(oneState);
+    auto oneState = mdd->makeBasisState(3, {1, 1, 1});
 
-  return 0;
+    mdd->printVector(oneState);
+
+    return 0;
 }
