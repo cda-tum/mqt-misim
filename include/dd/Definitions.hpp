@@ -45,6 +45,14 @@ namespace dd {
     static constexpr std::uint_fast8_t RADIX_3 = 3;
     // max no. of edges = RADIX_3^2
     static constexpr std::uint_fast8_t EDGE3 = RADIX_3 * RADIX_3;
+
+    static constexpr std::uint_fast8_t RADIX_4 = 4;
+    // max no. of edges = RADIX_3^2
+    static constexpr std::uint_fast8_t EDGE4 = RADIX_4 * RADIX_4;
+
+    static constexpr std::uint_fast8_t RADIX_5 = 5;
+    // max no. of edges = RADIX_3^2
+    static constexpr std::uint_fast8_t EDGE5 = RADIX_5 * RADIX_5;
     // TODO ABOVE TEMPORARY LEGACY CODE
     //-----------------------------------------------------------------------------------------
 

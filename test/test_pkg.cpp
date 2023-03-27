@@ -17,7 +17,7 @@ TEST(DDPackageTest, TrivialTest) {
     auto dd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{3, 2});
     EXPECT_EQ(dd->qregisters(), 2);
 
-    auto hGate0 = dd->makeGateDD<dd::TritMatrix>(dd::H3, 2, 0);
+    auto hGate0 = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 2, 0);
 
     ASSERT_TRUE(dd->getValueByPath(hGate0, "00")
                         .approximatelyEquals(dd::COMPLEX_SQRT3_3));
@@ -150,7 +150,7 @@ TEST(DDPackageTest, TrivialTest) {
               (dd::ComplexValue{-dd::SQRT2_2, 0}));
 
     dd::Controls controls1{{1, 1}};
-    auto         controlledH3 = dd->makeGateDD<dd::TritMatrix>(dd::H3, 2, controls1, 0);
+    auto         controlledH3 = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 2, controls1, 0);
 
     ASSERT_TRUE(dd->getValueByPath(controlledH3, "00")
                         .approximatelyEquals(dd::COMPLEX_ONE));
@@ -387,7 +387,7 @@ TEST(DDPackageTest, QutritBellState) {
     auto dd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{3, 3});
     EXPECT_EQ(dd->qregisters(), 2);
     // Gates
-    auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3, 2, 0);
+    auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 2, 0);
 
     dd::Controls control01{{0, 1}};
     auto         ctrlx1Gate = dd->makeGateDD<dd::TritMatrix>(dd::X3, 2, control01, 1);
@@ -446,7 +446,7 @@ TEST(DDPackageTest, GHZQutritState) {
             std::make_unique<dd::MDDPackage>(3, std::vector<std::size_t>{3, 3, 3});
     EXPECT_EQ(dd->qregisters(), 3);
     // Gates
-    auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3, 3, 0);
+    auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 3, 0);
 
     dd::Controls control01{{0, 1}};
     auto         cX011 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control01, 1);
@@ -507,7 +507,7 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
         EXPECT_EQ(dd->qregisters(), i);
 
         // Gates
-        auto                               h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3, i, 0);
+        auto                               h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), i, 0);
         std::vector<dd::MDDPackage::mEdge> gates  = {};
 
         for (auto target = 1U; target < i; target++) {
@@ -549,3 +549,51 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
                     dd::ComplexTable<>::tolerance());
     }
 }
+
+/*
+int customRandK(int min, int max){
+    return max
+}
+
+
+
+
+TEST(DDPackageTest, RandomCircuits) {
+
+    int width = 6;
+    unsigned int depth = 100L;
+    size_t max_d = 5;
+
+    std::vector<std::size_t> particles = {};
+    for(auto i=0; i < width; i++ ){
+        particles.push_back(customRandK(1, max_d));
+    }
+    auto dd = std::make_unique<dd::MDDPackage>(width, particles);
+
+    EXPECT_EQ(dd->qregisters(), width);
+
+    auto evolution = dd->makeZeroState(width);
+
+    for (auto timeStep = 0U; timeStep < depth; timeStep++){
+        for (int line = 0; line < width; line++ ){
+            //chose if local gate or entangling gate
+            auto randomChoice = customRandK(0,1);
+            if( randomChoice == 0){//local op
+
+                auto localChoice = customRandK(0,1);
+                if(localChoice == 0){//hadamard
+                   // auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), i, 0);
+                }
+                else{//givens
+                   // auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::RXY3(), i, 0);
+                }
+            }
+            else{//entangling
+                auto entChoice = customRandK(0,2);
+
+            }
+        }
+        //evolution      = dd->multiply(chosenGate, evolution);
+    }
+}
+*/

@@ -224,9 +224,19 @@ namespace dd {
             i += rhs.i;
             return *this;
         }
-
+        ComplexValue& operator*=(const ComplexValue& rhs) {
+            auto tempr = (this->r * rhs.r - this->i * rhs.i);
+            auto tempi = (this->r * rhs.i + this->i * rhs.r);
+            r          = tempr;
+            i          = tempi;
+            return *this;
+        }
         friend ComplexValue operator+(ComplexValue lhs, const ComplexValue& rhs) {
             lhs += rhs;
+            return lhs;
+        }
+        friend ComplexValue operator*(ComplexValue lhs, const ComplexValue& rhs) {
+            lhs *= rhs;
             return lhs;
         }
     };
