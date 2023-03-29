@@ -108,6 +108,21 @@ namespace dd {
                            {std::cos(lambda / 2.), std::sin(lambda / 2.)}}};
     }
 
+    inline GateMatrix H() {
+        return GateMatrix{COMPLEX_SQRT2_2,
+                          COMPLEX_SQRT2_2,
+                          COMPLEX_SQRT2_2,
+                          COMPLEX_MSQRT2_2};
+    }
+    inline GateMatrix RXY(fp theta, fp phi) {
+        GateMatrix rotation = {
+                dd::ComplexValue{std::cos(theta / 2.), 0.},
+                dd::ComplexValue{-std::sin(theta / 2.) * std::sin(phi), -std::sin(theta / 2.) * std::cos(phi)},
+                dd::ComplexValue{std::sin(theta / 2.) * std::sin(phi), -std::sin(theta / 2.) * std::cos(phi)},
+                dd::ComplexValue{std::cos(theta / 2.), 0.}};
+        return rotation;
+    }
+
     inline TritMatrix H3() {
         return TritMatrix{COMPLEX_SQRT3_3,
                           COMPLEX_SQRT3_3,
@@ -230,6 +245,15 @@ namespace dd {
         identity.at(4 * levb + levb) = dd::ComplexValue{std::cos(theta / 2.), 0.};
         return identity;
     }
+    constexpr QuartMatrix X4dag{COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                                COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
+                                COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
+                                COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO};
+
+    constexpr QuartMatrix X4{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
+                             COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                             COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO};
 
     inline QuintMatrix H5() {
         return QuintMatrix{COMPLEX_SQRT5_5,
@@ -303,5 +327,39 @@ namespace dd {
         identity.at(5 * levb + levb) = dd::ComplexValue{std::cos(theta / 2.), 0.};
         return identity;
     }
+
+    constexpr QuintMatrix X5dag{
+            COMPLEX_ZERO,
+            COMPLEX_ONE,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ONE,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ONE,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ONE,
+            COMPLEX_ONE,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+            COMPLEX_ZERO,
+    };
+
+    constexpr QuintMatrix X5{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
+                             COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                             COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO};
 } // namespace dd
 #endif // DD_PACKAGE_GATEMATRIXDEFINITIONS_H
