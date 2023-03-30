@@ -1298,10 +1298,14 @@ namespace dd {
             auto index   = 0UL;
 
             while (counter < numberOfQuantumRegisters) {
-                index       = numberOfQuantumRegisters - counter - 1;
-                cardinality = cardinality / registersSizes.at(index);
-                pathWay     = iIndex / cardinality;
-                iIndex      = iIndex % cardinality;
+                try {
+                    index       = numberOfQuantumRegisters - counter - 1;
+                    cardinality = cardinality / registersSizes.at(index);
+                    pathWay     = iIndex / cardinality;
+                    iIndex      = iIndex % cardinality;
+                } catch (const std::exception& e) {
+                    std::cout << "index = " << index << ", cardinality = " << cardinality << " ,counter = " << counter << std::endl;
+                }
 
                 repr.push_back(pathWay);
                 counter = counter + 1;

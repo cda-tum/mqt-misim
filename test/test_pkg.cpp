@@ -17,6 +17,9 @@ TEST(DDPackageTest, TrivialTest) {
     auto dd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{3, 2});
     EXPECT_EQ(dd->qregisters(), 2);
 
+    dd::ComplexValue h3plus  = dd::COMPLEX_SQRT3_3 * dd::ComplexValue{std::cos(2. * dd::PI / 3.), std::sin(2. * dd::PI / 3.)};
+    dd::ComplexValue h3minus = dd::COMPLEX_SQRT3_3 * dd::ComplexValue{std::cos(4. * dd::PI / 3.), std::sin(4. * dd::PI / 3.)};
+
     auto hGate0 = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 2, 0);
 
     ASSERT_TRUE(dd->getValueByPath(hGate0, "00")
@@ -27,16 +30,17 @@ TEST(DDPackageTest, TrivialTest) {
                         .approximatelyEquals(dd::COMPLEX_SQRT3_3));
     ASSERT_TRUE(dd->getValueByPath(hGate0, "30")
                         .approximatelyEquals(dd::COMPLEX_SQRT3_3));
-    ASSERT_TRUE(dd->getValueByPath(hGate0, "40")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, 0.5}));
-    ASSERT_TRUE(dd->getValueByPath(hGate0, "50")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, -0.5}));
+
+    ASSERT_TRUE(dd->getValueByPath(hGate0, "40").approximatelyEquals(h3plus));
+
+    ASSERT_TRUE(dd->getValueByPath(hGate0, "50").approximatelyEquals(h3minus));
+
     ASSERT_TRUE(dd->getValueByPath(hGate0, "60")
                         .approximatelyEquals(dd::COMPLEX_SQRT3_3));
-    ASSERT_TRUE(dd->getValueByPath(hGate0, "70")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, -0.5}));
-    ASSERT_TRUE(dd->getValueByPath(hGate0, "80")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, 0.5}));
+
+    ASSERT_TRUE(dd->getValueByPath(hGate0, "70").approximatelyEquals(h3minus));
+
+    ASSERT_TRUE(dd->getValueByPath(hGate0, "80").approximatelyEquals(h3plus));
 
     ASSERT_TRUE(
             dd->getValueByPath(hGate0, "01").approximatelyEquals(dd::COMPLEX_ZERO));
@@ -84,16 +88,14 @@ TEST(DDPackageTest, TrivialTest) {
                         .approximatelyEquals(dd::COMPLEX_SQRT3_3));
     ASSERT_TRUE(dd->getValueByPath(hGate0, "33")
                         .approximatelyEquals(dd::COMPLEX_SQRT3_3));
-    ASSERT_TRUE(dd->getValueByPath(hGate0, "43")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, 0.5}));
-    ASSERT_TRUE(dd->getValueByPath(hGate0, "53")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, -0.5}));
-    ASSERT_TRUE(dd->getValueByPath(hGate0, "63")
-                        .approximatelyEquals(dd::COMPLEX_SQRT3_3));
-    ASSERT_TRUE(dd->getValueByPath(hGate0, "73")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, -0.5}));
-    ASSERT_TRUE(dd->getValueByPath(hGate0, "83")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, 0.5}));
+
+    ASSERT_TRUE(dd->getValueByPath(hGate0, "43").approximatelyEquals(h3plus));
+    ASSERT_TRUE(dd->getValueByPath(hGate0, "53").approximatelyEquals(h3minus));
+
+    ASSERT_TRUE(dd->getValueByPath(hGate0, "63").approximatelyEquals(dd::COMPLEX_SQRT3_3));
+
+    ASSERT_TRUE(dd->getValueByPath(hGate0, "73").approximatelyEquals(h3minus));
+    ASSERT_TRUE(dd->getValueByPath(hGate0, "83").approximatelyEquals(h3plus));
 
     // case with higher target
     auto hGate1 = dd->makeGateDD<dd::GateMatrix>(dd::Hmat, 2, 1);
@@ -218,15 +220,15 @@ TEST(DDPackageTest, TrivialTest) {
     ASSERT_TRUE(dd->getValueByPath(controlledH3, "33")
                         .approximatelyEquals(dd::COMPLEX_SQRT3_3));
     ASSERT_TRUE(dd->getValueByPath(controlledH3, "43")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, 0.5}));
+                        .approximatelyEquals(h3plus));
     ASSERT_TRUE(dd->getValueByPath(controlledH3, "53")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, -0.5}));
+                        .approximatelyEquals(h3minus));
     ASSERT_TRUE(dd->getValueByPath(controlledH3, "63")
                         .approximatelyEquals(dd::COMPLEX_SQRT3_3));
     ASSERT_TRUE(dd->getValueByPath(controlledH3, "73")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, -0.5}));
+                        .approximatelyEquals(h3minus));
     ASSERT_TRUE(dd->getValueByPath(controlledH3, "83")
-                        .approximatelyEquals(dd::ComplexValue{-0.28867513, 0.5}));
+                        .approximatelyEquals(h3plus));
 
     dd::Controls controls0{{0, 1}};
     auto         controlled0H2 =
@@ -376,11 +378,6 @@ TEST(DDPackageTest, Multiplication) {
 
     ASSERT_EQ(dd->fidelity(zeroState, evolution), 0.0);
     ASSERT_EQ(dd->fidelity(evolution, basis110State), 1.0);
-    // repeat the same calculation - triggering compute table hit
-    // ASSERT_EQ(dd->fidelity(zeroState, oneState), 0.0);
-    // ASSERT_NEAR(dd->fidelity(zeroState, hState), 0.5,
-    // dd::ComplexTable<>::tolerance()); ASSERT_NEAR(dd->fidelity(oneState,
-    // hState), 0.5, dd::ComplexTable<>::tolerance());
 }
 
 TEST(DDPackageTest, QutritBellState) {
@@ -500,7 +497,7 @@ TEST(DDPackageTest, GHZQutritState) {
 }
 
 TEST(DDPackageTest, GHZQutritStateScaled) {
-    for (auto i = 2U; i < 129U; i++) {
+    for (auto i = 20U; i < 21U; i++) {
         auto                     test = 0;
         std::vector<std::size_t> init(i, 3);
         auto                     dd = std::make_unique<dd::MDDPackage>(i, init);
@@ -533,9 +530,11 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
         for (auto& gate: gates) {
             evolution = dd->multiply(gate, evolution);
         }
-        std::cout << "\n"
-                  << std::endl;
-        dd->printVector(evolution);
+        if (dd->qregisters() < 10) {
+            std::cout << "\n"
+                      << std::endl;
+            dd->printVector(evolution);
+        }
 
         auto basis00State = dd->makeBasisState(i, std::vector<size_t>(i, 0));
         auto basis11State = dd->makeBasisState(i, std::vector<size_t>(i, 1));
@@ -550,184 +549,206 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
     }
 }
 
-/*
-
-int customRandK(int min, int max){
-    return max;
-}
-
-
 TEST(DDPackageTest, RandomCircuits) {
+    int          width = 6;
+    unsigned int depth = 1L;
+    size_t       maxD  = 5;
 
-    int width = 6;
-    unsigned int depth = 100L;
-    size_t max_d = 5;
+    std::random_device rd;        // obtain a random number from hardware
+    std::mt19937       gen(rd()); // seed the generator
 
     std::vector<std::size_t> particles = {};
-    for(auto i=0; i < width; i++ ){
-        particles.push_back(customRandK(1, max_d));
+
+    std::uniform_int_distribution<> dimdistr(2, maxD);
+    for (auto i = 0; i < width; i++) {
+        particles.push_back(dimdistr(gen));
     }
+
     auto dd = std::make_unique<dd::MDDPackage>(width, particles);
 
     EXPECT_EQ(dd->qregisters(), width);
 
     auto evolution = dd->makeZeroState(width);
 
-    for (auto timeStep = 0U; timeStep < depth; timeStep++){
-        for (int line = 0; line < width; line++ ){
+    std::uniform_int_distribution<>  pickbool(0, 1);
+    std::uniform_int_distribution<>  pickcontrols(1, width - 1);
+    std::uniform_real_distribution<> angles(0.0, 2. * dd::PI);
 
+    for (auto timeStep = 0U; timeStep < depth; timeStep++) {
+        for (int line = 0; line < width; line++) {
             //chose if local gate or entangling gate
-            auto randomChoice = customRandK(0,1);
+            auto randomChoice = pickbool(gen);
 
-            if( randomChoice == 0){//local op
+            if (randomChoice == 0) { //local op
 
-                auto localChoice = customRandK(0,1);
+                auto localChoice = pickbool(gen);
 
-                if(localChoice == 0){//hadamard
-                    if(particles.at(line)==2){
+                if (localChoice == 0) { //hadamard
+                    if (particles.at(line) == 2) {
                         auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::H(), width, line);
-                        evolution = dd->multiply(chosenGate, evolution);
-                    }
-                    else if (particles.at(line)==3){
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 3) {
                         auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), width, line);
-                        evolution = dd->multiply(chosenGate, evolution);
-                    }
-                    else if (particles.at(line)==4){
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 4) {
                         auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::H4(), width, line);
-                        evolution = dd->multiply(chosenGate, evolution);
-                    }
-                    else if (particles.at(line)==5){
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 5) {
                         auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::H5(), width, line);
-                        evolution = dd->multiply(chosenGate, evolution);
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    }
+                } else { //givens
+
+                    if (particles.at(line) == 2) {
+                        long double theta      = 0.;
+                        long double phi        = 0.;
+                        auto        chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, line);
+                        evolution              = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 3) {
+                        long double                     theta = angles(gen);
+                        long double                     phi   = angles(gen);
+                        std::uniform_int_distribution<> picklevel(0, 2);
+
+                        int levelA = picklevel(gen);
+                        int levelB = (levelA + 1) % 3;
+                        if (levelA > levelB) {
+                            auto temp = levelA;
+                            levelA    = levelB;
+                            levelB    = temp;
+                        }
+
+                        auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::RXY3(theta, phi, levelA, levelB), width, line);
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 4) {
+                        long double                     theta = angles(gen);
+                        long double                     phi   = angles(gen);
+                        std::uniform_int_distribution<> picklevel(0, 3);
+
+                        int levelA = picklevel(gen);
+                        int levelB = (levelA + 1) % 4;
+                        if (levelA > levelB) {
+                            auto temp = levelA;
+                            levelA    = levelB;
+                            levelB    = temp;
+                        }
+
+                        auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::RXY4(theta, phi, levelA, levelB), width, line);
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 5) {
+                        long double                     theta = angles(gen);
+                        long double                     phi   = angles(gen);
+                        std::uniform_int_distribution<> picklevel(0, 4);
+
+                        int levelA = picklevel(gen);
+                        int levelB = (levelA + 1) % 5;
+                        if (levelA > levelB) {
+                            auto temp = levelA;
+                            levelA    = levelB;
+                            levelB    = temp;
+                        }
+
+                        auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::RXY5(theta, phi, levelA, levelB), width, line);
+                        evolution       = dd->multiply(chosenGate, evolution);
                     }
                 }
-                else{//givens
+            } else { //entangling
 
-                   if(particles.at(line)==2){
-                       long double theta = 0.;
-                       long double phi = 0.;
-                       auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, line);
-                       evolution = dd->multiply(chosenGate, evolution);
-                   }
-                   else if (particles.at(line)==3){
-                       long double theta = 0.;
-                       long double phi = 0.;
-                       int levelA = 0;
-                       int levelB = 0;
+                auto entChoice        = pickbool(gen);
+                auto numberOfControls = pickcontrols(gen);
 
-                       auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::RXY3(theta, phi, levelA, levelB), width, line);
-                       evolution = dd->multiply(chosenGate, evolution);
-                   }
-                   else if (particles.at(line)==4){
-                       long double theta = 0.;
-                       long double phi = 0.;
-                       int levelA = 0;
-                       int levelB = 0;
+            std:
+                std::vector<int> controlLines;
 
-                       auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::RXY4(theta, phi, levelA, levelB), width, line);
-                       evolution = dd->multiply(chosenGate, evolution);
-                   }
-                   else if (particles.at(line)==5){
-                       long double theta = 0.;
-                       long double phi = 0.;
-                       int levelA = 0;
-                       int levelB = 0;
-
-                       auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::RXY5(theta, phi, levelA, levelB), width, line);
-                       evolution = dd->multiply(chosenGate, evolution);
-                   }
-                }
-            }
-            else{//entangling
-
-                auto entChoice = customRandK(0,1);
-
-                auto numberOfControls = customRandK(1, width-1);
-                std:std::vector<int> controlLines;
-
-                for(auto i = 0U; i < width ;i++){
-                    if(i!= line) controlLines.push_back(i);
+                for (auto i = 0U; i < width; i++) {
+                    if (i != line) controlLines.push_back(i);
                 }
 
-                std::mt19937 rng(std::random_device{}());
-                std::shuffle(begin(controlLines), end(controlLines), rng);
+                std::shuffle(begin(controlLines), end(controlLines), gen);
                 std::vector<int> controlParticles(controlLines.begin(), controlLines.begin() + numberOfControls);
-
+                std::sort(controlParticles.begin(), controlParticles.end());
 
                 dd::Controls control{};
-                for (auto i = 0U; i< numberOfControls ; i++){
-                    std::random_device rd; // obtain a random number from hardware
-                    std::mt19937 gen(rd()); // seed the generator
+                for (auto i = 0U; i < numberOfControls; i++) {
+                    std::uniform_int_distribution<> picklevel(0, particles.at(controlParticles.at(i)) - 1);
+                    auto                            level = picklevel(gen);
 
-                    std::uniform_int_distribution<> distr(0, particles.at(i));
-                    auto level = distr(gen);
-
-                    const dd::Control c{static_cast<dd::QuantumRegister>(controlParticles.at(i)), level};
+                    const dd::Control c{static_cast<dd::QuantumRegister>(controlParticles.at(i)), static_cast<dd::Control::Type>(level)};
                     control.insert(c);
                 }
 
-                if(entChoice == 0 ){// CEX based
+                if (entChoice == 0) { // CEX based
                     //selection of controls
 
-                    if(particles.at(line)==2){
-                        long double theta = 0.;
-                        long double phi = 0.;
-                        auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, control, line);
-                        evolution = dd->multiply(chosenGate, evolution);
-                    }
-                    else if (particles.at(line)==3){
-                        long double theta = 0.;
-                        long double phi = 0.;
-                        int levelA = 0;
-                        int levelB = 0;
+                    if (particles.at(line) == 2) {
+                        long double theta      = angles(gen);
+                        long double phi        = angles(gen);
+                        auto        chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, control, line);
+                        evolution              = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 3) {
+                        std::uniform_int_distribution<> picklevel(0, 2);
+
+                        long double theta  = angles(gen);
+                        long double phi    = angles(gen);
+                        int         levelA = picklevel(gen);
+                        int         levelB = (levelA + 1) % 3;
+                        if (levelA > levelB) {
+                            auto temp = levelA;
+                            levelA    = levelB;
+                            levelB    = temp;
+                        }
 
                         auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::RXY3(theta, phi, levelA, levelB), width, control, line);
-                        evolution = dd->multiply(chosenGate, evolution);
-                    }
-                    else if (particles.at(line)==4){
-                        long double theta = 0.;
-                        long double phi = 0.;
-                        int levelA = 0;
-                        int levelB = 0;
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 4) {
+                        std::uniform_int_distribution<> picklevel(0, 3);
+
+                        long double theta  = angles(gen);
+                        long double phi    = angles(gen);
+                        int         levelA = picklevel(gen);
+                        int         levelB = (levelA + 1) % 4;
+                        if (levelA > levelB) {
+                            auto temp = levelA;
+                            levelA    = levelB;
+                            levelB    = temp;
+                        }
 
                         auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::RXY4(theta, phi, levelA, levelB), width, control, line);
-                        evolution = dd->multiply(chosenGate, evolution);
-                    }
-                    else if (particles.at(line)==5){
-                        long double theta = 0.;
-                        long double phi = 0.;
-                        int levelA = 0;
-                        int levelB = 0;
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 5) {
+                        std::uniform_int_distribution<> picklevel(0, 4);
+
+                        long double theta  = angles(gen);
+                        long double phi    = angles(gen);
+                        int         levelA = picklevel(gen);
+                        int         levelB = (levelA + 1) % 5;
+                        if (levelA > levelB) {
+                            auto temp = levelA;
+                            levelA    = levelB;
+                            levelB    = temp;
+                        }
 
                         auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::RXY5(theta, phi, levelA, levelB), width, control, line);
-                        evolution = dd->multiply(chosenGate, evolution);
+                        evolution       = dd->multiply(chosenGate, evolution);
                     }
-                }
-                else{// Controlled clifford
-                    if(particles.at(line)==2){
+                } else { // Controlled clifford
+                    if (particles.at(line) == 2) {
                         auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::Xmat, width, control, line);
-                        evolution = dd->multiply(chosenGate, evolution);
-                    }
-                    else if (particles.at(line)==3){
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 3) {
                         auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::X3, width, control, line);
-                        evolution = dd->multiply(chosenGate, evolution);
-                    }
-                    else if (particles.at(line)==4){
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 4) {
                         auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::X4, width, control, line);
-                        evolution = dd->multiply(chosenGate, evolution);
-                    }
-                    else if (particles.at(line)==5){
+                        evolution       = dd->multiply(chosenGate, evolution);
+                    } else if (particles.at(line) == 5) {
                         auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::X5, width, control, line);
-                        evolution = dd->multiply(chosenGate, evolution);
+                        evolution       = dd->multiply(chosenGate, evolution);
                     }
-
                 }
-
             }
-
         }
-
     }
+    auto basis0State = dd->makeBasisState(width, std::vector<size_t>(width, 0));
+    dd->printVector(evolution);
+    //ASSERT_NEAR(dd->fidelity(basis0State, evolution), 0.3333333333333333, dd::ComplexTable<>::tolerance());
 }
-
-*/

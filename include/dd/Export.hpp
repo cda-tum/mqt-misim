@@ -694,7 +694,7 @@ namespace dd {
             }
 
             // iterate over edges in reverse to guarantee correct proceossing order
-            for (auto i = static_cast<Qubit>(node->nextNode->edges.size() - 1); i >= 0; --i) {
+            for (auto i = static_cast<QuantumRegister>(node->nextNode->edges.size() - 1); i >= 0; --i) {
                 auto& edge = node->nextNode->edges[i];
                 if ((!memory && edge.weight.approximatelyZero()) ||
                     edge.weight == Complex::zero) {
@@ -787,7 +787,7 @@ namespace dd {
                     auto& edge = node->nextNode->edges[i];
                     if (edge.weight.approximatelyZero()) continue;
                     if (node_index.find(edge.nextNode) != node_index.end()) continue;
-                    if (!stack.empty()) hasChild = edge.p == stack.top()->nextNode;
+                    if (!stack.empty()) hasChild = edge.nextNode == stack.top()->nextNode;
                 }
 
                 if (hasChild) {
@@ -951,7 +951,7 @@ namespace dd {
             if (!ret.second) continue;
 
             // iterate over edges in reverse to guarantee correct proceossing order
-            for (auto i = static_cast<Qubit>(edgePtr->nextNode->edges.size() - 1); i >= 0; --i) {
+            for (auto i = static_cast<QuantumRegister>(edgePtr->nextNode->edges.size() - 1); i >= 0; --i) {
                 auto& child = edgePtr->nextNode->edges[i];
                 if (child.weight.approximatelyZero()) {
                     // potentially add zero stubs here
