@@ -8,8 +8,6 @@ int main() { // NOLINT(bugprone-exception-escape)
 
     auto rxy = mdd->makeGateDD<dd::QuintMatrix>(dd::RXY5(dd::PI_4, dd::PI_4, 0, 1), 1, 0);
 
-    // Gates
-    //auto h3Gate = mdd->makeGateDD<dd::QuintMatrix>(dd::H5(), 1, 0);
     mdd->getVectorizedMatrix(rxy);
 
     auto oneState = mdd->makeBasisState(1, {1});

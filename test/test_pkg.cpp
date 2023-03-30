@@ -497,7 +497,7 @@ TEST(DDPackageTest, GHZQutritState) {
 }
 
 TEST(DDPackageTest, GHZQutritStateScaled) {
-    for (auto i = 20U; i < 21U; i++) {
+    for (auto i = 120U; i < 129U; i++) {
         auto                     test = 0;
         std::vector<std::size_t> init(i, 3);
         auto                     dd = std::make_unique<dd::MDDPackage>(i, init);
@@ -550,8 +550,8 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
 }
 
 TEST(DDPackageTest, RandomCircuits) {
-    int          width = 6;
-    unsigned int depth = 1L;
+    int          width = 5;
+    unsigned int depth = 500L;
     size_t       maxD  = 5;
 
     std::random_device rd;        // obtain a random number from hardware
@@ -656,7 +656,6 @@ TEST(DDPackageTest, RandomCircuits) {
                 auto entChoice        = pickbool(gen);
                 auto numberOfControls = pickcontrols(gen);
 
-            std:
                 std::vector<int> controlLines;
 
                 for (auto i = 0U; i < width; i++) {
