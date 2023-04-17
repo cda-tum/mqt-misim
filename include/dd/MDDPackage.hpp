@@ -524,8 +524,7 @@ namespace dd {
 
                         std::vector<mEdge> quadEdges(radix * radix, mEdge::zero);
 
-                        if (currentControl != controls.end() &&
-                            currentControl->quantumRegister == currentReg) {
+                        if (currentControl != controls.end() && currentControl->quantumRegister == currentReg) {
                             if (rowMat == colMat) {
                                 for (auto i = 0U; i < radix; i++) {
                                     auto diagInd = i * radix + i;
@@ -533,17 +532,11 @@ namespace dd {
                                     if (i == currentControl->type) {
                                         quadEdges.at(diagInd) = edgesMat.at(entryPos);
                                     } else {
-                                        quadEdges.at(diagInd) =
-                                                makeIdent(static_cast<QuantumRegister>(start),
-                                                          static_cast<QuantumRegister>(currentReg - 1));
+                                        quadEdges.at(diagInd) = makeIdent(static_cast<QuantumRegister>(start), static_cast<QuantumRegister>(currentReg - 1));
                                     }
                                 }
-                            }
-
-                            else {
-                                quadEdges.at(currentControl->type +
-                                             radix * currentControl->type) =
-                                        edgesMat.at(entryPos);
+                            } else {
+                                quadEdges.at(currentControl->type + radix * currentControl->type) = edgesMat.at(entryPos);
                             }
                             edgesMat.at(entryPos) = makeDDNode(currentReg, quadEdges);
 
@@ -573,16 +566,14 @@ namespace dd {
                 auto               nextRadix = registersSizes.at(static_cast<QuantumRegister>(nextReg));
                 std::vector<mEdge> nextEdges(nextRadix * nextRadix, mEdge::zero);
 
-                if (currentControl != controls.end() &&
-                    currentControl->quantumRegister == nextReg) {
+                if (currentControl != controls.end() && currentControl->quantumRegister == nextReg) {
                     for (auto i = 0U; i < nextRadix; i++) {
                         auto diagInd = i * nextRadix + i;
                         if (i == currentControl->type) {
                             nextEdges.at(diagInd) = targetNodeEdge;
                         } else {
-                            nextEdges.at(diagInd) =
-                                    makeIdent(static_cast<QuantumRegisterCount>(start),
-                                              static_cast<QuantumRegisterCount>(nextReg - 1));
+                            nextEdges.at(diagInd) = makeIdent(static_cast<QuantumRegisterCount>(start),
+                                                              static_cast<QuantumRegisterCount>(nextReg - 1));
                         }
                     }
 
@@ -1126,6 +1117,329 @@ namespace dd {
         }
 
         ///
+        /// Kronecker/tensor product
+        ///
+    public:
+        ComputeTable<vEdge, vEdge, vCachedEdge, 4096> vectorKronecker{};
+        ComputeTable<mEdge, mEdge, mCachedEdge, 4096> matrixKronecker{};
+
+        template<class Node>
+        [[nodiscard]] ComputeTable<Edge<Node>, Edge<Node>, CachedEdge<Node>, 4096>& getKroneckerComputeTable();
+
+        template<class Edge>
+        Edge kronecker(const Edge& x, const Edge& y, bool incIdx = true) {
+            auto e = kronecker2(x, y, incIdx);
+
+            if (e.weight != Complex::zero && e.weight != Complex::one) {
+                complexNumber.returnToCache(e.weight);
+                e.weight = complexNumber.lookup(e.weight);
+            }
+
+            return e;
+        }
+
+        // extent the DD pointed to by `e` with `h` identities on top and `l` identities at the bottom
+        mEdge extend(const mEdge& e, QuantumRegister h, QuantumRegister l = 0) {
+            auto f = (l > 0) ? kronecker(e, makeIdent(l)) : e;
+            auto g = (h > 0) ? kronecker(makeIdent(h), f) : f;
+            return g;
+        }
+
+    private:
+        template<class Node>
+        Edge<Node> kronecker2(const Edge<Node>& x, const Edge<Node>& y, bool incIdx = true) {
+            if (x.weight.approximatelyZero() || y.weight.approximatelyZero()) {
+                return Edge<Node>::zero;
+            }
+
+            if (x.isTerminal()) {
+                auto r   = y;
+                r.weight = complexNumber.mulCached(x.weight, y.weight);
+                return r;
+            }
+
+            auto& computeTable = getKroneckerComputeTable<Node>();
+            auto  r            = computeTable.lookup(x, y);
+            if (r.nextNode != nullptr) {
+                if (r.weight.approximatelyZero()) {
+                    return Edge<Node>::zero;
+                } else {
+                    return {r.nextNode, complexNumber.getCached(r.weight)};
+                }
+            }
+
+            //constexpr std::size_t N = std::tuple_size_v<decltype(x.->e)>;
+            // special case handling for matrices
+            //if constexpr (N == EDGE2) {
+            if (x.nextNode->identity) {
+                std::vector<Edge<Node>> newEdges(x.nextNode->edges.size(), dd::Edge<Node>::zero);
+
+                for (auto i = 0U; i < registersSizes.at(x.nextNode->varIndx); i++) {
+                    newEdges.at(i + i * (registersSizes.at(x.nextNode->varIndx))) = y;
+                }
+                auto idx = incIdx ? static_cast<QuantumRegister>(y.nextNode->varIndx + 1) : y.nextNode->varIndx;
+
+                auto e = makeDDNode(idx, newEdges);
+
+                for (auto i = 0; i < x.nextNode->varIndx; ++i) {
+                    std::vector<Edge<Node>> eSucc(e.nextNode->edges.size(), dd::Edge<Node>::zero);
+                    for (auto j = 0U; j < registersSizes.at(e.nextNode->varIndx); j++) {
+                        eSucc.at(j + j * (registersSizes.at(e.nextNode->varIndx))) = e;
+                    }
+
+                    idx = incIdx ? static_cast<QuantumRegister>(e.nextNode->varIndx + 1) : e.nextNode->varIndx;
+
+                    e = makeDDNode(idx, eSucc);
+                }
+
+                e.weight = complexNumber.getCached(CTEntry::val(y.weight.real), CTEntry::val(y.weight.img));
+                computeTable.insert(x, y, {e.nextNode, e.weight});
+                return e;
+            }
+            //}
+
+            std::vector<Edge<Node>> edge(x.nextNode->edges.size(), dd::Edge<Node>::zero);
+            for (auto i = 0U; i < x.nextNode->edges.size(); ++i) {
+                edge.at(i) = kronecker2(x.nextNode->edges.at(i), y, incIdx);
+            }
+
+            auto idx = incIdx ? static_cast<QuantumRegister>(y.nextNode->varIndx + x.nextNode->varIndx + 1) : x.nextNode->varIndx;
+            auto e   = makeDDNode(idx, edge, true);
+            ComplexNumbers::mul(e.weight, e.weight, x.weight);
+            computeTable.insert(x, y, {e.nextNode, e.weight});
+            return e;
+        }
+
+    public:
+        mEdge CSUM(QuantumRegisterCount n, QuantumRegister cReg, QuantumRegister target, bool isDagger = false) {
+            if (registersSizes.at(cReg) != registersSizes.at(target)) {
+                throw std::invalid_argument("CSUM works on qudits of the same dimension");
+            }
+            if (registersSizes.at(cReg) == 2) {
+                auto res       = makeIdent(n);
+                bool firstTime = true;
+
+                for (auto i = 0U; i < registersSizes.at(cReg); i++) {
+                    auto controlPi = makeGateDD<dd::GateMatrix>(dd::Pimat(i), n, cReg);
+                    auto Xpwr      = makeGateDD<dd::GateMatrix>(dd::Xmat, n, target);
+
+                    auto tempMult = makeGateDD<dd::GateMatrix>(dd::Imat, n, target);
+
+                    for (auto counter = 0U; counter < i; counter++) {
+                        tempMult = multiply(tempMult, Xpwr);
+                    }
+
+                    auto kron = multiply(tempMult, controlPi);
+                    if (firstTime) {
+                        res       = kron;
+                        firstTime = false;
+                    } else {
+                        res = add(res, kron);
+                    }
+                }
+                return res;
+            } else if (registersSizes.at(cReg) == 3) {
+                auto res       = makeIdent(n);
+                bool firstTime = true;
+
+                for (auto i = 0U; i < registersSizes.at(cReg); i++) {
+                    auto controlPi = makeGateDD<dd::TritMatrix>(dd::Pi3(i), n, cReg);
+
+                    auto Xpwr = makeGateDD<dd::TritMatrix>(dd::X3, n, target);
+                    if (isDagger) Xpwr = makeGateDD<dd::TritMatrix>(dd::X3dag, n, target);
+
+                    auto tempMult = makeGateDD<dd::TritMatrix>(dd::I3, n, target);
+
+                    for (auto counter = 0U; counter < i; counter++) {
+                        tempMult = multiply(tempMult, Xpwr);
+                    }
+
+                    auto kron = multiply(tempMult, controlPi);
+                    if (firstTime) {
+                        res       = kron;
+                        firstTime = false;
+                    } else {
+                        res = add(res, kron);
+                    }
+                }
+                return res;
+            } else if (registersSizes.at(cReg) == 4) {
+                auto res       = makeIdent(n);
+                bool firstTime = true;
+
+                for (auto i = 0U; i < registersSizes.at(cReg); i++) {
+                    auto controlPi = makeGateDD<dd::QuartMatrix>(dd::Pi4(i), n, cReg);
+                    auto Xpwr      = makeGateDD<dd::QuartMatrix>(dd::X4, n, target);
+                    if (isDagger) Xpwr = makeGateDD<dd::QuartMatrix>(dd::X4dag, n, target);
+
+                    auto tempMult = makeGateDD<dd::QuartMatrix>(dd::I4, n, target);
+
+                    for (auto counter = 0U; counter < i; counter++) {
+                        tempMult = multiply(tempMult, Xpwr);
+                    }
+
+                    auto kron = multiply(tempMult, controlPi);
+                    if (firstTime) {
+                        res       = kron;
+                        firstTime = false;
+                    } else {
+                        res = add(res, kron);
+                    }
+                }
+                return res;
+            } else if (registersSizes.at(cReg) == 5) {
+                auto res       = makeIdent(n);
+                bool firstTime = true;
+
+                for (auto i = 0U; i < registersSizes.at(cReg); i++) {
+                    auto controlPi = makeGateDD<dd::QuintMatrix>(dd::Pi5(i), n, cReg);
+                    auto Xpwr      = makeGateDD<dd::QuintMatrix>(dd::X5, n, target);
+                    if (isDagger) Xpwr = makeGateDD<dd::QuintMatrix>(dd::X5dag, n, target);
+
+                    auto tempMult = makeGateDD<dd::QuintMatrix>(dd::I5, n, target);
+
+                    for (auto counter = 0U; counter < i; counter++) {
+                        tempMult = multiply(tempMult, Xpwr);
+                    }
+
+                    auto kron = multiply(tempMult, controlPi);
+                    if (firstTime) {
+                        res       = kron;
+                        firstTime = false;
+                    } else {
+                        res = add(res, kron);
+                    }
+                }
+                return res;
+            }
+        }
+
+        vEdge spread2(QuantumRegisterCount n, std::vector<QuantumRegister> lines, vEdge& state) {
+            dd::Controls control01{{lines.at(0), 1}};
+            auto         cH = makeGateDD<dd::GateMatrix>(dd::Hmat, n, control01, lines.at(1));
+
+            dd::Controls control10{{lines.at(1), 0}};
+            mEdge        minus = mEdge::zero;
+            mEdge        xp10  = mEdge::zero;
+
+            if (registersSizes.at(lines.at(0)) == 2) {
+                minus = makeGateDD<dd::GateMatrix>(dd::Xmat, n, lines.at(0));
+                xp10  = makeGateDD<dd::GateMatrix>(dd::Xmat, n, control10, lines.at(0));
+            }
+
+            if (registersSizes.at(lines.at(0)) == 3) {
+                minus = makeGateDD<dd::TritMatrix>(dd::X3dag, n, lines.at(0));
+                xp10  = makeGateDD<dd::TritMatrix>(dd::X3, n, control10, lines.at(0));
+            }
+
+            else if (registersSizes.at(lines.at(0)) == 5) {
+                minus = makeGateDD<dd::QuintMatrix>(dd::X5dag, n, lines.at(0));
+                xp10  = makeGateDD<dd::QuintMatrix>(dd::X5, n, control10, lines.at(0));
+            }
+
+            state = multiply(cH, state);
+            state = multiply(minus, state);
+            state = multiply(xp10, state);
+
+            return state;
+        }
+        vEdge spread3(QuantumRegisterCount n, std::vector<QuantumRegister> lines, vEdge& state) {
+            dd::Controls control01{{lines.at(0), 1}};
+            auto         cH = makeGateDD<dd::TritMatrix>(dd::H3(), n, control01, lines.at(1));
+
+            dd::Controls control10{{lines.at(1), 0}};
+            mEdge        minus = mEdge::zero;
+            mEdge        xp10  = mEdge::zero;
+
+            if (registersSizes.at(lines.at(0)) == 2) {
+                minus = makeGateDD<dd::GateMatrix>(dd::Xmat, n, lines.at(0));
+                xp10  = makeGateDD<dd::GateMatrix>(dd::Xmat, n, control10, lines.at(0));
+            }
+
+            if (registersSizes.at(lines.at(0)) == 3) {
+                minus = makeGateDD<dd::TritMatrix>(dd::X3dag, n, lines.at(0));
+                xp10  = makeGateDD<dd::TritMatrix>(dd::X3, n, control10, lines.at(0));
+            }
+
+            else if (registersSizes.at(lines.at(0)) == 5) {
+                minus = makeGateDD<dd::QuintMatrix>(dd::X5dag, n, lines.at(0));
+                xp10  = makeGateDD<dd::QuintMatrix>(dd::X5, n, control10, lines.at(0));
+            }
+
+            dd::Controls control12{{lines.at(1), 2}};
+            auto         xp12   = makeGateDD<dd::TritMatrix>(dd::X3, n, control12, lines.at(2));
+            auto         csum21 = CSUM(n, lines.at(2), lines.at(1), true);
+
+            state = multiply(cH, state);
+            state = multiply(minus, state);
+            state = multiply(xp10, state);
+            state = multiply(xp12, state);
+            state = multiply(csum21, state);
+            state = multiply(csum21, state);
+
+            return state;
+        }
+        vEdge spread5(QuantumRegisterCount n, std::vector<QuantumRegister> lines, vEdge& state) {
+            dd::Controls control01{{lines.at(0), 1}};
+            auto         cH = makeGateDD<dd::QuintMatrix>(dd::H5(), n, control01, lines.at(1));
+
+            dd::Controls control10{{lines.at(1), 0}};
+            mEdge        minus = mEdge::zero;
+            mEdge        xp10  = mEdge::zero;
+
+            if (registersSizes.at(lines.at(0)) == 2) {
+                minus = makeGateDD<dd::GateMatrix>(dd::Xmat, n, lines.at(0));
+                xp10  = makeGateDD<dd::GateMatrix>(dd::Xmat, n, control10, lines.at(0));
+            }
+
+            if (registersSizes.at(lines.at(0)) == 3) {
+                minus = makeGateDD<dd::TritMatrix>(dd::X3dag, n, lines.at(0));
+                xp10  = makeGateDD<dd::TritMatrix>(dd::X3, n, control10, lines.at(0));
+            }
+
+            else if (registersSizes.at(lines.at(0)) == 5) {
+                minus = makeGateDD<dd::QuintMatrix>(dd::X5dag, n, lines.at(0));
+                xp10  = makeGateDD<dd::QuintMatrix>(dd::X5, n, control10, lines.at(0));
+            }
+
+            dd::Controls control12{{lines.at(1), 2}};
+            auto         xp12 = makeGateDD<dd::QuintMatrix>(dd::X5, n, control12, lines.at(2));
+            dd::Controls control13{{lines.at(1), 3}};
+            auto         xp13 = makeGateDD<dd::QuintMatrix>(dd::X5, n, control13, lines.at(3));
+            dd::Controls control14{{lines.at(1), 4}};
+            auto         xp14 = makeGateDD<dd::QuintMatrix>(dd::X5, n, control14, lines.at(4));
+
+            auto csum21 = CSUM(n, lines.at(2), lines.at(1), true);
+            auto csum31 = CSUM(n, lines.at(3), lines.at(1), true);
+            auto csum41 = CSUM(n, lines.at(4), lines.at(1), true);
+
+            state = multiply(cH, state);
+            state = multiply(minus, state);
+
+            state = multiply(xp10, state);
+
+            state = multiply(xp12, state);
+
+            state = multiply(csum21, state);
+            state = multiply(csum21, state);
+
+            state = multiply(xp13, state);
+
+            state = multiply(csum31, state);
+            state = multiply(csum31, state);
+            state = multiply(csum31, state);
+
+            state = multiply(xp14, state);
+
+            state = multiply(csum41, state);
+            state = multiply(csum41, state);
+            state = multiply(csum41, state);
+            state = multiply(csum41, state);
+
+            return state;
+        }
+
+        ///
         /// Vector and matrix extraction from DDs
         ///
     public:
@@ -1314,7 +1628,7 @@ namespace dd {
             return repr;
         }
 
-        void printVector(const vEdge& edge) {
+        void printVector(const vEdge& edge, bool nonZero = false) {
             //unsigned long long numEntries = static_cast<unsigned long long int>(std::accumulate(registersSizes.begin(), registersSizes.end(), 1,std::multiplies<>()));
 
             unsigned long long numEntries = 1ULL;
@@ -1326,21 +1640,22 @@ namespace dd {
                 auto reprI = getReprOfIndex(i, numEntries);
                 // get amplitude
                 const auto amplitude = getValueByPath(edge, reprI);
-                // TODO HOW SHALL WE REPRESENT??
-                //
-                for (const unsigned long& coeff: reprI) {
-                    std::cout << coeff;
-                }
-                reprI.clear();
 
-                constexpr auto precision = 3;
-                // set fixed width to maximum of a printed number
-                // (-) 0.precision plus/minus 0.precision i
-                constexpr auto width = 1 + 2 + precision + 1 + 2 + precision + 1;
-                std::cout << ": " << std::setw(width)
-                          << ComplexValue::toString(amplitude.r, amplitude.i, false,
-                                                    precision)
-                          << "\n";
+                if (!amplitude.approximatelyZero() || !nonZero) {
+                    for (const unsigned long& coeff: reprI) {
+                        std::cout << coeff;
+                    }
+                    reprI.clear();
+
+                    constexpr auto precision = 3;
+                    // set fixed width to maximum of a printed number
+                    // (-) 0.precision plus/minus 0.precision i
+                    constexpr auto width = 1 + 2 + precision + 1 + 2 + precision + 1;
+                    std::cout << ": " << std::setw(width)
+                              << ComplexValue::toString(amplitude.r, amplitude.i, false,
+                                                        precision)
+                              << "\n";
+                }
             }
             std::cout << std::flush;
         }
@@ -1580,17 +1895,21 @@ namespace dd {
     MDDPackage::getMultiplicationComputeTable() {
         return matrixMatrixMultiplication;
     }
-    /*
-    template<>
-    [[nodiscard]] inline ComputeTable<MDDPackage::vEdge, MDDPackage::vEdge,
-    MDDPackage::vCachedEdge, 4096>& MDDPackage::getKroneckerComputeTable() {
-    return vectorKronecker; }
 
     template<>
-    [[nodiscard]] inline ComputeTable<Package::mEdge, Package::mEdge,
-    Package::mCachedEdge, 4096>& Package::getKroneckerComputeTable() { return
-    matrixKronecker; }
-    */
+    [[nodiscard]] inline ComputeTable<MDDPackage::vEdge, MDDPackage::vEdge,
+                                      MDDPackage::vCachedEdge, 4096>&
+    MDDPackage::getKroneckerComputeTable() {
+        return vectorKronecker;
+    }
+
+    template<>
+    [[nodiscard]] inline ComputeTable<MDDPackage::mEdge, MDDPackage::mEdge,
+                                      MDDPackage::mCachedEdge, 4096>&
+    MDDPackage::getKroneckerComputeTable() {
+        return matrixKronecker;
+    }
+
 } // namespace dd
 
 #endif

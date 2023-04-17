@@ -438,6 +438,164 @@ TEST(DDPackageTest, QutritBellState) {
                 dd::ComplexTable<>::tolerance());
 }
 
+TEST(DDPackageTest, W3State) {
+    auto dd = std::make_unique<dd::MDDPackage>(3, std::vector<std::size_t>{3, 3, 3});
+    EXPECT_EQ(dd->qregisters(), 3);
+
+    auto evolution = dd->makeZeroState(3);
+
+    auto         h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 3, 1);
+    dd::Controls control10{{1, 0}};
+    auto         xp10 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control10, 0);
+    dd::Controls control12{{1, 2}};
+    auto         xp12 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control12, 2);
+
+    auto csum21 = dd->CSUM(3, 2, 1, true);
+
+    evolution = dd->multiply(h3Gate, evolution);
+    std::cout << "\n"
+              << std::endl;
+    dd->printVector(evolution);
+
+    evolution = dd->multiply(xp10, evolution);
+    std::cout << "\n"
+              << std::endl;
+    dd->printVector(evolution);
+
+    evolution = dd->multiply(xp12, evolution);
+    std::cout << "\n"
+              << std::endl;
+    dd->printVector(evolution);
+
+    evolution = dd->multiply(csum21, evolution);
+    evolution = dd->multiply(csum21, evolution);
+
+    std::cout << "\n"
+              << std::endl;
+    dd->printVector(evolution);
+}
+TEST(DDPackageTest, Mix23WState) {
+    auto dd = std::make_unique<dd::MDDPackage>(6, std::vector<std::size_t>{2, 3, 3, 2, 3, 3});
+    EXPECT_EQ(dd->qregisters(), 6);
+
+    auto evolution = dd->makeBasisState(6, {1, 0, 0, 0, 0, 0});
+
+    evolution = dd->spread2(6, std::vector<dd::QuantumRegister>{0, 3}, evolution);
+    evolution = dd->spread3(6, std::vector<dd::QuantumRegister>{0, 1, 2}, evolution);
+    evolution = dd->spread3(6, std::vector<dd::QuantumRegister>{3, 4, 5}, evolution);
+
+    std::cout << "\n"
+              << std::endl;
+    dd->printVector(evolution);
+
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {1, 0, 0, 0, 0, 0}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {0, 1, 0, 0, 0, 0}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {0, 0, 1, 0, 0, 0}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {0, 0, 0, 1, 0, 0}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {0, 0, 0, 0, 1, 0}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {0, 0, 0, 0, 0, 1}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
+}
+
+TEST(DDPackageTest, W35State) {
+    auto dd = std::make_unique<dd::MDDPackage>(15, std::vector<std::size_t>{3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5});
+    EXPECT_EQ(dd->qregisters(), 15);
+
+    auto evolution = dd->makeBasisState(15, {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+
+    evolution = dd->spread3(15, std::vector<dd::QuantumRegister>{0, 1, 2}, evolution);
+    evolution = dd->spread5(15, std::vector<dd::QuantumRegister>{0, 3, 4, 5, 6}, evolution);
+    evolution = dd->spread5(15, std::vector<dd::QuantumRegister>{1, 7, 8, 9, 10}, evolution);
+    evolution = dd->spread5(15, std::vector<dd::QuantumRegister>{2, 11, 12, 13, 14}, evolution);
+
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+    ASSERT_NEAR(dd->fidelity(dd->makeBasisState(15, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}), evolution), 1.0 / 15.0, dd::ComplexTable<>::tolerance());
+}
+
+TEST(DDPackageTest, W5State) {
+    auto dd = std::make_unique<dd::MDDPackage>(5, std::vector<std::size_t>{5, 5, 5, 5, 5});
+
+    EXPECT_EQ(dd->qregisters(), 5);
+
+    auto evolution = dd->makeZeroState(5);
+
+    auto h5Gate = dd->makeGateDD<dd::QuintMatrix>(dd::H5(), 5, 1);
+
+    dd::Controls control10{{1, 0}};
+    auto         xp10 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control10, 0);
+    dd::Controls control12{{1, 2}};
+    auto         xp12 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control12, 2);
+    dd::Controls control13{{1, 3}};
+    auto         xp13 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control13, 3);
+    dd::Controls control14{{1, 4}};
+    auto         xp14 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control14, 4);
+
+    auto csum21 = dd->CSUM(5, 2, 1, true);
+    auto csum31 = dd->CSUM(5, 3, 1, true);
+    auto csum41 = dd->CSUM(5, 4, 1, true);
+
+    evolution = dd->multiply(h5Gate, evolution);
+    std::cout << "\n"
+              << std::endl;
+    //dd->printVector(evolution);
+
+    evolution = dd->multiply(xp10, evolution);
+    std::cout << "\n"
+              << std::endl;
+    //dd->printVector(evolution);
+
+    evolution = dd->multiply(xp12, evolution);
+    std::cout << "\n"
+              << std::endl;
+    //dd->printVector(evolution);
+
+    evolution = dd->multiply(csum21, evolution);
+    evolution = dd->multiply(csum21, evolution);
+
+    std::cout << "\n"
+              << std::endl;
+    //dd->printVector(evolution);
+
+    evolution = dd->multiply(xp13, evolution);
+    std::cout << "\n"
+              << std::endl;
+    //dd->printVector(evolution);
+
+    evolution = dd->multiply(csum31, evolution);
+    evolution = dd->multiply(csum31, evolution);
+    evolution = dd->multiply(csum31, evolution);
+
+    std::cout << "\n"
+              << std::endl;
+    //dd->printVector(evolution);
+
+    evolution = dd->multiply(xp14, evolution);
+    std::cout << "\n"
+              << std::endl;
+    //dd->printVector(evolution);
+
+    evolution = dd->multiply(csum41, evolution);
+    evolution = dd->multiply(csum41, evolution);
+    evolution = dd->multiply(csum41, evolution);
+    evolution = dd->multiply(csum41, evolution);
+
+    std::cout << "\n"
+              << std::endl;
+    dd->printVector(evolution);
+}
+
 TEST(DDPackageTest, GHZQutritState) {
     auto dd =
             std::make_unique<dd::MDDPackage>(3, std::vector<std::size_t>{3, 3, 3});
@@ -550,8 +708,8 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
 }
 
 TEST(DDPackageTest, RandomCircuits) {
-    int          width = 5;
-    unsigned int depth = 500L;
+    int          width = 9;
+    unsigned int depth = 100L;
     size_t       maxD  = 5;
 
     std::random_device rd;        // obtain a random number from hardware
@@ -570,6 +728,11 @@ TEST(DDPackageTest, RandomCircuits) {
 
     auto evolution = dd->makeZeroState(width);
 
+    std::cout << "\n"
+              << "STARTED"
+              << "\n"
+              << std::endl;
+
     std::uniform_int_distribution<>  pickbool(0, 1);
     std::uniform_int_distribution<>  pickcontrols(1, width - 1);
     std::uniform_real_distribution<> angles(0.0, 2. * dd::PI);
@@ -584,6 +747,10 @@ TEST(DDPackageTest, RandomCircuits) {
                 auto localChoice = pickbool(gen);
 
                 if (localChoice == 0) { //hadamard
+                    std::cout << "\n"
+                              << "hadamard"
+                              << "\n"
+                              << std::endl;
                     if (particles.at(line) == 2) {
                         auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::H(), width, line);
                         evolution       = dd->multiply(chosenGate, evolution);
@@ -598,7 +765,10 @@ TEST(DDPackageTest, RandomCircuits) {
                         evolution       = dd->multiply(chosenGate, evolution);
                     }
                 } else { //givens
-
+                    std::cout << "\n"
+                              << "givens"
+                              << "\n"
+                              << std::endl;
                     if (particles.at(line) == 2) {
                         long double theta      = 0.;
                         long double phi        = 0.;
@@ -652,6 +822,10 @@ TEST(DDPackageTest, RandomCircuits) {
                     }
                 }
             } else { //entangling
+                std::cout << "\n"
+                          << "entangling"
+                          << "\n"
+                          << std::endl;
 
                 auto entChoice        = pickbool(gen);
                 auto numberOfControls = pickcontrols(gen);
@@ -677,7 +851,10 @@ TEST(DDPackageTest, RandomCircuits) {
 
                 if (entChoice == 0) { // CEX based
                     //selection of controls
-
+                    std::cout << "\n"
+                              << "CEX"
+                              << "\n"
+                              << std::endl;
                     if (particles.at(line) == 2) {
                         long double theta      = angles(gen);
                         long double phi        = angles(gen);
@@ -730,6 +907,10 @@ TEST(DDPackageTest, RandomCircuits) {
                         evolution       = dd->multiply(chosenGate, evolution);
                     }
                 } else { // Controlled clifford
+                    std::cout << "\n"
+                              << "clifford"
+                              << "\n"
+                              << std::endl;
                     if (particles.at(line) == 2) {
                         auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::Xmat, width, control, line);
                         evolution       = dd->multiply(chosenGate, evolution);
@@ -747,7 +928,7 @@ TEST(DDPackageTest, RandomCircuits) {
             }
         }
     }
-    auto basis0State = dd->makeBasisState(width, std::vector<size_t>(width, 0));
-    dd->printVector(evolution);
-    //ASSERT_NEAR(dd->fidelity(basis0State, evolution), 0.3333333333333333, dd::ComplexTable<>::tolerance());
+
+    //auto basis0State = dd->makeBasisState(width, std::vector<size_t>(width, 0));
+    //dd->printVector(evolution);
 }

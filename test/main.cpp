@@ -4,15 +4,24 @@
 #include <vector>
 
 int main() { // NOLINT(bugprone-exception-escape)
-    auto mdd = std::make_unique<dd::MDDPackage>(1, std::vector<std::size_t>{5});
+    auto mdd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{5, 5});
 
-    auto rxy = mdd->makeGateDD<dd::QuintMatrix>(dd::RXY5(dd::PI_4, dd::PI_4, 0, 1), 1, 0);
+    //CSUM(QuantumRegisterCount n, QuantumRegister cReg, QuantumRegister target)
+    auto h5Gate = mdd->makeGateDD<dd::QuintMatrix>(dd::H5(), 2, 1);
+    //auto csum = mdd->CSUM(2, 1, 0);
 
-    mdd->getVectorizedMatrix(rxy);
+    auto mul = mdd->makeGateDD<dd::QuintMatrix>(dd::I5, 2, 1);
+    mul      = mdd->multiply(mul, h5Gate);
+    mul      = mdd->multiply(mul, h5Gate);
+    mul      = mdd->multiply(mul, h5Gate);
+    mul      = mdd->multiply(mul, h5Gate);
 
-    auto oneState = mdd->makeBasisState(1, {1});
+    //mul = mdd->multiply(mul, h5Gate);
+    mdd->getVectorizedMatrix(mul);
 
-    mdd->printVector(oneState);
+    //auto oneState = mdd->makeBasisState(1, {1});
+
+    //mdd->printVector(oneState);
 
     return 0;
 }

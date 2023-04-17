@@ -62,6 +62,12 @@ namespace dd {
     constexpr GateMatrix Vdagmat{COMPLEX_SQRT2_2, COMPLEX_ISQRT2_2,
                                  COMPLEX_ISQRT2_2, COMPLEX_SQRT2_2};
 
+    inline GateMatrix Pimat(size_t i) {
+        GateMatrix zero    = {COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO};
+        zero.at(i + i * 2) = COMPLEX_ONE;
+        return zero;
+    }
+
     inline GateMatrix U3mat(fp lambda, fp phi, fp theta) {
         return GateMatrix{{{std::cos(theta / 2.), 0.},
                            {-std::cos(lambda) * std::sin(theta / 2.),
@@ -121,6 +127,18 @@ namespace dd {
                 dd::ComplexValue{std::sin(theta / 2.) * std::sin(phi), -std::sin(theta / 2.) * std::cos(phi)},
                 dd::ComplexValue{std::cos(theta / 2.), 0.}};
         return rotation;
+    }
+
+    constexpr TritMatrix I3{COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                            COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
+                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+
+    inline TritMatrix Pi3(size_t i) {
+        TritMatrix zero    = {COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO};
+        zero.at(i + i * 3) = COMPLEX_ONE;
+        return zero;
     }
 
     inline TritMatrix H3() {
@@ -194,6 +212,21 @@ namespace dd {
         return identity;
     }
 
+    constexpr QuartMatrix I4{
+            COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+
+    inline QuartMatrix Pi4(size_t i) {
+        QuartMatrix zero   = {COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO};
+        zero.at(i + i * 4) = COMPLEX_ONE;
+        return zero;
+    }
+
     inline QuartMatrix H4() {
         return QuartMatrix{COMPLEX_SQRT4_4,
                            COMPLEX_SQRT4_4,
@@ -255,6 +288,22 @@ namespace dd {
                              COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO};
 
+    constexpr QuintMatrix I5{
+            COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+
+    inline QuintMatrix Pi5(size_t i) {
+        QuintMatrix zero   = {COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO};
+        zero.at(i + i * 5) = COMPLEX_ONE;
+        return zero;
+    }
     inline QuintMatrix H5() {
         return QuintMatrix{COMPLEX_SQRT5_5,
                            COMPLEX_SQRT5_5,
