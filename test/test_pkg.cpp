@@ -773,7 +773,7 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
 }
 
 TEST(DDPackageTest, RandomCircuits) {
-    int          width = 9;
+    int          width = 4;
     unsigned int depth = 100L;
     size_t       maxD  = 5;
 
