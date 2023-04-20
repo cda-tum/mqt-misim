@@ -547,53 +547,118 @@ TEST(DDPackageTest, W5State) {
     auto csum41 = dd->CSUM(5, 4, 1, true);
 
     evolution = dd->multiply(h5Gate, evolution);
-    std::cout << "\n"
-              << std::endl;
-    //dd->printVector(evolution);
-
     evolution = dd->multiply(xp10, evolution);
-    std::cout << "\n"
-              << std::endl;
-    //dd->printVector(evolution);
-
     evolution = dd->multiply(xp12, evolution);
-    std::cout << "\n"
-              << std::endl;
-    //dd->printVector(evolution);
-
     evolution = dd->multiply(csum21, evolution);
     evolution = dd->multiply(csum21, evolution);
-
-    std::cout << "\n"
-              << std::endl;
-    //dd->printVector(evolution);
-
     evolution = dd->multiply(xp13, evolution);
-    std::cout << "\n"
-              << std::endl;
-    //dd->printVector(evolution);
-
     evolution = dd->multiply(csum31, evolution);
     evolution = dd->multiply(csum31, evolution);
     evolution = dd->multiply(csum31, evolution);
-
-    std::cout << "\n"
-              << std::endl;
-    //dd->printVector(evolution);
-
     evolution = dd->multiply(xp14, evolution);
-    std::cout << "\n"
-              << std::endl;
-    //dd->printVector(evolution);
-
     evolution = dd->multiply(csum41, evolution);
     evolution = dd->multiply(csum41, evolution);
     evolution = dd->multiply(csum41, evolution);
     evolution = dd->multiply(csum41, evolution);
-
     std::cout << "\n"
               << std::endl;
     dd->printVector(evolution);
+}
+
+TEST(DDPackageTest, FullMixWState) {
+    std::vector<size_t>                           orderOfLayers{2, 3, 2, 3, 3};
+    std::vector<std::size_t>                      lines{};
+    unsigned int                                  numLines = 0U;
+    std::map<unsigned int, std::vector<int>>      application;
+    std::vector<std::vector<dd::QuantumRegister>> indexes{{}};
+    auto                                          sizeTracker = 0;
+
+    bool initial = true;
+    for (auto i = 0U; i < orderOfLayers.size(); i++) {
+        // Update cardinality of each line, put them in order
+        // Update the application indexes
+        if (initial) {
+            for (auto j = 0U; j < orderOfLayers.at(i); j++) {
+                lines.push_back(orderOfLayers.at(i));
+                indexes.at(0).push_back(static_cast<dd::QuantumRegister>(j));
+                numLines++;
+            }
+            application[i]     = std::vector<int>{sizeTracker};
+            application[i + 1] = {};
+            sizeTracker++;
+            for (auto j = 0U; j < indexes.at(0).size(); j++) {
+                indexes.push_back(std::vector<dd::QuantumRegister>{indexes.at(0).at(static_cast<dd::QuantumRegister>(j))});
+                application[i + 1].push_back(sizeTracker);
+                sizeTracker++;
+            }
+
+            initial = false;
+        } else {
+            auto tempLine = lines.size();
+            auto counter  = 0U;
+            for (auto k = 0U; k < tempLine; k++) {
+                auto adder = k + counter;
+                for (auto j = 1U; j < orderOfLayers.at(i); j++) {
+                    lines.insert(lines.begin() + adder + j, orderOfLayers.at(i)); //check if eventually gets out of range
+                    numLines++;
+                    counter++;
+                }
+            }
+            for (auto c = 0; c < indexes.size(); c++) {
+                for (auto f = 0; f < indexes.at(c).size(); f++) {
+                    indexes.at(c).at(f) = indexes.at(c).at(f) + indexes.at(c).at(f) * (static_cast<dd::QuantumRegister>(orderOfLayers.at(i) - 1));
+                }
+            }
+            std::vector<dd::QuantumRegister> toAdd{};
+            for (auto c = 0; c < indexes.size(); c++) {
+                if (indexes.at(c).size() == 1) {
+                    toAdd.push_back(indexes.at(c).at(0));
+                    for (auto j = 1; j < orderOfLayers.at(i); j++) {
+                        indexes.at(c).push_back(indexes.at(c).at(0) + static_cast<dd::QuantumRegister>(j));
+                        toAdd.push_back(indexes.at(c).at(0) + static_cast<dd::QuantumRegister>(j));
+                    }
+                }
+            }
+            if (i < orderOfLayers.size() - 1) {
+                for (auto l = 0; l < toAdd.size(); l++) {
+                    indexes.push_back(std::vector<dd::QuantumRegister>{toAdd.at(static_cast<dd::QuantumRegister>(l))});
+                    application[i + 1].push_back(sizeTracker);
+                    sizeTracker++;
+                }
+                application[i + 2] = {};
+            }
+        }
+    }
+
+    auto dd = std::make_unique<dd::MDDPackage>(numLines, lines);
+    EXPECT_EQ(dd->qregisters(), numLines);
+
+    std::vector<size_t> initState(numLines, 0);
+    initState.at(0) = 1;
+    auto evolution  = dd->makeBasisState(numLines, initState);
+
+    for (auto i = 0U; i < orderOfLayers.size(); i++) {
+        if (orderOfLayers.at(i) == 2) {
+            for (auto g = 0; g < application[i].size(); g++) {
+                std::vector<dd::QuantumRegister> inputLines = indexes.at(application[i].at(g));
+                evolution                                   = dd->spread2(numLines, inputLines, evolution);
+            }
+        } else if (orderOfLayers.at(i) == 3) {
+            for (auto g = 0; g < application[i].size(); g++) {
+                evolution = dd->spread3(numLines, reinterpret_cast<const std::vector<dd::QuantumRegister>&>(indexes.at(application[i].at(g))), evolution);
+            }
+        } else if (orderOfLayers.at(i) == 5) {
+            for (auto g = 0; g < application[i].size(); g++) {
+                evolution = dd->spread5(numLines, reinterpret_cast<const std::vector<dd::QuantumRegister>&>(indexes.at(application[i].at(g))), evolution);
+            }
+        }
+    }
+
+    for (auto h = 0U; h < numLines; h++) {
+        std::vector<size_t> checkState(numLines, 0);
+        checkState.at(h) = 1;
+        ASSERT_NEAR(dd->fidelity(dd->makeBasisState(numLines, checkState), evolution), 1.0 / numLines, dd::ComplexTable<>::tolerance());
+    }
 }
 
 TEST(DDPackageTest, GHZQutritState) {
@@ -712,8 +777,8 @@ TEST(DDPackageTest, RandomCircuits) {
     unsigned int depth = 100L;
     size_t       maxD  = 5;
 
-    std::random_device rd;        // obtain a random number from hardware
-    std::mt19937       gen(rd()); // seed the generator
+    std::random_device rd;         // obtain a random number from hardware
+    std::mt19937       gen(12345); // seed the generator
 
     std::vector<std::size_t> particles = {};
 
