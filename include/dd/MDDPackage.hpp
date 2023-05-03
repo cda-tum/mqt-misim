@@ -1439,6 +1439,21 @@ namespace dd {
             return state;
         }
 
+    public:
+        template<class Edge>
+        unsigned int nodeCount(const Edge& e, std::unordered_set<decltype(e.nextNode)>& v) const {
+            v.insert(e.nextNode);
+            unsigned int sum = 1;
+            if (!e.isTerminal()) {
+                for (const auto& edge: e.nextNode->edges) {
+                    if (edge.nextNode != nullptr && !v.count(edge.nextNode)) {
+                        sum += nodeCount(edge, v);
+                    }
+                }
+            }
+            return sum;
+        }
+
         ///
         /// Vector and matrix extraction from DDs
         ///

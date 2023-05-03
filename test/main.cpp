@@ -1,27 +1,39 @@
 #include "dd/MDDPackage.hpp"
 
 #include <memory>
-#include <vector>
 
-int main() { // NOLINT(bugprone-exception-escape)
-    auto mdd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{5, 5});
+int main() {
+    std::vector<std::size_t> lines{2, 3};
+    unsigned int             numLines = 2U;
 
-    //CSUM(QuantumRegisterCount n, QuantumRegister cReg, QuantumRegister target)
-    auto h5Gate = mdd->makeGateDD<dd::QuintMatrix>(dd::H5(), 2, 1);
-    //auto csum = mdd->CSUM(2, 1, 0);
+    auto dd         = std::make_unique<dd::MDDPackage>(numLines, lines); // Create new package instance capable of handling a qubit and a qutrit
+    auto zero_state = dd->makeZeroState(numLines);                       // zero_state = |0>
 
-    auto mul = mdd->makeGateDD<dd::QuintMatrix>(dd::I5, 2, 1);
-    mul      = mdd->multiply(mul, h5Gate);
-    mul      = mdd->multiply(mul, h5Gate);
-    mul      = mdd->multiply(mul, h5Gate);
-    mul      = mdd->multiply(mul, h5Gate);
+    /* Creating a DD requires the following inputs:
+ * 1. A matrix describing a single-qubit/qudit operation (here: the Hadamard matrix)
+ * 2. The number of qudits the DD will operate on (here: two lines)
+ * 3. The operations are applied to the qubit q0 and the qutrit q1
+ * (4. Controlled operations can be created by additionally specifying a list of control qubits before the target declaration)
+ */
+    auto h_on_qubit = dd->makeGateDD<dd::GateMatrix>(dd::H(), numLines, 0);
+    // auto h_on_qutrit = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 2, 1);
 
-    //mul = mdd->multiply(mul, h5Gate);
-    mdd->getVectorizedMatrix(mul);
+    // Multiplying the operation and the state results in a new state, here a single qubit in superposition
+    auto psi = dd->multiply(h_on_qubit, zero_state);
 
-    //auto oneState = mdd->makeBasisState(1, {1});
+    // Multiplying the operation and the state results in a new state, here a single qutrit in superposition
+    // psi = dd->multiply(h_on_qutrit, zero_state);
 
-    //mdd->printVector(oneState);
+    // An example of how to create a set of controls and add them together to create a more complex controlled operation
+    dd::Controls      control{};
+    const dd::Control c{0, 1};
+    control.insert(c);
 
-    return 0;
+    // An example of a controlled qutrit X operation, controlled on the level 1 of the qubit
+    auto CEX = dd->makeGateDD<dd::TritMatrix>(dd::X3, numLines, control, 1);
+
+    psi = dd->multiply(CEX, psi);
+
+    // The last lines retrieves the state vector and prints it
+    dd->printVector(psi);
 }

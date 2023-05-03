@@ -773,8 +773,8 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
 }
 
 TEST(DDPackageTest, RandomCircuits) {
-    int          width = 4;
-    unsigned int depth = 100L;
+    int          width = 8;
+    unsigned int depth = 1000L;
     size_t       maxD  = 5;
 
     std::random_device rd;         // obtain a random number from hardware
