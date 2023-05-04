@@ -1,7 +1,6 @@
-[![bench](https://img.shields.io/badge/benchmark-master-blue?logo=github&style=flat-square)](https://cda-tum.github.io/dd_package/dev/bench/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/cda-tum/dd_package/ci.yml?branch=main&logo=github&style=flat-square)](https://github.com/cda-tum/dd_package/actions?query=workflow%3A%22CI%22)
-[![Codecov](https://img.shields.io/codecov/c/github/cda-tum/dd_package/main?label=codecov&logo=codecov&style=flat-square)](https://codecov.io/gh/cda-tum/dd_package)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/cda-tum/MiSiM/ci.yml?branch=main&logo=github&style=flat-square)](https://github.com/cda-tum/MiSiM/actions?query=workflow%3A%22CI%22)
+[![Codecov](https://img.shields.io/codecov/c/github/cda-tum/MiSiM/main?label=codecov&logo=codecov&style=flat-square)](https://codecov.io/gh/cda-tum/MiSiM)
 
 # MQT MiSiM - A Tool for the Simulation of Mixed-Dimensional Quantum Circuits based on Decision Diagrams Written in C++
 
@@ -110,19 +109,6 @@ command. The flag `--parallel <NUMBER_OF_THREADS>` may be added to trigger a par
 
 This generates a number of executables in the `build/test` directory, including the test executable `dd_package_test`
 and the example executable `dd_package_example`.
-
-## Reference
-
-If you use the DD package for your research, we will be thankful if you refer to it by citing the following publication:
-
-```bibtex
-@article{Mato20XXMiSiM,
-    title={Mixed-Dimensional Quantum Circuit Simulation with Decision Diagrams},
-    author={Mato, Kevin and Hillmich, Stefan and Wille, Robert},
-    conference={XXX},
-    year={20XX}
-}
-```
 
 ## Further Information
 
