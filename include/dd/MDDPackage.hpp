@@ -1476,7 +1476,7 @@ namespace dd {
             // NOLINTNEXTLINE(cppcoreguidelines-avoid-do-while)
             do {
                 ComplexNumbers::mul(tempCompNumb, tempCompNumb, currentEdge.weight);
-                std::size_t tmp = pathElements.at(static_cast<std::size_t>(currentEdge.nextNode->varIndx)) - static_cast<std::size_t>('0');
+                const std::size_t tmp = static_cast<std::size_t>(pathElements.at(static_cast<std::size_t>(currentEdge.nextNode->varIndx)) - '0');
                 assert(tmp <= currentEdge.nextNode->edges.size());
                 currentEdge = currentEdge.nextNode->edges.at(tmp);
             } while (!currentEdge.isTerminal());
