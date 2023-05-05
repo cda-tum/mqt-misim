@@ -159,9 +159,9 @@ namespace dd {
         Complex lookup(const fp& r, const fp& i) {
             Complex ret{};
 
-            auto sign_r = std::signbit(r);
-            if (sign_r) {
-                auto absr = std::abs(r);
+            const auto signR = std::signbit(r);
+            if (signR) {
+                const auto absr = std::abs(r);
                 // if absolute value is close enough to zero, just return the zero entry (avoiding -0.0)
                 if (absr < decltype(complexTable)::tolerance()) {
                     ret.real = &decltype(complexTable)::zero;
@@ -172,9 +172,9 @@ namespace dd {
                 ret.real = complexTable.lookup(r);
             }
 
-            auto sign_i = std::signbit(i);
-            if (sign_i) {
-                auto absi = std::abs(i);
+            const auto signI = std::signbit(i);
+            if (signI) {
+                const auto absi = std::abs(i);
                 // if absolute value is close enough to zero, just return the zero entry (avoiding -0.0)
                 if (absi < decltype(complexTable)::tolerance()) {
                     ret.img = &decltype(complexTable)::zero;
