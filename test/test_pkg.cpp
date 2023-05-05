@@ -773,16 +773,15 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
 }
 
 TEST(DDPackageTest, RandomCircuits) {
-    int          width = 8;
-    unsigned int depth = 1000L;
-    size_t       maxD  = 5;
+    const dd::QuantumRegisterCount width = 3;
+    const std::size_t              depth = 1000;
+    const std::size_t              maxD  = 5;
 
-    std::random_device rd;         // obtain a random number from hardware
-    std::mt19937       gen(12345); // seed the generator
+    std::mt19937 gen(12345); // seed the generator
 
     std::vector<std::size_t> particles = {};
 
-    std::uniform_int_distribution<> dimdistr(2, maxD);
+    std::uniform_int_distribution<std::size_t> dimdistr(2, maxD);
     for (auto i = 0; i < width; i++) {
         particles.push_back(dimdistr(gen));
     }
@@ -798,12 +797,12 @@ TEST(DDPackageTest, RandomCircuits) {
               << "\n"
               << std::endl;
 
-    std::uniform_int_distribution<>  pickbool(0, 1);
-    std::uniform_int_distribution<>  pickcontrols(1, width - 1);
-    std::uniform_real_distribution<> angles(0.0, 2. * dd::PI);
+    std::uniform_int_distribution<>                         pickbool(0, 1);
+    std::uniform_int_distribution<dd::QuantumRegisterCount> pickcontrols(1, width - 1);
+    std::uniform_real_distribution<>                        angles(0.0, 2. * dd::PI);
 
-    for (auto timeStep = 0U; timeStep < depth; timeStep++) {
-        for (int line = 0; line < width; line++) {
+    for (std::size_t timeStep = 0; timeStep < depth; timeStep++) {
+        for (std::size_t line = 0; line < width; line++) {
             //chose if local gate or entangling gate
             auto randomChoice = pickbool(gen);
 
@@ -835,13 +834,13 @@ TEST(DDPackageTest, RandomCircuits) {
                               << "\n"
                               << std::endl;
                     if (particles.at(line) == 2) {
-                        long double theta      = 0.;
-                        long double phi        = 0.;
-                        auto        chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, line);
-                        evolution              = dd->multiply(chosenGate, evolution);
+                        double const theta      = 0.;
+                        double const phi        = 0.;
+                        auto         chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, line);
+                        evolution               = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 3) {
-                        long double                     theta = angles(gen);
-                        long double                     phi   = angles(gen);
+                        double const                    theta = angles(gen);
+                        double const                    phi   = angles(gen);
                         std::uniform_int_distribution<> picklevel(0, 2);
 
                         int levelA = picklevel(gen);
@@ -855,8 +854,8 @@ TEST(DDPackageTest, RandomCircuits) {
                         auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::RXY3(theta, phi, levelA, levelB), width, line);
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 4) {
-                        long double                     theta = angles(gen);
-                        long double                     phi   = angles(gen);
+                        double const                    theta = angles(gen);
+                        double const                    phi   = angles(gen);
                         std::uniform_int_distribution<> picklevel(0, 3);
 
                         int levelA = picklevel(gen);
@@ -870,8 +869,8 @@ TEST(DDPackageTest, RandomCircuits) {
                         auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::RXY4(theta, phi, levelA, levelB), width, line);
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 5) {
-                        long double                     theta = angles(gen);
-                        long double                     phi   = angles(gen);
+                        double const                    theta = angles(gen);
+                        double const                    phi   = angles(gen);
                         std::uniform_int_distribution<> picklevel(0, 4);
 
                         int levelA = picklevel(gen);
@@ -895,20 +894,22 @@ TEST(DDPackageTest, RandomCircuits) {
                 auto entChoice        = pickbool(gen);
                 auto numberOfControls = pickcontrols(gen);
 
-                std::vector<int> controlLines;
+                std::vector<std::size_t> controlLines;
 
                 for (auto i = 0U; i < width; i++) {
-                    if (i != line) controlLines.push_back(i);
+                    if (i != line) {
+                        controlLines.push_back(i);
+                    }
                 }
 
                 std::shuffle(begin(controlLines), end(controlLines), gen);
-                std::vector<int> controlParticles(controlLines.begin(), controlLines.begin() + numberOfControls);
+                std::vector<std::size_t> controlParticles(controlLines.begin(), controlLines.begin() + numberOfControls);
                 std::sort(controlParticles.begin(), controlParticles.end());
 
                 dd::Controls control{};
-                for (auto i = 0U; i < numberOfControls; i++) {
-                    std::uniform_int_distribution<> picklevel(0, particles.at(controlParticles.at(i)) - 1);
-                    auto                            level = picklevel(gen);
+                for (std::size_t i = 0; i < numberOfControls; i++) {
+                    std::uniform_int_distribution<std::size_t> picklevel(0, particles.at(controlParticles.at(i)) - 1);
+                    auto                                       level = picklevel(gen);
 
                     const dd::Control c{static_cast<dd::QuantumRegister>(controlParticles.at(i)), static_cast<dd::Control::Type>(level)};
                     control.insert(c);
@@ -921,17 +922,17 @@ TEST(DDPackageTest, RandomCircuits) {
                               << "\n"
                               << std::endl;
                     if (particles.at(line) == 2) {
-                        long double theta      = angles(gen);
-                        long double phi        = angles(gen);
-                        auto        chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, control, line);
-                        evolution              = dd->multiply(chosenGate, evolution);
+                        double const theta      = angles(gen);
+                        double const phi        = angles(gen);
+                        auto         chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, control, line);
+                        evolution               = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 3) {
                         std::uniform_int_distribution<> picklevel(0, 2);
 
-                        long double theta  = angles(gen);
-                        long double phi    = angles(gen);
-                        int         levelA = picklevel(gen);
-                        int         levelB = (levelA + 1) % 3;
+                        double const theta  = angles(gen);
+                        double const phi    = angles(gen);
+                        int          levelA = picklevel(gen);
+                        int          levelB = (levelA + 1) % 3;
                         if (levelA > levelB) {
                             auto temp = levelA;
                             levelA    = levelB;
@@ -943,10 +944,10 @@ TEST(DDPackageTest, RandomCircuits) {
                     } else if (particles.at(line) == 4) {
                         std::uniform_int_distribution<> picklevel(0, 3);
 
-                        long double theta  = angles(gen);
-                        long double phi    = angles(gen);
-                        int         levelA = picklevel(gen);
-                        int         levelB = (levelA + 1) % 4;
+                        double const theta  = angles(gen);
+                        double const phi    = angles(gen);
+                        int          levelA = picklevel(gen);
+                        int          levelB = (levelA + 1) % 4;
                         if (levelA > levelB) {
                             auto temp = levelA;
                             levelA    = levelB;
@@ -958,10 +959,10 @@ TEST(DDPackageTest, RandomCircuits) {
                     } else if (particles.at(line) == 5) {
                         std::uniform_int_distribution<> picklevel(0, 4);
 
-                        long double theta  = angles(gen);
-                        long double phi    = angles(gen);
-                        int         levelA = picklevel(gen);
-                        int         levelB = (levelA + 1) % 5;
+                        double const theta  = angles(gen);
+                        double const phi    = angles(gen);
+                        int          levelA = picklevel(gen);
+                        int          levelB = (levelA + 1) % 5;
                         if (levelA > levelB) {
                             auto temp = levelA;
                             levelA    = levelB;

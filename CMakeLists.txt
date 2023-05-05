@@ -1,6 +1,3 @@
-cmake_minimum_required(VERSION 3.19)
-project(MiSiM)
-
 # set required cmake version
 cmake_minimum_required(VERSION 3.19)
 
@@ -10,7 +7,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 
 # project definition
 project(
-  MiQsDD
+  MiSiM
   LANGUAGES CXX
   VERSION 0.1
   DESCRIPTION "MQT decision diagram package for mixed dimensional systems")

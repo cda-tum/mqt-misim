@@ -1,6 +1,6 @@
 /*
  * This file is part of the MQT DD Package which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum_dd/ for more information.
+ * See file README.md or go to https://www.cda.cit.tum.de/research/quantum_dd/ for more information.
  */
 
 #ifndef DD_PACKAGE_COMPLEXVALUE_HPP
@@ -58,19 +58,20 @@ namespace dd {
             os.write(reinterpret_cast<const char*>(&i), sizeof(decltype(i)));
         }
 
-        void from_string(const std::string& real_str, std::string imag_str) {
-            fp real = real_str.empty() ? 0. : std::stod(real_str);
+        void fromString(const std::string& realStr, std::string imagStr) {
+            const fp real = realStr.empty() ? 0. : std::stod(realStr);
 
-            imag_str.erase(remove(imag_str.begin(), imag_str.end(), ' '),
-                           imag_str.end());
-            imag_str.erase(remove(imag_str.begin(), imag_str.end(), 'i'), imag_str.end());
-            if (imag_str == "+" || imag_str == "-") imag_str = imag_str + "1";
-            fp imag = imag_str.empty() ? 0. : std::stod(imag_str);
-            r       = {real};
-            i       = {imag};
+            imagStr.erase(remove(imagStr.begin(), imagStr.end(), ' '), imagStr.end());
+            imagStr.erase(remove(imagStr.begin(), imagStr.end(), 'i'), imagStr.end());
+            if (imagStr == "+" || imagStr == "-") {
+                imagStr = imagStr + "1";
+            }
+            const fp imag = imagStr.empty() ? 0. : std::stod(imagStr);
+            r             = {real};
+            i             = {imag};
         }
 
-        static auto getLowestFraction(const double x, const std::uint64_t maxDenominator = std::uint64_t(1) << 10, const fp tol = dd::ComplexTable<>::tolerance()) {
+        static auto getLowestFraction(const double x, const std::uint64_t maxDenominator = 1U << 10, const fp tol = dd::ComplexTable<>::tolerance()) {
             assert(x >= 0.);
 
             std::pair<std::uint64_t, std::uint64_t> lowerBound{0U, 1U};
@@ -83,12 +84,13 @@ namespace dd {
                 if (std::abs(x - median) <= tol) {
                     if (den <= maxDenominator) {
                         return std::pair{num, den};
-                    } else if (upperBound.second > lowerBound.second) {
-                        return upperBound;
-                    } else {
-                        return lowerBound;
                     }
-                } else if (x > median) {
+                    if (upperBound.second > lowerBound.second) {
+                        return upperBound;
+                    }
+                    return lowerBound;
+                }
+                if (x > median) {
                     lowerBound = {num, den};
                 } else {
                     upperBound = {num, den};
@@ -96,9 +98,8 @@ namespace dd {
             }
             if (lowerBound.second > maxDenominator) {
                 return upperBound;
-            } else {
-                return lowerBound;
             }
+            return lowerBound;
         }
 
         static void printFormatted(std::ostream& os, fp num, bool imaginary = false) {
@@ -179,10 +180,14 @@ namespace dd {
         static std::string toString(const fp& real, const fp& imag, bool formatted = true, int precision = -1) {
             std::ostringstream ss{};
 
-            if (precision >= 0) ss << std::setprecision(precision);
+            if (precision >= 0) {
+                ss << std::setprecision(precision);
+            }
             const auto tol = ComplexTable<>::tolerance();
 
-            if (std::abs(real) <= tol && std::abs(imag) <= tol) return "0";
+            if (std::abs(real) <= tol && std::abs(imag) <= tol) {
+                return "0";
+            }
 
             if (std::abs(real) > tol) {
                 if (formatted) {
@@ -196,7 +201,8 @@ namespace dd {
                     if (std::abs(real - imag) <= tol) {
                         ss << "(1+i)";
                         return ss.str();
-                    } else if (std::abs(real + imag) <= tol) {
+                    }
+                    if (std::abs(real + imag) <= tol) {
                         ss << "(1-i)";
                         return ss.str();
                     }
@@ -225,10 +231,10 @@ namespace dd {
             return *this;
         }
         ComplexValue& operator*=(const ComplexValue& rhs) {
-            auto tempr = (this->r * rhs.r - this->i * rhs.i);
-            auto tempi = (this->r * rhs.i + this->i * rhs.r);
-            r          = tempr;
-            i          = tempi;
+            const auto tempr = (this->r * rhs.r - this->i * rhs.i);
+            const auto tempi = (this->r * rhs.i + this->i * rhs.r);
+            r                = tempr;
+            i                = tempi;
             return *this;
         }
         friend ComplexValue operator+(ComplexValue lhs, const ComplexValue& rhs) {
