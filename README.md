@@ -82,19 +82,19 @@ executing `git submodule update --init --recursive` in the main project director
 
 The MDD (Mixed-Decision-Diagrams) package is a header-only library, so there is no need to build it. However, we provide
 a CMake-based build system for testing and benchmarking purposes. Additionally, a dedicated CMake
-target `MQT::DDPackage` is provided to easily integrate the DD package into other CMake projects (see,
+target `MQT::MiSiM` is provided to easily integrate the DD package into other CMake projects (see,
 e.g., https://github.com/cda-tum/qfr).
 
 If you want to build the tests and benchmarks, you need to first configure the project using CMake. This can be done by
 calling
 
 ```shell
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_DD_PACKAGE_TESTS=ON
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_MISIM_TESTS=ON
 ```
 
 This tells CMake to search the current directory `.` (passed via `-S`) for a _CMakeLists.txt_ file and process it into a
 directory `build` (passed via `-B`). The flag `-DCMAKE_BUILD_TYPE=Release` tells CMake to configure a _Release_ build (
-as opposed to, e.g., a _Debug_ build), while the flag `-DBUILD_DD_PACKAGE_TESTS=ON` tells CMake to also include the
+as opposed to, e.g., a _Debug_ build), while the flag `-DBUILD_MISIM_TESTS=ON` tells CMake to also include the
 tests in the build process.
 
 After configuring with CMake, the project can be built by calling
@@ -107,8 +107,8 @@ This tries to build the project in the `build` directory (passed via `--build`).
 environments explicitly require a configuration to be set, which is why the `--config` flag is also passed to the build
 command. The flag `--parallel <NUMBER_OF_THREADS>` may be added to trigger a parallel build.
 
-This generates a number of executables in the `build/test` directory, including the test executable `dd_package_test`
-and the example executable `dd_package_example`.
+This generates a number of executables in the `build/test` directory, including the test executable `MiSiM_test`
+and the example executable `MiSiM_example`.
 
 ## Further Information
 
