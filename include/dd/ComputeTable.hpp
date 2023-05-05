@@ -70,8 +70,9 @@ namespace dd {
 
         void clear() {
             if (count > 0) {
-                for (auto& entry: table)
+                for (auto& entry: table) {
                     entry.result.p = nullptr;
+                }
                 count = 0;
             }
             hits    = 0;

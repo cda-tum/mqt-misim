@@ -155,8 +155,8 @@ namespace dd {
 
             assert(val - TOLERANCE >= 0); // should be handle above as special case
 
-            const auto lowerKey = hash(val - TOLERANCE);
-            const auto upperKey = hash(val + TOLERANCE);
+            const auto lowerKey = static_cast<std::size_t>(hash(val - TOLERANCE));
+            const auto upperKey = static_cast<std::size_t>(hash(val + TOLERANCE));
 
             if (upperKey == lowerKey) {
                 ++findOrInserts;
@@ -167,7 +167,7 @@ namespace dd {
             // in case a value close to a border is looked up,
             // only the last entry in the lower bucket and the first entry in the upper bucket need to be checked
 
-            const auto key = hash(val);
+            const auto key = static_cast<std::size_t>(hash(val));
 
             Entry* pLower; // NOLINT(cppcoreguidelines-init-variables)
             Entry* pUpper; // NOLINT(cppcoreguidelines-init-variables)
@@ -558,7 +558,7 @@ namespace dd {
          * @param val value to be inserted
          * @return pointer to the inserted entry
          */
-        inline Entry* insert(const std::int64_t key, const fp val) {
+        inline Entry* insert(const std::size_t key, const fp val) {
             ++inserts;
             Entry* entry = getEntry();
             entry->value = val;
