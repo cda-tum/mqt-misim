@@ -60,11 +60,11 @@ target_link_libraries(${PROJECT_NAME} INTERFACE project_options project_warnings
 target_include_directories(${PROJECT_NAME} INTERFACE include ${PROJECT_BINARY_DIR}/include)
 
 # add MQT alias
-add_library(MQT::DDPackage ALIAS ${PROJECT_NAME})
+add_library(MQT::MiSiM ALIAS ${PROJECT_NAME})
 
 # add test code
-option(BUILD_DD_PACKAGE_TESTS "Also build tests for DD package")
-if(BUILD_DD_PACKAGE_TESTS)
+option(BUILD_MISIM_TESTS "Also build tests for MiSiM")
+if(BUILD_MISIM_TESTS)
   check_submodule_present(googletest)
   enable_testing()
   include(GoogleTest)

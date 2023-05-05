@@ -23,11 +23,7 @@ endmacro()
 
 # add unit tests
 package_add_test(${PROJECT_NAME}_test ${PROJECT_NAME} test_pkg.cpp)
-
-add_executable(${PROJECT_NAME}_example main.cpp)
-target_link_libraries(${PROJECT_NAME}_example PRIVATE ${PROJECT_NAME})
-set_target_properties(${PROJECT_NAME}_example PROPERTIES FOLDER tests)
-add_test(NAME ${PROJECT_NAME}_example COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_example)
+package_add_test(${PROJECT_NAME}_example ${PROJECT_NAME} main.cpp)
 
 add_executable(${PROJECT_NAME}_collect data_collect.cpp)
 target_link_libraries(${PROJECT_NAME}_collect PRIVATE ${PROJECT_NAME})
