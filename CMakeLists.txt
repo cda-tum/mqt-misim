@@ -48,7 +48,6 @@ add_library(
   include/dd/Control.hpp
   include/dd/Definitions.hpp
   include/dd/Edge.hpp
-  include/dd/Export.hpp
   include/dd/GateMatrixDefinitions.hpp
   include/dd/MDDPackage.hpp
   include/dd/UnaryComputeTable.hpp
