@@ -85,7 +85,7 @@ namespace dd {
             }
 
             lookups++;
-            const auto key = hash(e.nextNode);
+            const auto key = static_cast<std::size_t>(hash(e.nextNode));
             const auto v   = e.nextNode->varIndx;
 
             // successors of a node shall either have successive variable numbers
@@ -94,7 +94,7 @@ namespace dd {
                 assert(edge.nextNode->varIndx == v - 1 || edge.isTerminal());
             }
 
-            Node* p = tables[v][key];
+            Node* p = tables[static_cast<std::size_t>(v)][key];
             while (p != nullptr) {
                 if (e.nextNode->edges == p->edges) {
                     // Match found
@@ -120,8 +120,8 @@ namespace dd {
             }
 
             // node was not found -> add it to front of unique table bucket
-            e.nextNode->next = tables[v][key];
-            tables[v][key]   = e.nextNode;
+            e.nextNode->next                         = tables[static_cast<std::size_t>(v)][key];
+            tables[static_cast<std::size_t>(v)][key] = e.nextNode;
             nodeCount++;
             peakNodeCount = std::max(peakNodeCount, nodeCount);
 

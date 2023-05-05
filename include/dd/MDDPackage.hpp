@@ -1608,13 +1608,13 @@ namespace dd {
             complexNumber.returnToCache(cNumb);
         }
 
-        std::vector<std::size_t> getReprOfIndex(const std::size_t i, const std::size_t num_entries) {
+        std::vector<std::size_t> getReprOfIndex(const std::size_t i, const std::size_t numEntries) {
             std::vector<std::size_t> repr;
             repr.reserve(numberOfQuantumRegisters);
             // get representation
             auto iIndex      = i;
             auto pathWay     = 0UL;
-            auto cardinality = num_entries;
+            auto cardinality = numEntries;
 
             auto counter = 0UL;
             auto index   = 0UL;
@@ -1845,7 +1845,7 @@ namespace dd {
         UniqueTable<mNode> mUniqueTable{numberOfQuantumRegisters};
     };
 
-    void clearUniqueTables() {
+    inline void clearUniqueTables() {
         // TODO IMPLEMENT
         //vUniqueTable.clear();
         //mUniqueTable.clear();
