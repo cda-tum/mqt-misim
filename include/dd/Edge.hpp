@@ -55,10 +55,10 @@ namespace dd {
         ComplexValue weight{};
 
         CachedEdge() = default;
-        CachedEdge(Node* next_node, const ComplexValue& weightOriginal):
-            nextNode(next_node), weight(weightOriginal) {}
-        CachedEdge(Node* next_node, const Complex& weightComplexNumber):
-            nextNode(next_node) {
+        CachedEdge(Node* nextNode, const ComplexValue& weightOriginal):
+            nextNode(nextNode), weight(weightOriginal) {}
+        CachedEdge(Node* nextNode, const Complex& weightComplexNumber):
+            nextNode(nextNode) {
             weight.r = CTEntry::val(weightComplexNumber.real);
             weight.i = CTEntry::val(weightComplexNumber.img);
         }

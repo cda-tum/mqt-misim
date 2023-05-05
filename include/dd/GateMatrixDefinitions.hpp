@@ -38,6 +38,7 @@ namespace dd {
     using QuartMatrix = std::array<ComplexValue, EDGE4>;
     using QuintMatrix = std::array<ComplexValue, EDGE5>;
 
+    // NOLINTBEGIN(readability-identifier-naming) As these constants are used by other projects, we keep the naming
     constexpr GateMatrix Imat{COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
     constexpr GateMatrix Hmat{COMPLEX_SQRT2_2, COMPLEX_SQRT2_2, COMPLEX_SQRT2_2,
                               COMPLEX_MSQRT2_2};
@@ -409,5 +410,6 @@ namespace dd {
                              COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO};
+    // NOLINTEND(readability-identifier-naming)
 } // namespace dd
 #endif // DD_PACKAGE_GATEMATRIXDEFINITIONS_H
