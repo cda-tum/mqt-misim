@@ -1,7 +1,6 @@
 #include "dd/MDDPackage.hpp"
 
 #include "gtest/gtest.h"
-#include <cstddef>
 
 using namespace dd::literals;
 
@@ -17,8 +16,8 @@ TEST(DDPackageTest, TrivialTest) {
     auto dd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{3, 2});
     EXPECT_EQ(dd->qregisters(), 2);
 
-    dd::ComplexValue h3plus  = dd::COMPLEX_SQRT3_3 * dd::ComplexValue{std::cos(2. * dd::PI / 3.), std::sin(2. * dd::PI / 3.)};
-    dd::ComplexValue h3minus = dd::COMPLEX_SQRT3_3 * dd::ComplexValue{std::cos(4. * dd::PI / 3.), std::sin(4. * dd::PI / 3.)};
+    dd::ComplexValue const h3plus  = dd::COMPLEX_SQRT3_3 * dd::ComplexValue{std::cos(2. * dd::PI / 3.), std::sin(2. * dd::PI / 3.)};
+    dd::ComplexValue const h3minus = dd::COMPLEX_SQRT3_3 * dd::ComplexValue{std::cos(4. * dd::PI / 3.), std::sin(4. * dd::PI / 3.)};
 
     auto hGate0 = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 2, 0);
 
@@ -151,8 +150,8 @@ TEST(DDPackageTest, TrivialTest) {
     ASSERT_EQ(dd->getValueByPath(hGate1, "83"),
               (dd::ComplexValue{-dd::SQRT2_2, 0}));
 
-    dd::Controls controls1{{1, 1}};
-    auto         controlledH3 = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 2, controls1, 0);
+    dd::Controls const controls1{{1, 1}};
+    auto               controlledH3 = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 2, controls1, 0);
 
     ASSERT_TRUE(dd->getValueByPath(controlledH3, "00")
                         .approximatelyEquals(dd::COMPLEX_ONE));
@@ -230,8 +229,8 @@ TEST(DDPackageTest, TrivialTest) {
     ASSERT_TRUE(dd->getValueByPath(controlledH3, "83")
                         .approximatelyEquals(h3plus));
 
-    dd::Controls controls0{{0, 1}};
-    auto         controlled0H2 =
+    dd::Controls const controls0{{0, 1}};
+    auto               controlled0H2 =
             dd->makeGateDD<dd::GateMatrix>(dd::Hmat, 2, controls0, 1);
 
     ASSERT_TRUE(dd->getValueByPath(controlled0H2, "00")
@@ -345,8 +344,8 @@ TEST(DDPackageTest, Multiplication) {
     auto x3dagGate = dd->makeGateDD<dd::TritMatrix>(dd::X3dag, 3, 2);
     auto x3Gate    = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, 2);
 
-    dd::Controls control{{0, 1}, {2, 1}};
-    auto         ctrlxGate = dd->makeGateDD<dd::GateMatrix>(dd::Xmat, 3, control, 1);
+    dd::Controls const control{{0, 1}, {2, 1}};
+    auto               ctrlxGate = dd->makeGateDD<dd::GateMatrix>(dd::Xmat, 3, control, 1);
 
     auto zeroState = dd->makeZeroState(3);
 
@@ -386,11 +385,11 @@ TEST(DDPackageTest, QutritBellState) {
     // Gates
     auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 2, 0);
 
-    dd::Controls control01{{0, 1}};
-    auto         ctrlx1Gate = dd->makeGateDD<dd::TritMatrix>(dd::X3, 2, control01, 1);
+    dd::Controls const control01{{0, 1}};
+    auto               ctrlx1Gate = dd->makeGateDD<dd::TritMatrix>(dd::X3, 2, control01, 1);
 
-    dd::Controls control02{{0, 2}};
-    auto         ctrlx2Gate = dd->makeGateDD<dd::TritMatrix>(dd::X3, 2, control02, 1);
+    dd::Controls const control02{{0, 2}};
+    auto               ctrlx2Gate = dd->makeGateDD<dd::TritMatrix>(dd::X3, 2, control02, 1);
 
     // Final Unitary
     auto op = dd->multiply(ctrlx1Gate, h3Gate);
@@ -444,11 +443,11 @@ TEST(DDPackageTest, W3State) {
 
     auto evolution = dd->makeZeroState(3);
 
-    auto         h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 3, 1);
-    dd::Controls control10{{1, 0}};
-    auto         xp10 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control10, 0);
-    dd::Controls control12{{1, 2}};
-    auto         xp12 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control12, 2);
+    auto               h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 3, 1);
+    dd::Controls const control10{{1, 0}};
+    auto               xp10 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control10, 0);
+    dd::Controls const control12{{1, 2}};
+    auto               xp12 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control12, 2);
 
     auto csum21 = dd->CSUM(3, 2, 1, true);
 
@@ -533,14 +532,14 @@ TEST(DDPackageTest, W5State) {
 
     auto h5Gate = dd->makeGateDD<dd::QuintMatrix>(dd::H5(), 5, 1);
 
-    dd::Controls control10{{1, 0}};
-    auto         xp10 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control10, 0);
-    dd::Controls control12{{1, 2}};
-    auto         xp12 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control12, 2);
-    dd::Controls control13{{1, 3}};
-    auto         xp13 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control13, 3);
-    dd::Controls control14{{1, 4}};
-    auto         xp14 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control14, 4);
+    dd::Controls const control10{{1, 0}};
+    auto               xp10 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control10, 0);
+    dd::Controls const control12{{1, 2}};
+    auto               xp12 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control12, 2);
+    dd::Controls const control13{{1, 3}};
+    auto               xp13 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control13, 3);
+    dd::Controls const control14{{1, 4}};
+    auto               xp14 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control14, 4);
 
     auto csum21 = dd->CSUM(5, 2, 1, true);
     auto csum31 = dd->CSUM(5, 3, 1, true);
@@ -566,12 +565,12 @@ TEST(DDPackageTest, W5State) {
 }
 
 TEST(DDPackageTest, FullMixWState) {
-    std::vector<size_t>                           orderOfLayers{2, 3, 2, 3, 3};
-    std::vector<std::size_t>                      lines{};
-    unsigned int                                  numLines = 0U;
-    std::map<unsigned int, std::vector<int>>      application;
-    std::vector<std::vector<dd::QuantumRegister>> indexes{{}};
-    auto                                          sizeTracker = 0;
+    std::vector<size_t>                             orderOfLayers{2, 3, 2, 3, 3};
+    std::vector<std::size_t>                        lines{};
+    dd::QuantumRegisterCount                        numLines = 0U;
+    std::map<std::size_t, std::vector<std::size_t>> application;
+    std::vector<std::vector<dd::QuantumRegister>>   indexes{{}};
+    std::size_t                                     sizeTracker = 0;
 
     bool initial = true;
     for (auto i = 0U; i < orderOfLayers.size(); i++) {
@@ -583,11 +582,11 @@ TEST(DDPackageTest, FullMixWState) {
                 indexes.at(0).push_back(static_cast<dd::QuantumRegister>(j));
                 numLines++;
             }
-            application[i]     = std::vector<int>{sizeTracker};
+            application[i]     = std::vector<std::size_t>{sizeTracker};
             application[i + 1] = {};
             sizeTracker++;
             for (auto j = 0U; j < indexes.at(0).size(); j++) {
-                indexes.push_back(std::vector<dd::QuantumRegister>{indexes.at(0).at(static_cast<dd::QuantumRegister>(j))});
+                indexes.push_back(std::vector<dd::QuantumRegister>{indexes.at(0).at(static_cast<std::size_t>(j))});
                 application[i + 1].push_back(sizeTracker);
                 sizeTracker++;
             }
@@ -604,24 +603,24 @@ TEST(DDPackageTest, FullMixWState) {
                     counter++;
                 }
             }
-            for (auto c = 0; c < indexes.size(); c++) {
-                for (auto f = 0; f < indexes.at(c).size(); f++) {
-                    indexes.at(c).at(f) = indexes.at(c).at(f) + indexes.at(c).at(f) * (static_cast<dd::QuantumRegister>(orderOfLayers.at(i) - 1));
+            for (auto& index: indexes) {
+                for (auto& f: index) {
+                    f = static_cast<dd::QuantumRegister>(f + f * (static_cast<dd::QuantumRegister>(orderOfLayers.at(i) - 1)));
                 }
             }
             std::vector<dd::QuantumRegister> toAdd{};
-            for (auto c = 0; c < indexes.size(); c++) {
-                if (indexes.at(c).size() == 1) {
-                    toAdd.push_back(indexes.at(c).at(0));
-                    for (auto j = 1; j < orderOfLayers.at(i); j++) {
-                        indexes.at(c).push_back(indexes.at(c).at(0) + static_cast<dd::QuantumRegister>(j));
-                        toAdd.push_back(indexes.at(c).at(0) + static_cast<dd::QuantumRegister>(j));
+            for (auto& index: indexes) {
+                if (index.size() == 1) {
+                    toAdd.push_back(index.at(0));
+                    for (auto j = 1U; j < orderOfLayers.at(i); j++) {
+                        index.push_back(static_cast<dd::QuantumRegister>(index.at(0) + static_cast<dd::QuantumRegister>(j)));
+                        toAdd.push_back(static_cast<dd::QuantumRegister>(index.at(0) + static_cast<dd::QuantumRegister>(j)));
                     }
                 }
             }
             if (i < orderOfLayers.size() - 1) {
-                for (auto l = 0; l < toAdd.size(); l++) {
-                    indexes.push_back(std::vector<dd::QuantumRegister>{toAdd.at(static_cast<dd::QuantumRegister>(l))});
+                for (const dd::QuantumRegister& l: toAdd) {
+                    indexes.push_back(std::vector<dd::QuantumRegister>{l});
                     application[i + 1].push_back(sizeTracker);
                     sizeTracker++;
                 }
@@ -639,16 +638,16 @@ TEST(DDPackageTest, FullMixWState) {
 
     for (auto i = 0U; i < orderOfLayers.size(); i++) {
         if (orderOfLayers.at(i) == 2) {
-            for (auto g = 0; g < application[i].size(); g++) {
-                std::vector<dd::QuantumRegister> inputLines = indexes.at(application[i].at(g));
-                evolution                                   = dd->spread2(numLines, inputLines, evolution);
+            for (auto g = 0U; g < application[i].size(); g++) {
+                std::vector<dd::QuantumRegister> const inputLines = indexes.at(application[i].at(g));
+                evolution                                         = dd->spread2(numLines, inputLines, evolution);
             }
         } else if (orderOfLayers.at(i) == 3) {
-            for (auto g = 0; g < application[i].size(); g++) {
+            for (auto g = 0U; g < application[i].size(); g++) {
                 evolution = dd->spread3(numLines, reinterpret_cast<const std::vector<dd::QuantumRegister>&>(indexes.at(application[i].at(g))), evolution);
             }
         } else if (orderOfLayers.at(i) == 5) {
-            for (auto g = 0; g < application[i].size(); g++) {
+            for (auto g = 0U; g < application[i].size(); g++) {
                 evolution = dd->spread5(numLines, reinterpret_cast<const std::vector<dd::QuantumRegister>&>(indexes.at(application[i].at(g))), evolution);
             }
         }
@@ -668,15 +667,15 @@ TEST(DDPackageTest, GHZQutritState) {
     // Gates
     auto h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), 3, 0);
 
-    dd::Controls control01{{0, 1}};
-    auto         cX011 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control01, 1);
-    dd::Controls control02{{0, 2}};
-    auto         cX021 = dd->makeGateDD<dd::TritMatrix>(dd::X3dag, 3, control02, 1);
+    dd::Controls const control01{{0, 1}};
+    auto               cX011 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control01, 1);
+    dd::Controls const control02{{0, 2}};
+    auto               cX021 = dd->makeGateDD<dd::TritMatrix>(dd::X3dag, 3, control02, 1);
 
-    dd::Controls control011{{0, 1}, {1, 1}};
-    auto         cXc01l1t2 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control011, 2);
-    dd::Controls control012{{0, 2}, {1, 2}};
-    auto         cX0122 = dd->makeGateDD<dd::TritMatrix>(dd::X3dag, 3, control012, 2);
+    dd::Controls const control011{{0, 1}, {1, 1}};
+    auto               cXc01l1t2 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control011, 2);
+    dd::Controls const control012{{0, 2}, {1, 2}};
+    auto               cX0122 = dd->makeGateDD<dd::TritMatrix>(dd::X3dag, 3, control012, 2);
 
     //auto testvec = dd->getVectorizedMatrix(cX0122);
 
@@ -720,31 +719,28 @@ TEST(DDPackageTest, GHZQutritState) {
 }
 
 TEST(DDPackageTest, GHZQutritStateScaled) {
-    for (auto i = 120U; i < 129U; i++) {
-        auto                     test = 0;
-        std::vector<std::size_t> init(i, 3);
-        auto                     dd = std::make_unique<dd::MDDPackage>(i, init);
+    for (dd::QuantumRegisterCount i = 120U; i < 129U; i++) {
+        const std::vector<std::size_t> init(i, 3);
+        auto                           dd = std::make_unique<dd::MDDPackage>(i, init);
         EXPECT_EQ(dd->qregisters(), i);
 
         // Gates
         auto                               h3Gate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), i, 0);
         std::vector<dd::MDDPackage::mEdge> gates  = {};
 
-        for (auto target = 1U; target < i; target++) {
+        for (int target = 1; target < i; target++) {
             dd::Controls target1{};
             dd::Controls target2{};
 
-            for (auto control = 0U; control < target; control++) {
+            for (dd::QuantumRegister control = 0; control < target; control++) {
                 const dd::Control c1{static_cast<dd::QuantumRegister>(control), 1};
                 const dd::Control c2{static_cast<dd::QuantumRegister>(control), 2};
                 target1.insert(c1);
                 target2.insert(c2);
             }
 
-            gates.push_back(
-                    dd->makeGateDD<dd::TritMatrix>(dd::X3, i, target1, target));
-            gates.push_back(
-                    dd->makeGateDD<dd::TritMatrix>(dd::X3dag, i, target2, target));
+            gates.push_back(dd->makeGateDD<dd::TritMatrix>(dd::X3, i, target1, static_cast<dd::QuantumRegister>(target)));
+            gates.push_back(dd->makeGateDD<dd::TritMatrix>(dd::X3dag, i, target2, static_cast<dd::QuantumRegister>(target)));
         }
 
         auto evolution = dd->makeZeroState(i);
@@ -782,8 +778,9 @@ TEST(DDPackageTest, RandomCircuits) {
     std::vector<std::size_t> particles = {};
 
     std::uniform_int_distribution<std::size_t> dimdistr(2, maxD);
+    particles.reserve(width);
     for (auto i = 0; i < width; i++) {
-        particles.push_back(dimdistr(gen));
+        particles.emplace_back(dimdistr(gen));
     }
 
     auto dd = std::make_unique<dd::MDDPackage>(width, particles);
@@ -816,16 +813,16 @@ TEST(DDPackageTest, RandomCircuits) {
                               << "\n"
                               << std::endl;
                     if (particles.at(line) == 2) {
-                        auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::H(), width, line);
+                        auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::H(), width, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 3) {
-                        auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), width, line);
+                        auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::H3(), width, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 4) {
-                        auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::H4(), width, line);
+                        auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::H4(), width, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 5) {
-                        auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::H5(), width, line);
+                        auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::H5(), width, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     }
                 } else { //givens
@@ -836,52 +833,52 @@ TEST(DDPackageTest, RandomCircuits) {
                     if (particles.at(line) == 2) {
                         double const theta      = 0.;
                         double const phi        = 0.;
-                        auto         chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, line);
+                        auto         chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, static_cast<dd::QuantumRegister>(line));
                         evolution               = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 3) {
-                        double const                    theta = angles(gen);
-                        double const                    phi   = angles(gen);
-                        std::uniform_int_distribution<> picklevel(0, 2);
+                        double const                               theta = angles(gen);
+                        double const                               phi   = angles(gen);
+                        std::uniform_int_distribution<std::size_t> picklevel(0, 2);
 
-                        int levelA = picklevel(gen);
-                        int levelB = (levelA + 1) % 3;
+                        auto levelA = picklevel(gen);
+                        auto levelB = (levelA + 1) % 3;
                         if (levelA > levelB) {
                             auto temp = levelA;
                             levelA    = levelB;
                             levelB    = temp;
                         }
 
-                        auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::RXY3(theta, phi, levelA, levelB), width, line);
+                        auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::RXY3(theta, phi, levelA, levelB), width, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 4) {
-                        double const                    theta = angles(gen);
-                        double const                    phi   = angles(gen);
-                        std::uniform_int_distribution<> picklevel(0, 3);
+                        double const                               theta = angles(gen);
+                        double const                               phi   = angles(gen);
+                        std::uniform_int_distribution<std::size_t> picklevel(0, 3);
 
-                        int levelA = picklevel(gen);
-                        int levelB = (levelA + 1) % 4;
+                        auto levelA = picklevel(gen);
+                        auto levelB = (levelA + 1) % 4;
                         if (levelA > levelB) {
                             auto temp = levelA;
                             levelA    = levelB;
                             levelB    = temp;
                         }
 
-                        auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::RXY4(theta, phi, levelA, levelB), width, line);
+                        auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::RXY4(theta, phi, levelA, levelB), width, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 5) {
-                        double const                    theta = angles(gen);
-                        double const                    phi   = angles(gen);
-                        std::uniform_int_distribution<> picklevel(0, 4);
+                        double const                               theta = angles(gen);
+                        double const                               phi   = angles(gen);
+                        std::uniform_int_distribution<std::size_t> picklevel(0, 4);
 
-                        int levelA = picklevel(gen);
-                        int levelB = (levelA + 1) % 5;
+                        auto levelA = picklevel(gen);
+                        auto levelB = (levelA + 1) % 5;
                         if (levelA > levelB) {
                             auto temp = levelA;
                             levelA    = levelB;
                             levelB    = temp;
                         }
 
-                        auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::RXY5(theta, phi, levelA, levelB), width, line);
+                        auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::RXY5(theta, phi, levelA, levelB), width, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     }
                 }
@@ -924,52 +921,52 @@ TEST(DDPackageTest, RandomCircuits) {
                     if (particles.at(line) == 2) {
                         double const theta      = angles(gen);
                         double const phi        = angles(gen);
-                        auto         chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, control, line);
+                        auto         chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::RXY(theta, phi), width, control, static_cast<dd::QuantumRegister>(line));
                         evolution               = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 3) {
-                        std::uniform_int_distribution<> picklevel(0, 2);
+                        std::uniform_int_distribution<std::size_t> picklevel(0, 2);
 
                         double const theta  = angles(gen);
                         double const phi    = angles(gen);
-                        int          levelA = picklevel(gen);
-                        int          levelB = (levelA + 1) % 3;
+                        auto         levelA = picklevel(gen);
+                        auto         levelB = (levelA + 1) % 3;
                         if (levelA > levelB) {
                             auto temp = levelA;
                             levelA    = levelB;
                             levelB    = temp;
                         }
 
-                        auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::RXY3(theta, phi, levelA, levelB), width, control, line);
+                        auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::RXY3(theta, phi, levelA, levelB), width, control, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 4) {
-                        std::uniform_int_distribution<> picklevel(0, 3);
+                        std::uniform_int_distribution<std::size_t> picklevel(0, 3);
 
                         double const theta  = angles(gen);
                         double const phi    = angles(gen);
-                        int          levelA = picklevel(gen);
-                        int          levelB = (levelA + 1) % 4;
+                        auto         levelA = picklevel(gen);
+                        auto         levelB = (levelA + 1) % 4;
                         if (levelA > levelB) {
                             auto temp = levelA;
                             levelA    = levelB;
                             levelB    = temp;
                         }
 
-                        auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::RXY4(theta, phi, levelA, levelB), width, control, line);
+                        auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::RXY4(theta, phi, levelA, levelB), width, control, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 5) {
-                        std::uniform_int_distribution<> picklevel(0, 4);
+                        std::uniform_int_distribution<std::size_t> picklevel(0, 4);
 
                         double const theta  = angles(gen);
                         double const phi    = angles(gen);
-                        int          levelA = picklevel(gen);
-                        int          levelB = (levelA + 1) % 5;
+                        auto         levelA = picklevel(gen);
+                        auto         levelB = (levelA + 1) % 5;
                         if (levelA > levelB) {
                             auto temp = levelA;
                             levelA    = levelB;
                             levelB    = temp;
                         }
 
-                        auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::RXY5(theta, phi, levelA, levelB), width, control, line);
+                        auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::RXY5(theta, phi, levelA, levelB), width, control, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     }
                 } else { // Controlled clifford
@@ -978,16 +975,16 @@ TEST(DDPackageTest, RandomCircuits) {
                               << "\n"
                               << std::endl;
                     if (particles.at(line) == 2) {
-                        auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::Xmat, width, control, line);
+                        auto chosenGate = dd->makeGateDD<dd::GateMatrix>(dd::Xmat, width, control, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 3) {
-                        auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::X3, width, control, line);
+                        auto chosenGate = dd->makeGateDD<dd::TritMatrix>(dd::X3, width, control, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 4) {
-                        auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::X4, width, control, line);
+                        auto chosenGate = dd->makeGateDD<dd::QuartMatrix>(dd::X4, width, control, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     } else if (particles.at(line) == 5) {
-                        auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::X5, width, control, line);
+                        auto chosenGate = dd->makeGateDD<dd::QuintMatrix>(dd::X5, width, control, static_cast<dd::QuantumRegister>(line));
                         evolution       = dd->multiply(chosenGate, evolution);
                     }
                 }

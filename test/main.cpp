@@ -4,7 +4,7 @@
 
 int main() {
     std::vector<std::size_t> lines{2, 3};
-    unsigned int             numLines = 2U;
+    dd::QuantumRegisterCount numLines = 2U;
 
     auto dd         = std::make_unique<dd::MDDPackage>(numLines, lines); // Create new package instance capable of handling a qubit and a qutrit
     auto zero_state = dd->makeZeroState(numLines);                       // zero_state = |0>
