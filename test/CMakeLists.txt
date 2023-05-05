@@ -28,3 +28,7 @@ add_executable(${PROJECT_NAME}_example main.cpp)
 target_link_libraries(${PROJECT_NAME}_example PRIVATE ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME}_example PROPERTIES FOLDER tests)
 add_test(NAME ${PROJECT_NAME}_example COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_example)
+
+add_executable(${PROJECT_NAME}_collect data_collect.cpp)
+target_link_libraries(${PROJECT_NAME}_collect PRIVATE ${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME}_collect PROPERTIES FOLDER tests)

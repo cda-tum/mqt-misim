@@ -1,6 +1,6 @@
 /*
  * This file is part of the MQT DD Package which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum_dd/ for more information.
+ * See file README.md or go to https://www.cda.cit.tum.de/research/quantum_dd/ for more information.
  */
 
 #ifndef DD_PACKAGE_CONTROL_HPP
@@ -51,11 +51,10 @@ namespace dd {
     using Controls = std::set<Control, CompareControl>;
 
     inline namespace literals {
+        // NOLINTNEXTLINE(google-runtime-int): Standard mandates usage of ULL
         inline Control operator""_pc(unsigned long long int qreg) {
             return {static_cast<QuantumRegister>(qreg)};
         }
-        //inline Control operator""_nc(unsigned long long int qreg) { return {static_cast<QuantumRegister>(qreg), Control::Type::neg}; }
-        //inline Control operator""_nc(unsigned long long int qreg) { return {static_cast<QuantumRegister>(qreg), Control::Type::neg}; }
     } // namespace literals
 } // namespace dd
 

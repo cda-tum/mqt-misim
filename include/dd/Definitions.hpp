@@ -1,6 +1,6 @@
 /*
  * This file is part of the MQT DD Package which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum_dd/ for more information.
+ * See file README.md or go to https://www.cda.cit.tum.de/research/quantum_dd/ for more information.
  */
 
 #ifndef DDpackage_DATATYPES_HPP
@@ -45,22 +45,34 @@ namespace dd {
     static constexpr std::uint_fast8_t RADIX_3 = 3;
     // max no. of edges = RADIX_3^2
     static constexpr std::uint_fast8_t EDGE3 = RADIX_3 * RADIX_3;
+
+    static constexpr std::uint_fast8_t RADIX_4 = 4;
+    // max no. of edges = RADIX_3^2
+    static constexpr std::uint_fast8_t EDGE4 = RADIX_4 * RADIX_4;
+
+    static constexpr std::uint_fast8_t RADIX_5 = 5;
+    // max no. of edges = RADIX_3^2
+    static constexpr std::uint_fast8_t EDGE5 = RADIX_5 * RADIX_5;
     // TODO ABOVE TEMPORARY LEGACY CODE
     //-----------------------------------------------------------------------------------------
 
     enum class BasisStates {
-        zero,
-        one,
-        plus,
-        minus,
-        right,
-        left
+        Zero,
+        One,
+        Plus,
+        Minus,
+        Right,
+        Left
     };
 
-    static constexpr fp SQRT2_2 = 0.707106781186547524400844362104849039284835937688474036588L;
-    static constexpr fp PI      = 3.141592653589793238462643383279502884197169399375105820974L;
-    static constexpr fp PI_2    = 1.570796326794896619231321691639751442098584699687552910487L;
-    static constexpr fp PI_4    = 0.785398163397448309615660845819875721049292349843776455243L;
+    static constexpr fp SQRT2_2 = static_cast<fp>(0.707106781186547524400844362104849039284835937688474036588L);
+    static constexpr fp SQRT3_3 = static_cast<fp>(0.577350269189625764509148780501957455647601751270126876018L);
+    static constexpr fp SQRT4_4 = static_cast<fp>(0.500000000000000000000000000000000000000000000000000000000L);
+    static constexpr fp SQRT5_5 = static_cast<fp>(0.447213595499957939281834733746255247088123671922305144854L);
+
+    static constexpr fp PI   = static_cast<fp>(3.141592653589793238462643383279502884197169399375105820974L);
+    static constexpr fp PI_2 = static_cast<fp>(1.570796326794896619231321691639751442098584699687552910487L);
+    static constexpr fp PI_4 = static_cast<fp>(0.785398163397448309615660845819875721049292349843776455243L);
 
     using CVec = std::vector<std::complex<fp>>;
     using CMat = std::vector<CVec>;
@@ -99,8 +111,9 @@ namespace dd {
 
     // calculates the Units in Last Place (ULP) distance of two floating point numbers
     [[maybe_unused]] static std::size_t ulpDistance(fp a, fp b) {
-        if (a == b)
+        if (a == b) {
             return 0;
+        }
 
         std::size_t ulps   = 1;
         fp          nextFP = std::nextafter(a, b);

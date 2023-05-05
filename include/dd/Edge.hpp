@@ -1,6 +1,6 @@
 /*
  * This file is part of the MQT DD Package which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum_dd/ for more information.
+ * See file README.md or go to https://www.cda.cit.tum.de/research/quantum_dd/ for more information.
  */
 
 #ifndef DD_PACKAGE_EDGE_HPP
@@ -35,8 +35,8 @@ namespace dd {
         }
 
         // edges pointing to zero and one terminals
-        static inline Edge one{Node::terminal, Complex::one};
-        static inline Edge zero{Node::terminal, Complex::zero};
+        static const inline Edge one{Node::terminal, Complex::one};   // NOLINT(readability-identifier-naming) automatic renaming does not work reliably, so skip linting
+        static const inline Edge zero{Node::terminal, Complex::zero}; // NOLINT(readability-identifier-naming) automatic renaming does not work reliably, so skip linting
 
         [[nodiscard]] static constexpr Edge terminal(const Complex& weight) {
             return {Node::terminal, weight};
@@ -55,10 +55,10 @@ namespace dd {
         ComplexValue weight{};
 
         CachedEdge() = default;
-        CachedEdge(Node* next_node, const ComplexValue& weightOriginal):
-            nextNode(next_node), weight(weightOriginal) {}
-        CachedEdge(Node* next_node, const Complex& weightComplexNumber):
-            nextNode(next_node) {
+        CachedEdge(Node* nextNode, const ComplexValue& weightOriginal):
+            nextNode(nextNode), weight(weightOriginal) {}
+        CachedEdge(Node* nextNode, const Complex& weightComplexNumber):
+            nextNode(nextNode) {
             weight.r = CTEntry::val(weightComplexNumber.real);
             weight.i = CTEntry::val(weightComplexNumber.img);
         }

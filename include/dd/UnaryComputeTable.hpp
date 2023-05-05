@@ -1,3 +1,8 @@
+/*
+* This file is part of the MQT DD Package which is released under the MIT license.
+* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_dd/ for more information.
+*/
+
 #ifndef DDpackage_UNARYCOMPUTETABLE_HPP
 #define DDpackage_UNARYCOMPUTETABLE_HPP
 
@@ -44,8 +49,12 @@ namespace dd {
             lookups++;
             const auto key   = hash(operand);
             auto&      entry = table[key];
-            if (entry.result.nextNode == nullptr) return result;
-            if (entry.operand != operand) return result;
+            if (entry.result.nextNode == nullptr) {
+                return result;
+            }
+            if (entry.operand != operand) {
+                return result;
+            }
 
             hits++;
             return entry.result;
@@ -53,7 +62,9 @@ namespace dd {
 
         void clear() {
             if (count > 0) {
-                for (auto& entry: table) entry.result.nextNode = nullptr;
+                for (auto& entry: table) {
+                    entry.result.nextNode = nullptr;
+                }
                 count = 0;
             }
             hits    = 0;

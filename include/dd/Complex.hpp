@@ -1,6 +1,6 @@
 /*
  * This file is part of the MQT DD Package which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum_dd/ for more information.
+ * See file README.md or go to https://www.cda.cit.tum.de/research/quantum_dd/ for more information.
  */
 
 #ifndef DD_PACKAGE_COMPLEX_HPP
@@ -20,16 +20,16 @@ namespace dd {
         CTEntry* real;
         CTEntry* img;
 
-        static Complex zero;
-        static Complex one;
+        static Complex zero; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables): Making it const breaks the code
+        static Complex one;  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables): Making it const breaks the code
 
-        void setVal(const Complex& complex_num) const {
-            real->value = CTEntry::val(complex_num.real);
-            img->value  = CTEntry::val(complex_num.img);
+        void setVal(const Complex& complexNum) const {
+            real->value = CTEntry::val(complexNum.real);
+            img->value  = CTEntry::val(complexNum.img);
         }
 
-        [[nodiscard]] inline bool approximatelyEquals(const Complex& complex_num) const {
-            return CTEntry::approximatelyEquals(real, complex_num.real) && CTEntry::approximatelyEquals(img, complex_num.img);
+        [[nodiscard]] inline bool approximatelyEquals(const Complex& complexNum) const {
+            return CTEntry::approximatelyEquals(real, complexNum.real) && CTEntry::approximatelyEquals(img, complexNum.img);
         };
 
         [[nodiscard]] inline bool approximatelyZero() const {
@@ -58,20 +58,21 @@ namespace dd {
         }
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Complex& complex_num) {
-        return os << complex_num.toString();
+    inline std::ostream& operator<<(std::ostream& os, const Complex& complexNum) {
+        return os << complexNum.toString();
     }
-
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables): Making it const breaks the code
     inline Complex Complex::zero{&ComplexTable<>::zero, &ComplexTable<>::zero};
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables): Making it const breaks the code
     inline Complex Complex::one{&ComplexTable<>::one, &ComplexTable<>::zero};
 } // namespace dd
 
 namespace std {
     template<>
     struct hash<dd::Complex> {
-        std::size_t operator()(dd::Complex const& complex_num) const noexcept {
-            auto h1 = dd::murmur64(reinterpret_cast<std::size_t>(complex_num.real));
-            auto h2 = dd::murmur64(reinterpret_cast<std::size_t>(complex_num.img));
+        std::size_t operator()(dd::Complex const& complexNum) const noexcept {
+            auto h1 = dd::murmur64(reinterpret_cast<std::size_t>(complexNum.real));
+            auto h2 = dd::murmur64(reinterpret_cast<std::size_t>(complexNum.img));
             return dd::combineHash(h1, h2);
         }
     };
