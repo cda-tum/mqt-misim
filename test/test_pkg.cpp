@@ -777,7 +777,7 @@ TEST(DDPackageTest, RandomCircuits) {
     const std::size_t              depth = 1000;
     const std::size_t              maxD  = 5;
 
-    std::mt19937 gen(12345); // seed the generator
+    std::mt19937 gen(12345); // NOLINT(cert-msc51-cpp): seed the generator with fixed value for reproducibility
 
     std::vector<std::size_t> particles = {};
 
@@ -797,9 +797,9 @@ TEST(DDPackageTest, RandomCircuits) {
               << "\n"
               << std::endl;
 
-    std::uniform_int_distribution<>                         pickbool(0, 1);
-    std::uniform_int_distribution<dd::QuantumRegisterCount> pickcontrols(1, width - 1);
-    std::uniform_real_distribution<>                        angles(0.0, 2. * dd::PI);
+    std::uniform_int_distribution<>             pickbool(0, 1);
+    std::uniform_int_distribution<unsigned int> pickcontrols(1, width - 1);
+    std::uniform_real_distribution<>            angles(0.0, 2. * dd::PI);
 
     for (std::size_t timeStep = 0; timeStep < depth; timeStep++) {
         for (std::size_t line = 0; line < width; line++) {
