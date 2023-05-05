@@ -498,7 +498,7 @@ namespace dd {
         std::size_t gcRuns  = 0;
         std::size_t gcLimit = INITIAL_GC_LIMIT;
 
-        inline Entry* findOrInsert(const std::int64_t key, const fp val) {
+        inline Entry* findOrInsert(const std::size_t key, const fp val) {
             [[maybe_unused]] const fp valTol = val + TOLERANCE;
 
             Entry* curr = table[key];

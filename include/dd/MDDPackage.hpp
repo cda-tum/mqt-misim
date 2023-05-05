@@ -830,7 +830,6 @@ namespace dd {
             [[maybe_unused]] const auto before = complexNumber.cacheCount();
 
             QuantumRegister var = -1;
-            RightOperand    e;
 
             if (!x.isTerminal()) {
                 var = x.nextNode->varIndx;
@@ -839,7 +838,7 @@ namespace dd {
                 var = y.nextNode->varIndx;
             }
 
-            e = multiply2(x, y, var, start);
+            RightOperand e = multiply2(x, y, var, start);
 
             if (e.weight != Complex::zero && e.weight != Complex::one) {
                 complexNumber.returnToCache(e.weight);
@@ -1198,7 +1197,7 @@ namespace dd {
     public:
         // NOLINTNEXTLINE(readability-identifier-naming)
         mEdge CSUM(QuantumRegisterCount n, QuantumRegister cReg, QuantumRegister target, bool isDagger = false) {
-            if (registersSizes.at(static_cast<std::size_t>(cReg)) != registersSizes.at(target)) {
+            if (registersSizes.at(static_cast<std::size_t>(cReg)) != registersSizes.at(static_cast<std::size_t>(target))) {
                 throw std::invalid_argument("CSUM works on qudits of the same dimension");
             }
             if (registersSizes.at(static_cast<std::size_t>(cReg)) == 2) {
@@ -1232,13 +1231,15 @@ namespace dd {
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
                     auto controlPi = makeGateDD<dd::TritMatrix>(dd::Pi3(i), n, cReg);
 
-                    auto Xpwr = makeGateDD<dd::TritMatrix>(dd::X3, n, target);
-                    if (isDagger) Xpwr = makeGateDD<dd::TritMatrix>(dd::X3dag, n, target);
+                    auto xpwr = makeGateDD<dd::TritMatrix>(dd::X3, n, target);
+                    if (isDagger) {
+                        xpwr = makeGateDD<dd::TritMatrix>(dd::X3dag, n, target);
+                    }
 
                     auto tempMult = makeGateDD<dd::TritMatrix>(dd::I3, n, target);
 
                     for (auto counter = 0U; counter < i; counter++) {
-                        tempMult = multiply(tempMult, Xpwr);
+                        tempMult = multiply(tempMult, xpwr);
                     }
 
                     auto kron = multiply(tempMult, controlPi);
@@ -1257,13 +1258,15 @@ namespace dd {
 
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
                     auto controlPi = makeGateDD<dd::QuartMatrix>(dd::Pi4(i), n, cReg);
-                    auto Xpwr      = makeGateDD<dd::QuartMatrix>(dd::X4, n, target);
-                    if (isDagger) Xpwr = makeGateDD<dd::QuartMatrix>(dd::X4dag, n, target);
+                    auto xpwr      = makeGateDD<dd::QuartMatrix>(dd::X4, n, target);
+                    if (isDagger) {
+                        xpwr = makeGateDD<dd::QuartMatrix>(dd::X4dag, n, target);
+                    }
 
                     auto tempMult = makeGateDD<dd::QuartMatrix>(dd::I4, n, target);
 
                     for (auto counter = 0U; counter < i; counter++) {
-                        tempMult = multiply(tempMult, Xpwr);
+                        tempMult = multiply(tempMult, xpwr);
                     }
 
                     auto kron = multiply(tempMult, controlPi);
@@ -1283,13 +1286,15 @@ namespace dd {
 
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
                     auto controlPi = makeGateDD<dd::QuintMatrix>(dd::Pi5(i), n, cReg);
-                    auto Xpwr      = makeGateDD<dd::QuintMatrix>(dd::X5, n, target);
-                    if (isDagger) Xpwr = makeGateDD<dd::QuintMatrix>(dd::X5dag, n, target);
+                    auto xpwr      = makeGateDD<dd::QuintMatrix>(dd::X5, n, target);
+                    if (isDagger) {
+                        xpwr = makeGateDD<dd::QuintMatrix>(dd::X5dag, n, target);
+                    }
 
                     auto tempMult = makeGateDD<dd::QuintMatrix>(dd::I5, n, target);
 
                     for (auto counter = 0U; counter < i; counter++) {
-                        tempMult = multiply(tempMult, Xpwr);
+                        tempMult = multiply(tempMult, xpwr);
                     }
 
                     auto kron = multiply(tempMult, controlPi);
@@ -1302,9 +1307,10 @@ namespace dd {
                 }
                 return res;
             }
+            throw std::runtime_error("Unsupported dimension for CSUM.");
         }
 
-        vEdge spread2(QuantumRegisterCount n, std::vector<QuantumRegister> lines, vEdge& state) {
+        vEdge spread2(QuantumRegisterCount n, const std::vector<QuantumRegister>& lines, vEdge& state) {
             dd::Controls const control01{{lines.at(0), 1}};
             auto               cH = makeGateDD<dd::GateMatrix>(dd::Hmat, n, control01, lines.at(1));
 
@@ -1312,17 +1318,17 @@ namespace dd {
             mEdge              minus = mEdge::zero;
             mEdge              xp10  = mEdge::zero;
 
-            if (registersSizes.at(lines.at(0)) == 2) {
+            if (registersSizes.at(static_cast<std::size_t>(lines.at(0))) == 2) {
                 minus = makeGateDD<dd::GateMatrix>(dd::Xmat, n, lines.at(0));
                 xp10  = makeGateDD<dd::GateMatrix>(dd::Xmat, n, control10, lines.at(0));
             }
 
-            if (registersSizes.at(lines.at(0)) == 3) {
+            if (registersSizes.at(static_cast<std::size_t>(lines.at(0))) == 3) {
                 minus = makeGateDD<dd::TritMatrix>(dd::X3dag, n, lines.at(0));
                 xp10  = makeGateDD<dd::TritMatrix>(dd::X3, n, control10, lines.at(0));
             }
 
-            else if (registersSizes.at(lines.at(0)) == 5) {
+            else if (registersSizes.at(static_cast<std::size_t>(lines.at(0))) == 5) {
                 minus = makeGateDD<dd::QuintMatrix>(dd::X5dag, n, lines.at(0));
                 xp10  = makeGateDD<dd::QuintMatrix>(dd::X5, n, control10, lines.at(0));
             }
@@ -1341,17 +1347,17 @@ namespace dd {
             mEdge              minus = mEdge::zero;
             mEdge              xp10  = mEdge::zero;
 
-            if (registersSizes.at(lines.at(0)) == 2) {
+            if (registersSizes.at(static_cast<std::size_t>(lines.at(0))) == 2) {
                 minus = makeGateDD<dd::GateMatrix>(dd::Xmat, n, lines.at(0));
                 xp10  = makeGateDD<dd::GateMatrix>(dd::Xmat, n, control10, lines.at(0));
             }
 
-            if (registersSizes.at(lines.at(0)) == 3) {
+            if (registersSizes.at(static_cast<std::size_t>(lines.at(0))) == 3) {
                 minus = makeGateDD<dd::TritMatrix>(dd::X3dag, n, lines.at(0));
                 xp10  = makeGateDD<dd::TritMatrix>(dd::X3, n, control10, lines.at(0));
             }
 
-            else if (registersSizes.at(lines.at(0)) == 5) {
+            else if (registersSizes.at(static_cast<std::size_t>(lines.at(0))) == 5) {
                 minus = makeGateDD<dd::QuintMatrix>(dd::X5dag, n, lines.at(0));
                 xp10  = makeGateDD<dd::QuintMatrix>(dd::X5, n, control10, lines.at(0));
             }
@@ -1377,17 +1383,17 @@ namespace dd {
             mEdge              minus = mEdge::zero;
             mEdge              xp10  = mEdge::zero;
 
-            if (registersSizes.at(lines.at(0)) == 2) {
+            if (registersSizes.at(static_cast<std::size_t>(lines.at(0))) == 2) {
                 minus = makeGateDD<dd::GateMatrix>(dd::Xmat, n, lines.at(0));
                 xp10  = makeGateDD<dd::GateMatrix>(dd::Xmat, n, control10, lines.at(0));
             }
 
-            if (registersSizes.at(lines.at(0)) == 3) {
+            if (registersSizes.at(static_cast<std::size_t>(lines.at(0))) == 3) {
                 minus = makeGateDD<dd::TritMatrix>(dd::X3dag, n, lines.at(0));
                 xp10  = makeGateDD<dd::TritMatrix>(dd::X3, n, control10, lines.at(0));
             }
 
-            else if (registersSizes.at(lines.at(0)) == 5) {
+            else if (registersSizes.at(static_cast<std::size_t>(lines.at(0))) == 5) {
                 minus = makeGateDD<dd::QuintMatrix>(dd::X5dag, n, lines.at(0));
                 xp10  = makeGateDD<dd::QuintMatrix>(dd::X5, n, control10, lines.at(0));
             }
@@ -1572,8 +1578,8 @@ namespace dd {
             // base case
             if (edge.isTerminal()) {
                 if (std::is_same<Node, mNode>::value) {
-                    for (const auto i: pathTracker) {
-                        std::cout << i;
+                    for (const auto j: pathTracker) {
+                        std::cout << j;
                     }
                     std::cout << ": ";
                     std::cout << cNumb << std::endl;
@@ -1585,7 +1591,7 @@ namespace dd {
 
             auto offset = (next - i) / edge.nextNode->edges.size();
 
-            for (auto k = 0L; k < edge.nextNode->edges.size(); k++) {
+            for (auto k = 0UL; k < edge.nextNode->edges.size(); k++) {
                 if (std::is_same<Node, mNode>::value) {
                     pathTracker.push_back(k);
                     getVector(edge.nextNode->edges.at(k), cNumb, i + (k * offset), vec,
@@ -1686,9 +1692,9 @@ namespace dd {
             node->symmetric = false; // assume symmetric
 
             // check if matrix is symmetric
-            auto basicDim = registersSizes.at(node->varIndx);
+            auto basicDim = registersSizes.at(static_cast<std::size_t>(node->varIndx));
 
-            for (auto i = 0L; i < basicDim; i++) {
+            for (auto i = 0UL; i < basicDim; i++) {
                 if (!node->edges.at(i * basicDim + i).nextNode->symmetric) {
                     return;
                 }
@@ -1697,8 +1703,8 @@ namespace dd {
             // if (!node->edges.at(0).nextNode->symmetric ||
             // !node->edges.at(3).nextNode->symmetric) return;
 
-            for (auto i = 0L; i < basicDim; i++) {
-                for (auto j = 0L; j < basicDim; j++) {
+            for (auto i = 0UL; i < basicDim; i++) {
+                for (auto j = 0UL; j < basicDim; j++) {
                     if (i != j) {
                         // row major indexing - enable optimization here
                         if (transpose(node->edges.at(i * basicDim + j)) !=
