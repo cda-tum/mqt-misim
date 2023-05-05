@@ -131,7 +131,7 @@ dd::Edge<dd::MDDPackage::vNode> fullMixWState([[maybe_unused]] std::ofstream& fi
     return evolution;
 }
 
-dd::Edge<dd::MDDPackage::vNode> GHZQutritStateScaled(std::ofstream& file, dd::QuantumRegisterCount i) {
+dd::Edge<dd::MDDPackage::vNode> ghzQutritStateScaled(std::ofstream& file, dd::QuantumRegisterCount i) {
     const std::vector<std::size_t> init(i, 3);
     auto                           dd = std::make_unique<dd::MDDPackage>(i, init);
 
@@ -415,12 +415,12 @@ int main() { // NOLINT(bugprone-exception-escape)
     myfile.close();
     myfile.open("/home/k3vn/Desktop/trycollect.csv", std::ios_base::app);
 
-    GHZQutritStateScaled(myfile, 5);
-    GHZQutritStateScaled(myfile, 10);
-    GHZQutritStateScaled(myfile, 30);
-    GHZQutritStateScaled(myfile, 60);
-    GHZQutritStateScaled(myfile, 120);
-    GHZQutritStateScaled(myfile, 128);
+    ghzQutritStateScaled(myfile, 5);
+    ghzQutritStateScaled(myfile, 10);
+    ghzQutritStateScaled(myfile, 30);
+    ghzQutritStateScaled(myfile, 60);
+    ghzQutritStateScaled(myfile, 120);
+    ghzQutritStateScaled(myfile, 128);
     std::cout << "Second set"
               << "\n";
     myfile.close();

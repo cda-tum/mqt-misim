@@ -732,7 +732,7 @@ TEST(DDPackageTest, GHZQutritStateScaled) {
             dd::Controls target1{};
             dd::Controls target2{};
 
-            for (dd::QuantumRegister control = 0; control < target; control++) {
+            for (int control = 0; control < target; control++) {
                 const dd::Control c1{static_cast<dd::QuantumRegister>(control), 1};
                 const dd::Control c2{static_cast<dd::QuantumRegister>(control), 2};
                 target1.insert(c1);
