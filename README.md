@@ -121,7 +121,7 @@ and the example executable `MiSiM_example`.
 
 The following papers provide further information on different aspects of representing states and operation in the
 quantum realm.
-  
+
 - K. Mato, S. Hillmich and R. Wille, "Mixed-Dimensional Quantum Circuit Simulation with Decision Diagrams," 2023 IEEE International Conference on Quantum Computing and Engineering (QCE), Bellevue, Washington, USA, 2023.
 
 - For the representation of unitary matrices and state vectors (with a particular focus on simulation and measurement):
