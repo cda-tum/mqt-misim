@@ -2,6 +2,13 @@
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/cda-tum/MiSiM/ci.yml?branch=main&logo=github&style=flat-square)](https://github.com/cda-tum/MiSiM/actions?query=workflow%3A%22CI%22)
 [![Codecov](https://img.shields.io/codecov/c/github/cda-tum/MiSiM/main?label=codecov&logo=codecov&style=flat-square)](https://codecov.io/gh/cda-tum/MiSiM)
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_light.png" width="60%">
+    <img src="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_dark.png" width="60%">
+  </picture>
+</p>
+
 # MQT MiSiM - A Tool for the Simulation of Mixed-Dimensional Quantum Circuits based on Decision Diagrams Written in C++
 
 A tool for the simulation of mixed-dimensional quantum circuit by
