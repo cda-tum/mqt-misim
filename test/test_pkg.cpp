@@ -365,7 +365,7 @@ TEST(DDPackageTest, Multiplication) {
 
 TEST(DDPackageTest, ConjugateTranspose) {
     std::vector<std::size_t> lines{3};
-    dd::QuantumRegisterCount       numLines  = 1U;
+    dd::QuantumRegisterCount numLines  = 1U;
     auto                     dd        = std::make_unique<dd::MDDPackage>(numLines, lines);
     auto                     zeroState = dd->makeZeroState(numLines);
     auto                     h         = dd->makeGateDD<dd::TritMatrix>(dd::H3(), numLines, 0);
