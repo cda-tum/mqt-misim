@@ -1801,7 +1801,6 @@ namespace dd {
             }
 
             std::vector<mEdge> newEdge(edge.nextNode->edges.size(), dd::Edge<mNode>::zero);
-            ;
             auto basicDim = registersSizes.at(static_cast<std::size_t>(edge.nextNode->varIndx));
 
             // conjugate transpose submatrices and rearrange as required
