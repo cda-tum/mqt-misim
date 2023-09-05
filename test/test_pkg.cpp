@@ -351,15 +351,11 @@ TEST(DDPackageTest, Multiplication) {
 
     auto evolution = dd->multiply(xGate, zeroState);
 
-
     evolution = dd->multiply(x3Gate, evolution);
-
 
     evolution = dd->multiply(ctrlxGate, evolution);
 
-
     evolution = dd->multiply(x3dagGate, evolution);
-
 
     auto basis110State = dd->makeBasisState(3, {1, 1, 0});
 
@@ -377,7 +373,6 @@ TEST(DDPackageTest, ConjugateTranspose) {
     psi = dd->multiply(dd->conjugateTranspose(h), psi);
     ASSERT_EQ(dd->fidelity(psi, zeroState), 1.0);
 }
-
 
 TEST(DDPackageTest, QutritBellState) {
     auto dd = std::make_unique<dd::MDDPackage>(2, std::vector<std::size_t>{3, 3});
@@ -448,7 +443,6 @@ TEST(DDPackageTest, W3State) {
     evolution = dd->multiply(xp12, evolution);
     evolution = dd->multiply(csum21, evolution);
     evolution = dd->multiply(csum21, evolution);
-
 }
 TEST(DDPackageTest, Mix23WState) {
     auto dd = std::make_unique<dd::MDDPackage>(6, std::vector<std::size_t>{2, 3, 3, 2, 3, 3});
@@ -459,7 +453,6 @@ TEST(DDPackageTest, Mix23WState) {
     evolution = dd->spread2(6, std::vector<dd::QuantumRegister>{0, 3}, evolution);
     evolution = dd->spread3(6, std::vector<dd::QuantumRegister>{0, 1, 2}, evolution);
     evolution = dd->spread3(6, std::vector<dd::QuantumRegister>{3, 4, 5}, evolution);
-
 
     ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {1, 0, 0, 0, 0, 0}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
     ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {0, 1, 0, 0, 0, 0}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
@@ -653,17 +646,14 @@ TEST(DDPackageTest, GHZQutritState) {
     // Evolution
     auto evolution = dd->makeZeroState(3);
 
-
     evolution = dd->multiply(h3Gate, evolution);
 
     evolution = dd->multiply(cX011, evolution);
     evolution = dd->multiply(cX021, evolution);
 
-
     evolution = dd->multiply(cXc01l1t2, evolution);
 
     evolution = dd->multiply(cX0122, evolution);
-
 
     auto basis00State = dd->makeBasisState(3, {0, 0, 0});
     auto basis11State = dd->makeBasisState(3, {1, 1, 1});
