@@ -364,13 +364,13 @@ TEST(DDPackageTest, Multiplication) {
 }
 
 TEST(DDPackageTest, ConjugateTranspose) {
-    std::vector<std::size_t> lines{ 3 };
-    unsigned int numLines = 1U;
-    auto dd = std::make_unique<dd::MDDPackage>(numLines, lines); 
-    auto zeroState = dd->makeZeroState(numLines);
-    auto h = dd->makeGateDD<dd::TritMatrix>(dd::H3(), numLines, 0);
-    auto psi = dd->multiply(h, zeroState);
-    psi = dd->multiply(dd->conjugateTranspose(h), psi);
+    std::vector<std::size_t> lines{3};
+    unsigned int             numLines  = 1U;
+    auto                     dd        = std::make_unique<dd::MDDPackage>(numLines, lines);
+    auto                     zeroState = dd->makeZeroState(numLines);
+    auto                     h         = dd->makeGateDD<dd::TritMatrix>(dd::H3(), numLines, 0);
+    auto                     psi       = dd->multiply(h, zeroState);
+    psi                                = dd->multiply(dd->conjugateTranspose(h), psi);
     ASSERT_EQ(dd->fidelity(psi, zeroState), 1.0);
 }
 
