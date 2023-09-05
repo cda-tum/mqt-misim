@@ -2,6 +2,13 @@
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/cda-tum/MiSiM/ci.yml?branch=main&logo=github&style=flat-square)](https://github.com/cda-tum/MiSiM/actions?query=workflow%3A%22CI%22)
 [![Codecov](https://img.shields.io/codecov/c/github/cda-tum/MiSiM/main?label=codecov&logo=codecov&style=flat-square)](https://codecov.io/gh/cda-tum/MiSiM)
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_light.png" width="60%">
+    <img src="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_dark.png" width="60%">
+  </picture>
+</p>
+
 # MQT MiSiM - A Tool for the Simulation of Mixed-Dimensional Quantum Circuits based on Decision Diagrams Written in C++
 
 A tool for the simulation of mixed-dimensional quantum circuit by
@@ -114,6 +121,8 @@ and the example executable `MiSiM_example`.
 
 The following papers provide further information on different aspects of representing states and operation in the
 quantum realm.
+
+- K. Mato, S. Hillmich and R. Wille, "[Mixed-Dimensional Quantum Circuit Simulation with Decision Diagrams](https://www.cda.cit.tum.de/files/eda/2023_mixed_dimensional_quantum_circuit_simulation_with_decision_diagrams.pdf)," 2023 IEEE International Conference on Quantum Computing and Engineering (QCE), Bellevue, Washington, USA, 2023.
 
 - For the representation of unitary matrices and state vectors (with a particular focus on simulation and measurement):
   A. Zulehner and R. Wille. Advanced Simulation of Quantum Computations. IEEE Transactions on Computer Aided Design of
