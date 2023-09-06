@@ -351,32 +351,27 @@ TEST(DDPackageTest, Multiplication) {
 
     auto evolution = dd->multiply(xGate, zeroState);
 
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
-
     evolution = dd->multiply(x3Gate, evolution);
-
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
 
     evolution = dd->multiply(ctrlxGate, evolution);
 
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
-
     evolution = dd->multiply(x3dagGate, evolution);
-
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
 
     auto basis110State = dd->makeBasisState(3, {1, 1, 0});
 
     ASSERT_EQ(dd->fidelity(zeroState, evolution), 0.0);
     ASSERT_EQ(dd->fidelity(evolution, basis110State), 1.0);
+}
+
+TEST(DDPackageTest, ConjugateTranspose) {
+    std::vector<std::size_t> lines{3};
+    dd::QuantumRegisterCount numLines  = 1U;
+    auto                     dd        = std::make_unique<dd::MDDPackage>(numLines, lines);
+    auto                     zeroState = dd->makeZeroState(numLines);
+    auto                     h         = dd->makeGateDD<dd::TritMatrix>(dd::H3(), numLines, 0);
+    auto                     psi       = dd->multiply(h, zeroState);
+    psi                                = dd->multiply(dd->conjugateTranspose(h), psi);
+    ASSERT_EQ(dd->fidelity(psi, zeroState), 1.0);
 }
 
 TEST(DDPackageTest, QutritBellState) {
@@ -399,15 +394,7 @@ TEST(DDPackageTest, QutritBellState) {
     // Evolution
     auto evolution = dd->makeZeroState(2);
 
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
-
     evolution = dd->multiply(op, evolution);
-
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
 
     auto basis00State = dd->makeBasisState(2, {0, 0});
     auto basis11State = dd->makeBasisState(2, {1, 1});
@@ -452,26 +439,10 @@ TEST(DDPackageTest, W3State) {
     auto csum21 = dd->CSUM(3, 2, 1, true);
 
     evolution = dd->multiply(h3Gate, evolution);
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
-
     evolution = dd->multiply(xp10, evolution);
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
-
     evolution = dd->multiply(xp12, evolution);
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
-
     evolution = dd->multiply(csum21, evolution);
     evolution = dd->multiply(csum21, evolution);
-
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
 }
 TEST(DDPackageTest, Mix23WState) {
     auto dd = std::make_unique<dd::MDDPackage>(6, std::vector<std::size_t>{2, 3, 3, 2, 3, 3});
@@ -482,10 +453,6 @@ TEST(DDPackageTest, Mix23WState) {
     evolution = dd->spread2(6, std::vector<dd::QuantumRegister>{0, 3}, evolution);
     evolution = dd->spread3(6, std::vector<dd::QuantumRegister>{0, 1, 2}, evolution);
     evolution = dd->spread3(6, std::vector<dd::QuantumRegister>{3, 4, 5}, evolution);
-
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
 
     ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {1, 0, 0, 0, 0, 0}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
     ASSERT_NEAR(dd->fidelity(dd->makeBasisState(6, {0, 1, 0, 0, 0, 0}), evolution), 1.0 / 6.0, dd::ComplexTable<>::tolerance());
@@ -559,9 +526,6 @@ TEST(DDPackageTest, W5State) {
     evolution = dd->multiply(csum41, evolution);
     evolution = dd->multiply(csum41, evolution);
     evolution = dd->multiply(csum41, evolution);
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
 }
 
 TEST(DDPackageTest, FullMixWState) {
@@ -682,29 +646,14 @@ TEST(DDPackageTest, GHZQutritState) {
     // Evolution
     auto evolution = dd->makeZeroState(3);
 
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
-
     evolution = dd->multiply(h3Gate, evolution);
 
     evolution = dd->multiply(cX011, evolution);
     evolution = dd->multiply(cX021, evolution);
 
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
-
     evolution = dd->multiply(cXc01l1t2, evolution);
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
 
     evolution = dd->multiply(cX0122, evolution);
-
-    std::cout << "\n"
-              << std::endl;
-    dd->printVector(evolution);
 
     auto basis00State = dd->makeBasisState(3, {0, 0, 0});
     auto basis11State = dd->makeBasisState(3, {1, 1, 1});
@@ -991,7 +940,4 @@ TEST(DDPackageTest, RandomCircuits) {
             }
         }
     }
-
-    //auto basis0State = dd->makeBasisState(width, std::vector<size_t>(width, 0));
-    //dd->printVector(evolution);
 }
