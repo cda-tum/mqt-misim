@@ -1,6 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/cda-tum/MiSiM/ci.yml?branch=main&logo=github&style=flat-square)](https://github.com/cda-tum/MiSiM/actions?query=workflow%3A%22CI%22)
-[![Codecov](https://img.shields.io/codecov/c/github/cda-tum/MiSiM/main?label=codecov&logo=codecov&style=flat-square)](https://codecov.io/gh/cda-tum/MiSiM)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-misim/ci.yml?branch=main&logo=github&style=flat-square)](https://github.com/cda-tum/mqt-misim/actions?query=workflow%3A%22CI%22)
+[![Codecov](https://img.shields.io/codecov/c/github/cda-tum/mqt-misim/main?label=codecov&logo=codecov&style=flat-square)](https://codecov.io/gh/cda-tum/mqt-misim)
 
 <p align="center">
   <picture>
@@ -16,7 +16,7 @@ the [Chair for Design Automation](https://www.cda.cit.tum.de/) at
 the [Technical University of Munich](https://www.tum.de/).
 
 If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de](mailto:quantum.cda@xcit.tum.de) or by
-creating an [issue](https://github.com/cda-tum/MiSiM/issues) on GitHub. For more information on Decision Diagrams,
+creating an [issue](https://github.com/cda-tum/mqt-misim/issues) on GitHub. For more information on Decision Diagrams,
 please visit [www.cda.cit.tum.de/research/quantum_dd/](https://www.cda.cit.tum.de/research/quantum_dd/).
 
 ## Usage
@@ -80,7 +80,7 @@ implementation should be compatible with any current C++ compiler supporting C++
 To start off, clone this repository using
 
 ```shell
-git clone --recurse-submodules -j8 https://github.com/cda-tum/MiSiM/
+git clone --recurse-submodules -j8 https://github.com/cda-tum/mqt-misim/
 ```
 
 Note the `--recurse-submodules` flag. It is required to also clone all the required submodules. If you happen to forget
