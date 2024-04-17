@@ -28,10 +28,8 @@ if(BUILD_MQT_DDSIM_BINDINGS)
   else()
     find_package(pybind11_json QUIET)
     if(NOT pybind11_json_FOUND)
-      FetchContent_Declare(
-        pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
+      FetchContent_Declare(pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
       FetchContent_MakeAvailable(pybind11_json)
     endif()
   endif()
 endif()
-
