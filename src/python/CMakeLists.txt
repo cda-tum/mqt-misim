@@ -6,7 +6,7 @@ pybind11_add_module(
   OPT_SIZE
   # Source code goes here
   bindings.cpp)
-target_link_libraries(pymisim PRIVATE  MQT::MiSiM)
+target_link_libraries(pymisim PRIVATE MQT::MiSiM)
 
 # Install directive for scikit-build-core
 install(

@@ -135,10 +135,10 @@ namespace dd {
 
     inline GateMatrix RZ(fp phi) {
         GateMatrix rotation = {
-                dd::ComplexValue{std::cos(phi/2), -std::sin(phi/2)},
+                dd::ComplexValue{std::cos(phi / 2), -std::sin(phi / 2)},
                 COMPLEX_ZERO,
                 COMPLEX_ZERO,
-                dd::ComplexValue{std::cos(phi/2), std::sin(phi/2)}};
+                dd::ComplexValue{std::cos(phi / 2), std::sin(phi / 2)}};
         return rotation;
     }
 
@@ -149,11 +149,11 @@ namespace dd {
     }
 
     inline GateMatrix embX2(fp phi) {
-        GateMatrix identity    = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
-        identity.at(0) = COMPLEX_ZERO;
-        identity.at(2) = dd::ComplexValue{-std::sin(phi), -std::cos(phi)};
-        identity.at(1) = dd::ComplexValue{ std::sin(phi), -std::cos(phi)};
-        identity.at(3) = COMPLEX_ZERO;
+        GateMatrix identity = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+        identity.at(0)      = COMPLEX_ZERO;
+        identity.at(2)      = dd::ComplexValue{-std::sin(phi), -std::cos(phi)};
+        identity.at(1)      = dd::ComplexValue{std::sin(phi), -std::cos(phi)};
+        identity.at(3)      = COMPLEX_ZERO;
         return identity;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,38 +258,38 @@ namespace dd {
                 COMPLEX_ZERO,
                 COMPLEX_ZERO,
                 COMPLEX_ONE};
-        identity.at(3 * leva + leva) = dd::ComplexValue{std::cos(phi/2), -std::sin(phi/2)};
-        identity.at(3 * levb + levb) = dd::ComplexValue{std::cos(phi/2), +std::sin(phi/2)};
+        identity.at(3 * leva + leva) = dd::ComplexValue{std::cos(phi / 2), -std::sin(phi / 2)};
+        identity.at(3 * levb + levb) = dd::ComplexValue{std::cos(phi / 2), +std::sin(phi / 2)};
         return identity;
     }
 
     inline TritMatrix VirtRZ3(fp phi, size_t i) {
         TritMatrix zero    = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
-                           COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
-                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+                              COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         zero.at(i + i * 3) = dd::ComplexValue{std::cos(phi), -std::sin(phi)};
         return zero;
     }
 
     inline TritMatrix Z3() {
-        TritMatrix id   = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+        TritMatrix id = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
                          COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                          COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         for (int level = 0; level < 3; ++level) {
-            double angle = fmod(2.0 * level / 3, 2.0) * PI;
-            id.at(level + level * 3) = dd::ComplexValue {cos(angle), sin(angle)};
+            double angle             = fmod(2.0 * level / 3, 2.0) * PI;
+            id.at(level + level * 3) = dd::ComplexValue{cos(angle), sin(angle)};
         }
 
         return id;
     }
     inline TritMatrix S3() {
-        TritMatrix id   = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
-                          COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
-                          COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+        TritMatrix id = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                         COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
+                         COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         for (int level = 0; level < 3; ++level) {
-            double omegaArg = fmod(2.0 / 3 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue  omega = dd::ComplexValue{cos(omegaArg * PI), sin(omegaArg * PI)};
-            id.at(level + level * 3) = omega;
+            double           omegaArg = fmod(2.0 / 3 * level * (level + 1) / 2.0, 2.0);
+            dd::ComplexValue omega    = dd::ComplexValue{cos(omegaArg * PI), sin(omegaArg * PI)};
+            id.at(level + level * 3)  = omega;
         }
         return id;
     }
@@ -309,7 +309,7 @@ namespace dd {
                 COMPLEX_ZERO,
                 COMPLEX_ONE};
         identity.at(3 * leva + leva) = COMPLEX_ZERO;
-        identity.at(3 * leva + levb) = dd::ComplexValue{ std::sin(phi), -std::cos(phi)};
+        identity.at(3 * leva + levb) = dd::ComplexValue{std::sin(phi), -std::cos(phi)};
         identity.at(3 * levb + leva) = dd::ComplexValue{-std::sin(phi), -std::cos(phi)};
         identity.at(3 * levb + levb) = COMPLEX_ZERO;
         return identity;
@@ -419,43 +419,42 @@ namespace dd {
                 COMPLEX_ZERO,
                 COMPLEX_ZERO,
                 COMPLEX_ONE};
-        identity.at(4 * leva + leva) = dd::ComplexValue{std::cos(phi/2), -std::sin(phi/2)};
-        identity.at(4 * levb + levb) = dd::ComplexValue{std::cos(phi/2), +std::sin(phi/2)};
+        identity.at(4 * leva + leva) = dd::ComplexValue{std::cos(phi / 2), -std::sin(phi / 2)};
+        identity.at(4 * levb + levb) = dd::ComplexValue{std::cos(phi / 2), +std::sin(phi / 2)};
         return identity;
     }
 
-
-    inline QuartMatrix  VirtRZ4(fp phi, size_t i) {
+    inline QuartMatrix VirtRZ4(fp phi, size_t i) {
         QuartMatrix zero   = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+                              COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         zero.at(i + i * 4) = dd::ComplexValue{std::cos(phi), -std::sin(phi)};
         return zero;
     }
 
     inline QuartMatrix Z4() {
-        QuartMatrix id   = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+        QuartMatrix id = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
 
         for (auto level = 0; level < 4; level++) {
-            double angle = fmod(2.0 * level / 4, 2.0) * PI;
+            double angle             = fmod(2.0 * level / 4, 2.0) * PI;
             id.at(level + level * 4) = dd::ComplexValue{std::cos(angle), std::sin(angle)};
         }
 
         return id;
     }
     inline QuartMatrix S4() {
-        QuartMatrix id   = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+        QuartMatrix id = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         for (auto level = 0; level < 4; level++) {
-            double omegaArg = fmod(2.0 / 4 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue  omega = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
-            id.at(level + level * 4) = omega;
+            double           omegaArg = fmod(2.0 / 4 * level * (level + 1) / 2.0, 2.0);
+            dd::ComplexValue omega    = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
+            id.at(level + level * 4)  = omega;
         }
         return id;
     }
@@ -470,7 +469,7 @@ namespace dd {
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         identity.at(4 * leva + leva) = COMPLEX_ZERO;
-        identity.at(4 * leva + levb) = dd::ComplexValue{ std::sin(phi), -std::cos(phi)};
+        identity.at(4 * leva + levb) = dd::ComplexValue{std::sin(phi), -std::cos(phi)};
         identity.at(4 * levb + leva) = dd::ComplexValue{-std::sin(phi), -std::cos(phi)};
         identity.at(4 * levb + levb) = COMPLEX_ZERO;
         return identity;
@@ -636,43 +635,43 @@ namespace dd {
                 COMPLEX_ZERO,
                 COMPLEX_ZERO,
                 COMPLEX_ONE};
-        identity.at(5 * leva + leva) = dd::ComplexValue{std::cos(phi/2), -std::sin(phi/2)};
-        identity.at(5 * levb + levb) = dd::ComplexValue{std::cos(phi/2), +std::sin(phi/2)};
+        identity.at(5 * leva + leva) = dd::ComplexValue{std::cos(phi / 2), -std::sin(phi / 2)};
+        identity.at(5 * levb + levb) = dd::ComplexValue{std::cos(phi / 2), +std::sin(phi / 2)};
         return identity;
     }
     inline QuintMatrix VirtRZ5(fp phi, size_t i) {
         QuintMatrix zero   = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+                              COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
+                              COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         zero.at(i + i * 5) = dd::ComplexValue{std::cos(phi), -std::sin(phi)};
         return zero;
     }
 
     inline QuintMatrix Z5() {
-        QuintMatrix id   = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
-        for (int level = 0; level < 5; ++level) {
-            double angle = fmod(2.0 * level / 5, 2.0) * PI;
-            id.at(level + level * 5) = dd::ComplexValue {std::cos(angle), std::sin(angle)};
-        }
-
-        return id;
-    }
-    inline QuintMatrix S5() {
-        QuintMatrix id   = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+        QuintMatrix id = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         for (int level = 0; level < 5; ++level) {
-            double omegaArg = fmod(2.0 / 5 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue  omega = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
-            id.at(level + level * 5) = omega;
+            double angle             = fmod(2.0 * level / 5, 2.0) * PI;
+            id.at(level + level * 5) = dd::ComplexValue{std::cos(angle), std::sin(angle)};
+        }
+
+        return id;
+    }
+    inline QuintMatrix S5() {
+        QuintMatrix id = {COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                          COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                          COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                          COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
+                          COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
+        for (int level = 0; level < 5; ++level) {
+            double           omegaArg = fmod(2.0 / 5 * level * (level + 1) / 2.0, 2.0);
+            dd::ComplexValue omega    = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
+            id.at(level + level * 5)  = omega;
         }
         return id;
     }
@@ -687,7 +686,7 @@ namespace dd {
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         identity.at(5 * leva + leva) = COMPLEX_ZERO;
-        identity.at(5 * leva + levb) = dd::ComplexValue{ std::sin(phi), -std::cos(phi)};
+        identity.at(5 * leva + levb) = dd::ComplexValue{std::sin(phi), -std::cos(phi)};
         identity.at(5 * levb + leva) = dd::ComplexValue{-std::sin(phi), -std::cos(phi)};
         identity.at(5 * levb + levb) = COMPLEX_ZERO;
         return identity;
@@ -699,55 +698,86 @@ namespace dd {
             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
-            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE
-    };
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
 
     inline SextMatrix Pi6(size_t i) {
-        SextMatrix zero   = {COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+        SextMatrix zero = {
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
+                COMPLEX_ZERO,
         };
         zero.at(i + i * 6) = COMPLEX_ONE;
         return zero;
     }
     inline SextMatrix H6() {
-        return SextMatrix{COMPLEX_SQRT6_6,
-                          COMPLEX_SQRT6_6,
-                          COMPLEX_SQRT6_6,
-                          COMPLEX_SQRT6_6,
-                          COMPLEX_SQRT6_6,
-                          COMPLEX_SQRT6_6,
+        return SextMatrix{
+                COMPLEX_SQRT6_6,
+                COMPLEX_SQRT6_6,
+                COMPLEX_SQRT6_6,
+                COMPLEX_SQRT6_6,
+                COMPLEX_SQRT6_6,
+                COMPLEX_SQRT6_6,
 
-                          COMPLEX_SQRT6_6,
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(2. * PI / 6.), std::sin(2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(2. * 2. * PI / 6.), std::sin(2. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(3. * 2. * PI / 6.), std::sin(3. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(4. * 2. * PI / 6.), std::sin(4. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(5. * 2. * PI / 6.), std::sin(5. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6,
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(2. * PI / 6.), std::sin(2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(2. * 2. * PI / 6.), std::sin(2. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(3. * 2. * PI / 6.), std::sin(3. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(4. * 2. * PI / 6.), std::sin(4. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(5. * 2. * PI / 6.), std::sin(5. * 2. * PI / 6.)},
 
-                          COMPLEX_SQRT6_6,
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(2. * 2. * PI / 6.), std::sin(2. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(4. * 2. * PI / 6.), std::sin(4. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(6. * 2. * PI / 6.), std::sin(6. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(8. * 2. * PI / 6.), std::sin(8. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(10. * 2. * PI / 6.), std::sin(10. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6,
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(2. * 2. * PI / 6.), std::sin(2. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(4. * 2. * PI / 6.), std::sin(4. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(6. * 2. * PI / 6.), std::sin(6. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(8. * 2. * PI / 6.), std::sin(8. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(10. * 2. * PI / 6.), std::sin(10. * 2. * PI / 6.)},
 
-                          COMPLEX_SQRT6_6,
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(3. * 2. * PI / 6.), std::sin(3. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(6. * 2. * PI / 6.), std::sin(6. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(9. * 2. * PI / 6.), std::sin(9. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(12. * 2. * PI / 6.), std::sin(12. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(15. * 2. * PI / 6.), std::sin(15. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6,
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(3. * 2. * PI / 6.), std::sin(3. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(6. * 2. * PI / 6.), std::sin(6. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(9. * 2. * PI / 6.), std::sin(9. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(12. * 2. * PI / 6.), std::sin(12. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(15. * 2. * PI / 6.), std::sin(15. * 2. * PI / 6.)},
 
-                          COMPLEX_SQRT6_6,
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(4. * 2. * PI / 6.), std::sin(4. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(8. * 2. * PI / 6.), std::sin(8. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(12. * 2. * PI / 6.), std::sin(12. * 2. * PI / 6.)},
-                          COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(16. * 2. * PI / 6.), std::sin(16. * 2. * PI / 6.)},
-                        COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(20. * 2. * PI / 6.), std::sin(20. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6,
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(4. * 2. * PI / 6.), std::sin(4. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(8. * 2. * PI / 6.), std::sin(8. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(12. * 2. * PI / 6.), std::sin(12. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(16. * 2. * PI / 6.), std::sin(16. * 2. * PI / 6.)},
+                COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(20. * 2. * PI / 6.), std::sin(20. * 2. * PI / 6.)},
 
                 COMPLEX_SQRT6_6,
                 COMPLEX_SQRT6_6 * dd::ComplexValue{std::cos(5. * 2. * PI / 6.), std::sin(5. * 2. * PI / 6.)},
@@ -762,7 +792,7 @@ namespace dd {
         if (leva > levb or leva > 5 or levb > 5) {
             throw std::invalid_argument("LEV A cannot be higher than  LEV B");
         }
-        SextMatrix identity = I6;
+        SextMatrix identity          = I6;
         identity.at(6 * leva + leva) = dd::ComplexValue{std::cos(theta / 2.), 0.};
         identity.at(6 * levb + leva) = dd::ComplexValue{-std::sin(theta / 2.) * std::sin(phi), -std::sin(theta / 2.) * std::cos(phi)};
         identity.at(6 * leva + levb) = dd::ComplexValue{std::sin(theta / 2.) * std::sin(phi), -std::sin(theta / 2.) * std::cos(phi)};
@@ -811,47 +841,45 @@ namespace dd {
             COMPLEX_ZERO,
             COMPLEX_ZERO,
             COMPLEX_ZERO,
-            COMPLEX_ZERO
-    };
+            COMPLEX_ZERO};
 
     constexpr SextMatrix X6{COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
-                             COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                             COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
-                             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO
-    };
+                            COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                            COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO};
 
     inline SextMatrix RZ6(fp phi, size_t leva, size_t levb) {
         if (leva > levb or leva > 5 or levb > 5) {
             throw std::invalid_argument("LEV A cannot be higher than  LEV B");
         }
-        SextMatrix identity = I6;
-        identity.at(6 * leva + leva) = dd::ComplexValue{std::cos(phi/2), -std::sin(phi/2)};
-        identity.at(6 * levb + levb) = dd::ComplexValue{std::cos(phi/2), +std::sin(phi/2)};
+        SextMatrix identity          = I6;
+        identity.at(6 * leva + leva) = dd::ComplexValue{std::cos(phi / 2), -std::sin(phi / 2)};
+        identity.at(6 * levb + levb) = dd::ComplexValue{std::cos(phi / 2), +std::sin(phi / 2)};
         return identity;
     }
     inline SextMatrix VirtRZ6(fp phi, size_t i) {
-        SextMatrix identity = I6;
+        SextMatrix identity    = I6;
         identity.at(i + i * 6) = dd::ComplexValue{std::cos(phi), -std::sin(phi)};
         return identity;
     }
 
     inline SextMatrix Z6() {
         SextMatrix id = I6;
-        for(int level = 0; level < 6; ++level) {
-            double angle = fmod(2.0 * level / 6, 2.0) * PI;
-            id.at(level + level * 6) = dd::ComplexValue {std::cos(angle), std::sin(angle)};
+        for (int level = 0; level < 6; ++level) {
+            double angle             = fmod(2.0 * level / 6, 2.0) * PI;
+            id.at(level + level * 6) = dd::ComplexValue{std::cos(angle), std::sin(angle)};
         }
 
         return id;
     }
     inline SextMatrix S6() {
-        SextMatrix id   = I6;
+        SextMatrix id = I6;
         for (int level = 0; level < 6; ++level) {
-            double omegaArg = fmod(2.0 / 6 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue  omega = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
-            id.at(level + level * 6) = omega;
+            double           omegaArg = fmod(2.0 / 6 * level * (level + 1) / 2.0, 2.0);
+            dd::ComplexValue omega    = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
+            id.at(level + level * 6)  = omega;
         }
         return id;
     }
@@ -859,9 +887,9 @@ namespace dd {
         if (leva > levb or leva > 5 or levb > 5) {
             throw std::invalid_argument("LEV A cannot be higher than  LEV B");
         }
-        SextMatrix identity = I6;
+        SextMatrix identity          = I6;
         identity.at(6 * leva + leva) = COMPLEX_ZERO;
-        identity.at(6 * leva + levb) = dd::ComplexValue{ std::sin(phi), -std::cos(phi)};
+        identity.at(6 * leva + levb) = dd::ComplexValue{std::sin(phi), -std::cos(phi)};
         identity.at(6 * levb + leva) = dd::ComplexValue{-std::sin(phi), -std::cos(phi)};
         identity.at(6 * levb + levb) = COMPLEX_ZERO;
         return identity;
@@ -874,19 +902,17 @@ namespace dd {
             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
             COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
-            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE
-    };
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
 
     inline SeptMatrix Pi7(size_t i) {
-        SeptMatrix zero   = {
+        SeptMatrix zero = {
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
                 COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO
-        };
+                COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO};
         zero.at(i + i * 7) = COMPLEX_ONE;
         return zero;
     }
@@ -946,15 +972,14 @@ namespace dd {
                 COMPLEX_SQRT7_7 * dd::ComplexValue{std::cos(18. * 2. * PI / 7.), std::sin(18. * 2. * PI / 7.)},
                 COMPLEX_SQRT7_7 * dd::ComplexValue{std::cos(24. * 2. * PI / 7.), std::sin(24. * 2. * PI / 7.)},
                 COMPLEX_SQRT7_7 * dd::ComplexValue{std::cos(30. * 2. * PI / 7.), std::sin(30. * 2. * PI / 7.)},
-                COMPLEX_SQRT7_7 * dd::ComplexValue{std::cos(36. * 2. * PI / 7.), std::sin(36. * 2. * PI / 7.)}
-        };
+                COMPLEX_SQRT7_7 * dd::ComplexValue{std::cos(36. * 2. * PI / 7.), std::sin(36. * 2. * PI / 7.)}};
     }
 
     inline SeptMatrix RXY7(fp theta, fp phi, size_t leva, size_t levb) {
         if (leva > levb or leva > 6 or levb > 6) {
             throw std::invalid_argument("LEV A cannot be higher than  LEV B");
         }
-        SeptMatrix identity = I7;
+        SeptMatrix identity          = I7;
         identity.at(7 * leva + leva) = dd::ComplexValue{std::cos(theta / 2.), 0.};
         identity.at(7 * levb + leva) = dd::ComplexValue{-std::sin(theta / 2.) * std::sin(phi), -std::sin(theta / 2.) * std::cos(phi)};
         identity.at(7 * leva + levb) = dd::ComplexValue{std::sin(theta / 2.) * std::sin(phi), -std::sin(theta / 2.) * std::cos(phi)};
@@ -1017,49 +1042,47 @@ namespace dd {
             COMPLEX_ZERO,
             COMPLEX_ZERO,
             COMPLEX_ZERO,
-            COMPLEX_ZERO
-    };
+            COMPLEX_ZERO};
 
     constexpr SeptMatrix X7{
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
-                            COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
-                            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO
-    };
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE,
+            COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO, COMPLEX_ZERO,
+            COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO};
 
     inline SeptMatrix RZ7(fp phi, size_t leva, size_t levb) {
         if (leva > levb or leva > 6 or levb > 6) {
             throw std::invalid_argument("LEV A cannot be higher than  LEV B");
         }
-        SeptMatrix identity = I7;
-        identity.at(7 * leva + leva) = dd::ComplexValue{std::cos(phi/2), -std::sin(phi/2)};
-        identity.at(7 * levb + levb) = dd::ComplexValue{std::cos(phi/2), +std::sin(phi/2)};
+        SeptMatrix identity          = I7;
+        identity.at(7 * leva + leva) = dd::ComplexValue{std::cos(phi / 2), -std::sin(phi / 2)};
+        identity.at(7 * levb + levb) = dd::ComplexValue{std::cos(phi / 2), +std::sin(phi / 2)};
         return identity;
     }
     inline SeptMatrix VirtRZ7(fp phi, size_t i) {
-        SeptMatrix identity = I7;
+        SeptMatrix identity    = I7;
         identity.at(i + i * 7) = dd::ComplexValue{std::cos(phi), -std::sin(phi)};
         return identity;
     }
 
     inline SeptMatrix Z7() {
         SeptMatrix id = I7;
-        for(int level = 0; level < 7; ++level) {
-            double angle = fmod(2.0 * level / 7, 2.0) * PI;
-            id.at(level + level * 7) = dd::ComplexValue {std::cos(angle), std::sin(angle)};
+        for (int level = 0; level < 7; ++level) {
+            double angle             = fmod(2.0 * level / 7, 2.0) * PI;
+            id.at(level + level * 7) = dd::ComplexValue{std::cos(angle), std::sin(angle)};
         }
 
         return id;
     }
     inline SeptMatrix S7() {
-        SeptMatrix id   = I7;
+        SeptMatrix id = I7;
         for (int level = 0; level < 7; ++level) {
-            double omegaArg = fmod(2.0 / 7 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue  omega = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
-            id.at(level + level * 7) = omega;
+            double           omegaArg = fmod(2.0 / 7 * level * (level + 1) / 2.0, 2.0);
+            dd::ComplexValue omega    = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
+            id.at(level + level * 7)  = omega;
         }
         return id;
     }
@@ -1067,9 +1090,9 @@ namespace dd {
         if (leva > levb or leva > 6 or levb > 6) {
             throw std::invalid_argument("LEV A cannot be higher than  LEV B");
         }
-        SeptMatrix identity = I7;
+        SeptMatrix identity          = I7;
         identity.at(7 * leva + leva) = COMPLEX_ZERO;
-        identity.at(7 * leva + levb) = dd::ComplexValue{ std::sin(phi), -std::cos(phi)};
+        identity.at(7 * leva + levb) = dd::ComplexValue{std::sin(phi), -std::cos(phi)};
         identity.at(7 * levb + leva) = dd::ComplexValue{-std::sin(phi), -std::cos(phi)};
         identity.at(7 * levb + levb) = COMPLEX_ZERO;
         return identity;
