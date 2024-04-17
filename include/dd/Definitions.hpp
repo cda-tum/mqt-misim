@@ -6,6 +6,8 @@
 #ifndef DDpackage_DATATYPES_HPP
 #define DDpackage_DATATYPES_HPP
 
+#include "MDDPackage.hpp"
+
 #include <complex>
 #include <cstdint>
 #include <type_traits>
@@ -53,6 +55,14 @@ namespace dd {
     static constexpr std::uint_fast8_t RADIX_5 = 5;
     // max no. of edges = RADIX_3^2
     static constexpr std::uint_fast8_t EDGE5 = RADIX_5 * RADIX_5;
+
+    static constexpr std::uint_fast8_t RADIX_6 = 6;
+
+    static constexpr std::uint_fast8_t EDGE6 = RADIX_6 * RADIX_6;
+
+    static constexpr std::uint_fast8_t RADIX_7 = 7;
+
+    static constexpr std::uint_fast8_t EDGE7 = RADIX_7 * RADIX_7;
     // TODO ABOVE TEMPORARY LEGACY CODE
     //-----------------------------------------------------------------------------------------
 
@@ -69,6 +79,10 @@ namespace dd {
     static constexpr fp SQRT3_3 = static_cast<fp>(0.577350269189625764509148780501957455647601751270126876018L);
     static constexpr fp SQRT4_4 = static_cast<fp>(0.500000000000000000000000000000000000000000000000000000000L);
     static constexpr fp SQRT5_5 = static_cast<fp>(0.447213595499957939281834733746255247088123671922305144854L);
+    static constexpr fp SQRT6_6 = static_cast<fp>(0.408248290463863016366214012450981898660991246776111688072L);
+    static constexpr fp SQRT7_7 = static_cast<fp>(0.377964473009227227214516536234180060815751311868921454338L);
+
+
 
     static constexpr fp PI   = static_cast<fp>(3.141592653589793238462643383279502884197169399375105820974L);
     static constexpr fp PI_2 = static_cast<fp>(1.570796326794896619231321691639751442098584699687552910487L);
