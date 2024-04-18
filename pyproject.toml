@@ -55,8 +55,6 @@ docs = [
     "ipython",
     "ipykernel",
     "sphinx-autoapi",
-    "qiskit[visualization]",
-    "mqt.core[evaluation]"
 ]
 dev = ["mqt.misim[coverage,docs]"]
 
