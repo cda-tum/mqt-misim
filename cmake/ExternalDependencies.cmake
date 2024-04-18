@@ -1,15 +1,16 @@
+# Declare all external dependencies and make sure that they are available.
+
 include(FetchContent)
+include(CMakeDependentOption)
 set(FETCH_PACKAGES "")
 
 if(BUILD_MQT_MISIM_BINDINGS)
   if(NOT SKBUILD)
-    # Manually detect the installed pybind11 package.
+    # Manually detect the installed pybind11 package and import it into CMake.
     execute_process(
       COMMAND "${Python_EXECUTABLE}" -m pybind11 --cmakedir
       OUTPUT_STRIP_TRAILING_WHITESPACE
       OUTPUT_VARIABLE pybind11_DIR)
-
-    # Add the detected directory to the CMake prefix path.
     list(APPEND CMAKE_PREFIX_PATH "${pybind11_DIR}")
   endif()
 
@@ -17,20 +18,31 @@ if(BUILD_MQT_MISIM_BINDINGS)
   find_package(pybind11 CONFIG REQUIRED)
 endif()
 
-if(BUILD_MQT_MISIM_BINDINGS)
-  # add pybind11_json library
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.20)
-    # Prefer using FetchContent instead of find_package for pybind11_json
-    FetchContent_Declare(
-      pybind11_json
-      GIT_REPOSITORY https://github.com/pybind/pybind11_json
-      GIT_TAG v3.0.1) # specify a release tag or commit hash if needed
-    FetchContent_MakeAvailable(pybind11_json)
+if(BUILD_MQT_MISIM_TESTS)
+  set(FETCHCONTENT_SOURCE_DIR_GOOGLETEST
+      ${PROJECT_SOURCE_DIR}/extern/googletest
+      CACHE
+        PATH
+        "Path to the source directory of the gtest submodule. This variable is used by FetchContent to download the library if it is not already available."
+  )
+  set(gtest_force_shared_crt
+      ON
+      CACHE BOOL "" FORCE)
+  set(GTEST_VERSION
+      1.14.0
+      CACHE STRING "Google Test version")
+  set(GTEST_URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz)
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
+    list(APPEND FETCH_PACKAGES googletest)
   else()
-    message(WARNING "CMake version is too old to use FetchContent. Please consider updating.")
-    find_package(pybind11_json QUIET)
-    if(NOT pybind11_json_FOUND)
-      message(FATAL_ERROR "pybind11_json package not found. Please install it.")
+    find_package(googletest ${GTEST_VERSION} QUIET NAMES GTest)
+    if(NOT googletest_FOUND)
+      FetchContent_Declare(googletest URL ${GTEST_URL})
+      list(APPEND FETCH_PACKAGES googletest)
     endif()
   endif()
 endif()
+
+# Make all declared dependencies available.
+FetchContent_MakeAvailable(${FETCH_PACKAGES})
