@@ -21,7 +21,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS
     ON
     CACHE BOOL "Export compile commands" FORCE)
 
-option(ENABLE_IPO "Enable Interprocedural Optimization, aka Link Time Optimization (LTO)" ON)
+option(ENABLE_IPO "Enable Interprocedural Optimization, aka Link Time Optimization (LTO)" OFF)
 if(ENABLE_IPO)
   include(CheckIPOSupported)
   check_ipo_supported(RESULT ipo_supported OUTPUT ipo_output)
@@ -49,6 +49,11 @@ if(DEFINED ENV{DEPLOY})
       $ENV{DEPLOY}
       CACHE BOOL "Use deployment configuration from environment" FORCE)
   message(STATUS "Setting deployment configuration to '${DEPLOY}' from environment")
+elseif(DEFINED ENV{CI})
+  set(DEPLOY
+      ON
+      CACHE BOOL "Set deployment configuration to ON for CI" FORCE)
+  message(STATUS "Setting deployment configuration to '${DEPLOY}' for CI")
 endif()
 
 # set deployment specific options
