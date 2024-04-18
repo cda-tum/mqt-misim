@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core>=0.8.1", "setuptools-scm>=7", "pybind11>=2.11"]
+requires = ["scikit-build-core>=0.8.1", "setuptools-scm>=7", "pybind11>=2.12"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -8,7 +8,8 @@ description = "A quantum simulator based on decision diagrams written in C++"
 readme = "README.md"
 authors = [
     { name = "Kevin Mato", email = "kevin.mato@tum.de"},
-    { name = "Stefan Hillmich", email = "stefan.hillmich@scch.at"}
+    { name = "Stefan Hillmich", email = "stefan.hillmich@scch.at"},
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de"},
 ]
 keywords = ["MQT", "quantum-computing", "design-automation", "quantum-circuit-sim", "simulation"]
 license = { file = "LICENSE" }
