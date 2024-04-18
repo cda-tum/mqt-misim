@@ -276,7 +276,7 @@ namespace dd {
                          COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                          COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         for (int level = 0; level < 3; ++level) {
-            double angle             = fmod(2.0 * level / 3, 2.0) * PI;
+            const double angle       = fmod(2.0 * level / 3, 2.0) * PI;
             id.at(level + level * 3) = dd::ComplexValue{cos(angle), sin(angle)};
         }
 
@@ -287,9 +287,9 @@ namespace dd {
                          COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                          COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         for (int level = 0; level < 3; ++level) {
-            double           omegaArg = fmod(2.0 / 3 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue omega    = dd::ComplexValue{cos(omegaArg * PI), sin(omegaArg * PI)};
-            id.at(level + level * 3)  = omega;
+            const double omegaArg    = fmod(2.0 / 3 * level * (level + 1) / 2.0, 2.0);
+            const auto   omega       = dd::ComplexValue{cos(omegaArg * PI), sin(omegaArg * PI)};
+            id.at(level + level * 3) = omega;
         }
         return id;
     }
@@ -440,7 +440,7 @@ namespace dd {
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
 
         for (auto level = 0; level < 4; level++) {
-            double angle             = fmod(2.0 * level / 4, 2.0) * PI;
+            const double angle       = fmod(2.0 * level / 4, 2.0) * PI;
             id.at(level + level * 4) = dd::ComplexValue{std::cos(angle), std::sin(angle)};
         }
 
@@ -452,9 +452,9 @@ namespace dd {
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         for (auto level = 0; level < 4; level++) {
-            double           omegaArg = fmod(2.0 / 4 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue omega    = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
-            id.at(level + level * 4)  = omega;
+            const double omegaArg    = fmod(2.0 / 4 * level * (level + 1) / 2.0, 2.0);
+            const auto   omega       = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
+            id.at(level + level * 4) = omega;
         }
         return id;
     }
@@ -656,7 +656,7 @@ namespace dd {
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         for (int level = 0; level < 5; ++level) {
-            double angle             = fmod(2.0 * level / 5, 2.0) * PI;
+            const double angle       = fmod(2.0 * level / 5, 2.0) * PI;
             id.at(level + level * 5) = dd::ComplexValue{std::cos(angle), std::sin(angle)};
         }
 
@@ -669,9 +669,9 @@ namespace dd {
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE, COMPLEX_ZERO,
                           COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ZERO, COMPLEX_ONE};
         for (int level = 0; level < 5; ++level) {
-            double           omegaArg = fmod(2.0 / 5 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue omega    = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
-            id.at(level + level * 5)  = omega;
+            const double omegaArg    = fmod(2.0 / 5 * level * (level + 1) / 2.0, 2.0);
+            const auto   omega       = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
+            id.at(level + level * 5) = omega;
         }
         return id;
     }
@@ -868,7 +868,7 @@ namespace dd {
     inline SextMatrix Z6() {
         SextMatrix id = I6;
         for (int level = 0; level < 6; ++level) {
-            double angle             = fmod(2.0 * level / 6, 2.0) * PI;
+            const double angle       = fmod(2.0 * level / 6, 2.0) * PI;
             id.at(level + level * 6) = dd::ComplexValue{std::cos(angle), std::sin(angle)};
         }
 
@@ -877,9 +877,9 @@ namespace dd {
     inline SextMatrix S6() {
         SextMatrix id = I6;
         for (int level = 0; level < 6; ++level) {
-            double           omegaArg = fmod(2.0 / 6 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue omega    = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
-            id.at(level + level * 6)  = omega;
+            const double omegaArg    = fmod(2.0 / 6 * level * (level + 1) / 2.0, 2.0);
+            const auto   omega       = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
+            id.at(level + level * 6) = omega;
         }
         return id;
     }
@@ -1071,7 +1071,7 @@ namespace dd {
     inline SeptMatrix Z7() {
         SeptMatrix id = I7;
         for (int level = 0; level < 7; ++level) {
-            double angle             = fmod(2.0 * level / 7, 2.0) * PI;
+            const double angle       = fmod(2.0 * level / 7, 2.0) * PI;
             id.at(level + level * 7) = dd::ComplexValue{std::cos(angle), std::sin(angle)};
         }
 
@@ -1080,9 +1080,9 @@ namespace dd {
     inline SeptMatrix S7() {
         SeptMatrix id = I7;
         for (int level = 0; level < 7; ++level) {
-            double           omegaArg = fmod(2.0 / 7 * level * (level + 1) / 2.0, 2.0);
-            dd::ComplexValue omega    = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
-            id.at(level + level * 7)  = omega;
+            const double omegaArg    = fmod(2.0 / 7 * level * (level + 1) / 2.0, 2.0);
+            const auto   omega       = dd::ComplexValue{std::cos(omegaArg * PI), std::sin(omegaArg * PI)};
+            id.at(level + level * 7) = omega;
         }
         return id;
     }

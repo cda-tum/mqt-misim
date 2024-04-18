@@ -381,7 +381,7 @@ namespace dd {
             std::vector<bool> zero;
 
             for (auto& i: edge.nextNode->edges) {
-                zero.push_back(i.weight.approximatelyZero());
+                zero.emplace_back(i.weight.approximatelyZero());
             }
 
             // make sure to release cached numbers approximately zero, but not
@@ -501,10 +501,10 @@ namespace dd {
             }
             // std::cout<< "INSIDE THE MONSTER" << std::endl;
             // std::cout << "Control Indices   "<< std::endl;
-            for (const auto& cc: controls) {
-                // std::cout<< "Yo" << std::endl;
-                // std::cout << static_cast<int>(cc.quantumRegister) <<" levs now "<< cc.type << std::endl;
-            }
+            // for (const auto& cc: controls) {
+            // std::cout<< "Yo" << std::endl;
+            // std::cout << static_cast<int>(cc.quantumRegister) <<" levs now "<< cc.type << std::endl;
+            // }
 
             auto targetRadix = registersSizes.at(static_cast<std::size_t>(target));
             // std::cout<< "Started" << std::endl;
@@ -1202,82 +1202,71 @@ namespace dd {
         }
 
     public:
-        mEdge CEX(QuantumRegisterCount numberRegs, dd::Control::Type level,
+        mEdge cex(QuantumRegisterCount numberRegs, dd::Control::Type level,
                   fp phi, size_t leva, size_t levb, QuantumRegister cReg, QuantumRegister target,
                   bool isDagger = false) {
-            dd::Control control{cReg, level};
+            const dd::Control control{cReg, level};
 
             if (registersSizes.at(static_cast<std::size_t>(target)) == 2) {
-                dd::GateMatrix matrix = dd::embX2(phi);
-                auto           gate   = makeGateDD<dd::GateMatrix>(matrix, numberRegs, control, target);
+                const auto matrix = dd::embX2(phi);
+                auto       gate   = makeGateDD<dd::GateMatrix>(matrix, numberRegs, control, target);
                 if (isDagger) {
                     gate = conjugateTranspose(gate);
                 }
                 return gate;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 3) {
-                dd::TritMatrix matrix = dd::embX3(phi, leva, levb);
-                auto           gate   = makeGateDD<dd::TritMatrix>(matrix, numberRegs, control, target);
-                if (isDagger) {
-                    gate = conjugateTranspose(gate);
-                }
-                return gate;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 4) {
-                dd::QuartMatrix matrix = dd::embX4(phi, leva, levb);
-                auto            gate   = makeGateDD<dd::QuartMatrix>(matrix, numberRegs, control, target);
-                if (isDagger) {
-                    gate = conjugateTranspose(gate);
-                }
-                return gate;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 5) {
-                dd::QuintMatrix matrix = dd::embX5(phi, leva, levb);
-                auto            gate   = makeGateDD<dd::QuintMatrix>(matrix, numberRegs, control, target);
-                if (isDagger) {
-                    gate = conjugateTranspose(gate);
-                }
-                return gate;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 6) {
-                dd::SextMatrix matrix = dd::embX6(phi, leva, levb);
-                auto           gate   = makeGateDD<dd::SextMatrix>(matrix, numberRegs, control, target);
-                if (isDagger) {
-                    gate = conjugateTranspose(gate);
-                }
-                return gate;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 7) {
-                dd::SeptMatrix matrix = dd::embX7(phi, leva, levb);
-                auto           gate   = makeGateDD<dd::SeptMatrix>(matrix, numberRegs, control, target);
-                if (isDagger) {
-                    gate = conjugateTranspose(gate);
-                }
-                return gate;
-            } else {
-                throw std::invalid_argument("Dimensions of target not implemented");
             }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 3) {
+                const auto matrix = dd::embX3(phi, leva, levb);
+                auto       gate   = makeGateDD<dd::TritMatrix>(matrix, numberRegs, control, target);
+                if (isDagger) {
+                    gate = conjugateTranspose(gate);
+                }
+                return gate;
+            }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 4) {
+                const auto matrix = dd::embX4(phi, leva, levb);
+                auto       gate   = makeGateDD<dd::QuartMatrix>(matrix, numberRegs, control, target);
+                if (isDagger) {
+                    gate = conjugateTranspose(gate);
+                }
+                return gate;
+            }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 5) {
+                const auto matrix = dd::embX5(phi, leva, levb);
+                auto       gate   = makeGateDD<dd::QuintMatrix>(matrix, numberRegs, control, target);
+                if (isDagger) {
+                    gate = conjugateTranspose(gate);
+                }
+                return gate;
+            }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 6) {
+                const auto matrix = dd::embX6(phi, leva, levb);
+                auto       gate   = makeGateDD<dd::SextMatrix>(matrix, numberRegs, control, target);
+                if (isDagger) {
+                    gate = conjugateTranspose(gate);
+                }
+                return gate;
+            }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 7) {
+                const auto matrix = dd::embX7(phi, leva, levb);
+                auto       gate   = makeGateDD<dd::SeptMatrix>(matrix, numberRegs, control, target);
+                if (isDagger) {
+                    gate = conjugateTranspose(gate);
+                }
+                return gate;
+            }
+            throw std::invalid_argument("Dimensions of target not implemented");
         }
 
-        mEdge CSUM(QuantumRegisterCount numberRegs, QuantumRegister cReg, QuantumRegister target, bool isDagger = false) {
+        mEdge csum(QuantumRegisterCount numberRegs, QuantumRegister cReg, QuantumRegister target, bool isDagger = false) {
             auto res = makeIdent(numberRegs);
 
             if (registersSizes.at(static_cast<std::size_t>(target)) == 2) {
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
-                    dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
+                    const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
 
-                    dd::GateMatrix matrix = dd::Xmat;
-                    auto           gate   = makeGateDD<dd::GateMatrix>(matrix, numberRegs, control, target);
-
-                    for (auto counter = 0U; counter < i; counter++) {
-                        res = multiply(res, gate);
-                    }
-                }
-                if (isDagger) {
-                    res = conjugateTranspose(res);
-                }
-                return res;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 3) {
-                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
-                    dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    dd::TritMatrix matrix = dd::X3;
-                    auto           gate   = makeGateDD<dd::TritMatrix>(matrix, numberRegs, control, target);
+                    const auto matrix = dd::Xmat;
+                    auto       gate   = makeGateDD<dd::GateMatrix>(matrix, numberRegs, control, target);
 
                     for (auto counter = 0U; counter < i; counter++) {
                         res = multiply(res, gate);
@@ -1287,69 +1276,88 @@ namespace dd {
                     res = conjugateTranspose(res);
                 }
                 return res;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 4) {
-                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
-                    dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    dd::QuartMatrix matrix = dd::X4;
-                    auto            gate   = makeGateDD<dd::QuartMatrix>(matrix, numberRegs, control, target);
-
-                    for (auto counter = 0U; counter < i; counter++) {
-                        res = multiply(res, gate);
-                    }
-                }
-                if (isDagger) {
-                    res = conjugateTranspose(res);
-                }
-                return res;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 5) {
-                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
-                    dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    dd::QuintMatrix matrix = dd::X5;
-                    auto            gate   = makeGateDD<dd::QuintMatrix>(matrix, numberRegs, control, target);
-
-                    for (auto counter = 0U; counter < i; counter++) {
-                        res = multiply(res, gate);
-                    }
-                }
-                if (isDagger) {
-                    res = conjugateTranspose(res);
-                }
-                return res;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 6) {
-                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
-                    dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    dd::SextMatrix matrix = dd::X6;
-                    auto           gate   = makeGateDD<dd::SextMatrix>(matrix, numberRegs, control, target);
-
-                    for (auto counter = 0U; counter < i; counter++) {
-                        res = multiply(res, gate);
-                    }
-                }
-                if (isDagger) {
-                    res = conjugateTranspose(res);
-                }
-                return res;
-            } else if (registersSizes.at(static_cast<std::size_t>(target)) == 7) {
-                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
-                    dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    dd::SeptMatrix matrix = dd::X7;
-                    auto           gate   = makeGateDD<dd::SeptMatrix>(matrix, numberRegs, control, target);
-
-                    for (auto counter = 0U; counter < i; counter++) {
-                        res = multiply(res, gate);
-                    }
-                }
-                if (isDagger) {
-                    res = conjugateTranspose(res);
-                }
-                return res;
-            } else {
-                throw std::invalid_argument("Dimensions of target not implemented");
             }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 3) {
+                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
+                    const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
+
+                    const auto matrix = dd::X3;
+                    auto       gate   = makeGateDD<dd::TritMatrix>(matrix, numberRegs, control, target);
+
+                    for (auto counter = 0U; counter < i; counter++) {
+                        res = multiply(res, gate);
+                    }
+                }
+                if (isDagger) {
+                    res = conjugateTranspose(res);
+                }
+                return res;
+            }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 4) {
+                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
+                    const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
+
+                    const auto matrix = dd::X4;
+                    auto       gate   = makeGateDD<dd::QuartMatrix>(matrix, numberRegs, control, target);
+
+                    for (auto counter = 0U; counter < i; counter++) {
+                        res = multiply(res, gate);
+                    }
+                }
+                if (isDagger) {
+                    res = conjugateTranspose(res);
+                }
+                return res;
+            }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 5) {
+                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
+                    const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
+
+                    const auto matrix = dd::X5;
+                    auto       gate   = makeGateDD<dd::QuintMatrix>(matrix, numberRegs, control, target);
+
+                    for (auto counter = 0U; counter < i; counter++) {
+                        res = multiply(res, gate);
+                    }
+                }
+                if (isDagger) {
+                    res = conjugateTranspose(res);
+                }
+                return res;
+            }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 6) {
+                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
+                    const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
+
+                    const auto matrix = dd::X6;
+                    auto       gate   = makeGateDD<dd::SextMatrix>(matrix, numberRegs, control, target);
+
+                    for (auto counter = 0U; counter < i; counter++) {
+                        res = multiply(res, gate);
+                    }
+                }
+                if (isDagger) {
+                    res = conjugateTranspose(res);
+                }
+                return res;
+            }
+            if (registersSizes.at(static_cast<std::size_t>(target)) == 7) {
+                for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
+                    const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
+
+                    const auto matrix = dd::X7;
+                    auto       gate   = makeGateDD<dd::SeptMatrix>(matrix, numberRegs, control, target);
+
+                    for (auto counter = 0U; counter < i; counter++) {
+                        res = multiply(res, gate);
+                    }
+                }
+                if (isDagger) {
+                    res = conjugateTranspose(res);
+                }
+                return res;
+            }
+            throw std::invalid_argument("Dimensions of target not implemented");
         }
 
         vEdge spread2(QuantumRegisterCount n, const std::vector<QuantumRegister>& lines, vEdge& state) {
@@ -1406,7 +1414,7 @@ namespace dd {
 
             dd::Controls const control12{{lines.at(1), 2}};
             auto               xp12   = makeGateDD<dd::TritMatrix>(dd::X3, n, control12, lines.at(2));
-            auto               csum21 = CSUM(n, lines.at(2), lines.at(1), true);
+            auto               csum21 = csum(n, lines.at(2), lines.at(1), true);
 
             state = multiply(cH, state);
             state = multiply(minus, state);
@@ -1447,9 +1455,9 @@ namespace dd {
             dd::Controls const control14{{lines.at(1), 4}};
             auto               xp14 = makeGateDD<dd::QuintMatrix>(dd::X5, n, control14, lines.at(4));
 
-            auto csum21 = CSUM(n, lines.at(2), lines.at(1), true);
-            auto csum31 = CSUM(n, lines.at(3), lines.at(1), true);
-            auto csum41 = CSUM(n, lines.at(4), lines.at(1), true);
+            auto csum21 = csum(n, lines.at(2), lines.at(1), true);
+            auto csum31 = csum(n, lines.at(3), lines.at(1), true);
+            auto csum41 = csum(n, lines.at(4), lines.at(1), true);
 
             state = multiply(cH, state);
             state = multiply(minus, state);
