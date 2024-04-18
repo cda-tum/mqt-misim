@@ -379,7 +379,7 @@ namespace dd {
             auto argmax = -1;
 
             std::vector<bool> zero;
-
+            zero.reserve(edge.nextNode->edges.size());
             for (auto& i: edge.nextNode->edges) {
                 zero.emplace_back(i.weight.approximatelyZero());
             }
