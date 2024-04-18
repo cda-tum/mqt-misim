@@ -39,7 +39,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 test = ["pytest>=7.0"]
-coverage = ["pytest>=7.0", "pytest-cov>=4"]
+coverage = ["mqt.misim[test]", "pytest-cov>=4"]
 docs = [
     "furo>=2023.08.17",
     "sphinx",
