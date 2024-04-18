@@ -634,11 +634,11 @@ dd::MDDPackage::mEdge getGate(const ddpkg& dd, const Instruction& instruction) {
 
         auto cReg   = static_cast<dd::QuantumRegister>(target_qudits.at(0));
         auto target = static_cast<dd::QuantumRegister>(target_qudits.at(1));
-        return dd->CEX(numberRegs, ctrlLev, phi, leva, levb, cReg, target, dag);
+        return dd->cex(numberRegs, ctrlLev, phi, leva, levb, cReg, target, dag);
     } else if (tag == "csum") {
         auto cReg   = static_cast<dd::QuantumRegister>(target_qudits.at(0));
         auto target = static_cast<dd::QuantumRegister>(target_qudits.at(1));
-        return dd->CSUM(numberRegs, cReg, target, dag);
+        return dd->csum(numberRegs, cReg, target, dag);
     }
     if (dag) {
         gate = dd->conjugateTranspose(gate);

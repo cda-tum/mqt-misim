@@ -436,7 +436,7 @@ TEST(DDPackageTest, W3State) {
     dd::Controls const control12{{1, 2}};
     auto               xp12 = dd->makeGateDD<dd::TritMatrix>(dd::X3, 3, control12, 2);
 
-    auto csum21 = dd->CSUM(3, 2, 1, true);
+    auto csum21 = dd->csum(3, 2, 1, true);
 
     evolution = dd->multiply(h3Gate, evolution);
     evolution = dd->multiply(xp10, evolution);
@@ -508,9 +508,9 @@ TEST(DDPackageTest, W5State) {
     dd::Controls const control14{{1, 4}};
     auto               xp14 = dd->makeGateDD<dd::QuintMatrix>(dd::X5, 5, control14, 4);
 
-    auto csum21 = dd->CSUM(5, 2, 1, true);
-    auto csum31 = dd->CSUM(5, 3, 1, true);
-    auto csum41 = dd->CSUM(5, 4, 1, true);
+    auto csum21 = dd->csum(5, 2, 1, true);
+    auto csum31 = dd->csum(5, 3, 1, true);
+    auto csum41 = dd->csum(5, 4, 1, true);
 
     evolution = dd->multiply(h5Gate, evolution);
     evolution = dd->multiply(xp10, evolution);
