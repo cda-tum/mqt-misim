@@ -1245,14 +1245,11 @@ namespace dd {
 
         mEdge csum(QuantumRegisterCount numberRegs, QuantumRegister cReg, QuantumRegister target, bool isDagger = false) {
             auto res = makeIdent(numberRegs);
-
             if (registersSizes.at(static_cast<std::size_t>(target)) == 2) {
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
                     const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    const auto matrix = dd::Xmat;
-                    auto       gate   = makeGateDD<dd::GateMatrix>(matrix, numberRegs, control, target);
-
+                    const auto        matrix = dd::Xmat;
+                    auto              gate   = makeGateDD<dd::GateMatrix>(matrix, numberRegs, control, target);
                     for (auto counter = 0U; counter < i; counter++) {
                         res = multiply(res, gate);
                     }
@@ -1265,10 +1262,8 @@ namespace dd {
             if (registersSizes.at(static_cast<std::size_t>(target)) == 3) {
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
                     const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    const auto matrix = dd::X3;
-                    auto       gate   = makeGateDD<dd::TritMatrix>(matrix, numberRegs, control, target);
-
+                    const auto        matrix = dd::X3;
+                    auto              gate   = makeGateDD<dd::TritMatrix>(matrix, numberRegs, control, target);
                     for (auto counter = 0U; counter < i; counter++) {
                         res = multiply(res, gate);
                     }
@@ -1281,10 +1276,8 @@ namespace dd {
             if (registersSizes.at(static_cast<std::size_t>(target)) == 4) {
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
                     const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    const auto matrix = dd::X4;
-                    auto       gate   = makeGateDD<dd::QuartMatrix>(matrix, numberRegs, control, target);
-
+                    const auto        matrix = dd::X4;
+                    auto              gate   = makeGateDD<dd::QuartMatrix>(matrix, numberRegs, control, target);
                     for (auto counter = 0U; counter < i; counter++) {
                         res = multiply(res, gate);
                     }
@@ -1297,10 +1290,8 @@ namespace dd {
             if (registersSizes.at(static_cast<std::size_t>(target)) == 5) {
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
                     const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    const auto matrix = dd::X5;
-                    auto       gate   = makeGateDD<dd::QuintMatrix>(matrix, numberRegs, control, target);
-
+                    const auto        matrix = dd::X5;
+                    auto              gate   = makeGateDD<dd::QuintMatrix>(matrix, numberRegs, control, target);
                     for (auto counter = 0U; counter < i; counter++) {
                         res = multiply(res, gate);
                     }
@@ -1313,10 +1304,8 @@ namespace dd {
             if (registersSizes.at(static_cast<std::size_t>(target)) == 6) {
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
                     const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    const auto matrix = dd::X6;
-                    auto       gate   = makeGateDD<dd::SextMatrix>(matrix, numberRegs, control, target);
-
+                    const auto        matrix = dd::X6;
+                    auto              gate   = makeGateDD<dd::SextMatrix>(matrix, numberRegs, control, target);
                     for (auto counter = 0U; counter < i; counter++) {
                         res = multiply(res, gate);
                     }
@@ -1329,10 +1318,8 @@ namespace dd {
             if (registersSizes.at(static_cast<std::size_t>(target)) == 7) {
                 for (auto i = 0U; i < registersSizes.at(static_cast<std::size_t>(cReg)); i++) {
                     const dd::Control control{cReg, static_cast<dd::Control::Type>(i)};
-
-                    const auto matrix = dd::X7;
-                    auto       gate   = makeGateDD<dd::SeptMatrix>(matrix, numberRegs, control, target);
-
+                    const auto        matrix = dd::X7;
+                    auto              gate   = makeGateDD<dd::SeptMatrix>(matrix, numberRegs, control, target);
                     for (auto counter = 0U; counter < i; counter++) {
                         res = multiply(res, gate);
                     }
