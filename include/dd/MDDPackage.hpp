@@ -499,17 +499,9 @@ namespace dd {
                         std::to_string(numberOfQuantumRegisters) +
                         " qubits. Please allocate a larger package instance.");
             }
-            // std::cout<< "INSIDE THE MONSTER" << std::endl;
-            // std::cout << "Control Indices   "<< std::endl;
-            // for (const auto& cc: controls) {
-            // std::cout<< "Yo" << std::endl;
-            // std::cout << static_cast<int>(cc.quantumRegister) <<" levs now "<< cc.type << std::endl;
-            // }
 
-            auto targetRadix = registersSizes.at(static_cast<std::size_t>(target));
-            // std::cout<< "Started" << std::endl;
-            auto edges = targetRadix * targetRadix;
-            // std::cout<< "edges  "<< edges << std::endl;
+            auto               targetRadix = registersSizes.at(static_cast<std::size_t>(target));
+            auto               edges       = targetRadix * targetRadix;
             std::vector<mEdge> edgesMat(edges, mEdge::zero);
 
             auto currentControl = controls.begin();
@@ -519,12 +511,10 @@ namespace dd {
                     edgesMat.at(i) = mEdge::terminal(complexNumber.lookup(mat.at(i)));
                 }
             }
-            // std::cout<< "made gate dd" << std::endl;
             auto currentReg = static_cast<QuantumRegister>(start);
             // process lines below target
             for (; currentReg < target; currentReg++) {
                 auto radix = registersSizes.at(static_cast<std::size_t>(currentReg));
-                // std::cout<< "running lines" << std::endl;
                 for (auto rowMat = 0U; rowMat < targetRadix; ++rowMat) {
                     for (auto colMat = 0U; colMat < targetRadix; ++colMat) {
                         auto entryPos = (rowMat * targetRadix) + colMat;
@@ -535,7 +525,6 @@ namespace dd {
                             if (rowMat == colMat) {
                                 for (auto i = 0U; i < radix; i++) {
                                     auto diagInd = i * radix + i;
-                                    // std::cout << "making contrls 1   "<< std::endl;
                                     if (i == currentControl->type) {
                                         quadEdges.at(diagInd) = edgesMat.at(entryPos);
                                     } else {
@@ -548,7 +537,6 @@ namespace dd {
                             edgesMat.at(entryPos) = makeDDNode(currentReg, quadEdges);
 
                         } else { // not connected
-                            // std::cout<< "not control below target" << std::endl;
                             for (auto iD = 0U; iD < radix; iD++) {
                                 quadEdges.at(iD * radix + iD) = edgesMat.at(entryPos);
                             }
@@ -574,7 +562,6 @@ namespace dd {
                 std::vector<mEdge> nextEdges(nextRadix * nextRadix, mEdge::zero);
 
                 if (currentControl != controls.end() && currentControl->quantumRegister == nextReg) {
-                    // std::cout << "making contrls 2   "<< std::endl;
                     for (auto i = 0U; i < nextRadix; i++) {
                         auto diagInd = i * nextRadix + i;
                         if (i == currentControl->type) {
@@ -588,13 +575,11 @@ namespace dd {
 
                 } else { // not connected
                     for (auto iD = 0U; iD < nextRadix; iD++) {
-                        // std::cout<< "not control above target" << std::endl;
                         nextEdges.at(iD * nextRadix + iD) = targetNodeEdge;
                     }
                 }
                 targetNodeEdge = makeDDNode(nextReg, nextEdges);
             }
-            // std::cout<< "GOT OUT OF  THE MONSTER" << std::endl;
             return targetNodeEdge;
         }
 

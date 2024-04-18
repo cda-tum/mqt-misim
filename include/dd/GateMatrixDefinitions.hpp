@@ -236,8 +236,6 @@ namespace dd {
                 COMPLEX_ZERO,
                 COMPLEX_ZERO,
                 COMPLEX_ONE};
-        //std::cout<< "theta" << theta << std::endl;
-        //std::cout<< "phi" << phi << std::endl;
         identity.at(3 * leva + leva) = dd::ComplexValue{std::cos(theta / 2.), 0.};
         identity.at(3 * levb + leva) = dd::ComplexValue{-std::sin(theta / 2.) * std::sin(phi), -std::sin(theta / 2.) * std::cos(phi)};
         identity.at(3 * leva + levb) = dd::ComplexValue{std::sin(theta / 2.) * std::sin(phi), -std::sin(theta / 2.) * std::cos(phi)};
