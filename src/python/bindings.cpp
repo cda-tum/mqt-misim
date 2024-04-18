@@ -692,6 +692,6 @@ py::list stateVectorSimulation(py::object& circ, py::object& noiseModel) {
     return result;
 }
 
-PYBIND11_MODULE(pymisim, m) {
+PYBIND11_MODULE(_misim, m) {
     m.def("state_vector_simulation", &stateVectorSimulation, "circuit"_a, "noise_model"_a);
 }
