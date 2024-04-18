@@ -31,12 +31,21 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
+    "Typing :: Typed",
 ]
 requires-python = ">=3.8"
+dynamic = ["version"]
 
-# dynamic = ["version"]
-version = "0.0"
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+coverage = ["mqt.misim[test]", "pytest-cov>=4"]
+dev = ["mqt.misim[coverage]"]
+
+[project.urls]
+Homepage = "https://github.com/cda-tum/mqt-misim"
+Issues = "https://github.com/cda-tum/mqt-misim/issues"
+Discussions = "https://github.com/cda-tum/mqt-misim/discussions"
 
 [tool.scikit-build]
 # Protect the configuration against future changes in scikit-build-core
@@ -55,7 +64,7 @@ build-dir = "build/{wheel_tag}"
 # Explicitly set the package directory
 wheel.packages = ["src/mqt"]
 
-# metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 sdist.include = ["src/mqt/misim/_version.py"]
 sdist.exclude = [
     "**/.github",
@@ -65,30 +74,19 @@ sdist.exclude = [
     "**/plots",
     "**/test",
     "**/tests",
-    "extern/mqt-core/extern/json/include",
-    "extern/mqt-core/extern/googletest",
-    "extern/mqt-core/extern/boost/config/checks",
-    "extern/mqt-core/extern/boost/config/tools",
-    "extern/mqt-core/extern/boost/multiprecision/config",
-    "extern/mqt-core/extern/boost/multiprecision/example",
-    "extern/mqt-core/extern/boost/multiprecision/performance",
-    "extern/mqt-core/extern/boost/multiprecision/tools"
+]
+
+[tool.check-sdist]
+sdist-only = ["src/mqt/core/_version.py"]
+git-only = [
+    "docs/*",
+    "extern/*",
+    "test/*",
 ]
 
 [tool.scikit-build.cmake.define]
 BUILD_MQT_MISIM_TESTS = "OFF"
 BUILD_MQT_MISIM_BINDINGS = "ON"
-BUILD_MQT_MISIM_CLI = "OFF"
-
-
-[tool.check-sdist]
-sdist-only = ["src/mqt/misim/_version.py"]
-git-only = [
-    "docs/*",
-    "extern/*",
-    "test/*",
-    ".idea/*",
-]
 
 
 [tool.setuptools_scm]
@@ -97,20 +95,22 @@ write_to = "src/mqt/misim/_version.py"
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-testpaths = ["test/python"]
-addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
-log_cli_level = "INFO"
+addopts = ["-ra", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
     "error",
     'ignore:.*datetime\.datetime\.utcfromtimestamp.*:DeprecationWarning:',
 ]
+log_cli_level = "info"
+testpaths = ["test/python"]
 
 [tool.coverage]
 run.source = ["mqt.misim"]
 report.exclude_also = [
     '\.\.\.',
     'if TYPE_CHECKING:',
+    'raise AssertionError',
+    'raise NotImplementedError',
 ]
 
 
@@ -118,11 +118,12 @@ report.exclude_also = [
 files = ["src/mqt", "test/python"]
 mypy_path = ["$MYPY_CONFIG_FILE_DIR/src"]
 python_version = "3.8"
-strict = false
+warn_unused_configs = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-warn_unreachable = true
+strict = true
+disallow_untyped_defs = false
 explicit_package_bases = true
-pretty = true
+warn_unreachable = true
 
 [tool.ruff]
 line-length = 120
@@ -139,7 +140,7 @@ extend-select = [
     "ASYNC",       # flake8-async
     "B",  "B904",  # flake8-bugbear
     "C4",          # flake8-comprehensions
-#    "D",           # pydocstyle
+    "D",           # pydocstyle
     "EM",          # flake8-errmsg
     "EXE",         # flake8-executable
     "FA",          # flake8-future-annotations
@@ -151,6 +152,7 @@ extend-select = [
     "LOG",         # flake8-logging-format
     "N",           # flake8-naming
     "NPY",         # numpy
+    "PD",          # pandas-vet
     "PERF",        # perflint
     "PGH",         # pygrep-hooks
     "PIE",         # flake8-pie
@@ -186,19 +188,28 @@ ignore = [
 ]
 isort.required-imports = ["from __future__ import annotations"]
 
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"typing.Callable".msg = "Use collections.abc.Callable instead."
+"typing.Iterator".msg = "Use collections.abc.Iterator instead."
+"typing.Mapping".msg = "Use collections.abc.Mapping instead."
+"typing.Sequence".msg = "Use collections.abc.Sequence instead."
+"typing.Set".msg = "Use collections.abc.Set instead."
+"typing.Self".msg = "Use scikit_build_core._compat.typing.Self instead."
+"typing_extensions.Self".msg = "Use scikit_build_core._compat.typing.Self instead."
+"typing.assert_never".msg = "Use scikit_build_core._compat.typing.assert_never instead."
+"importlib.resources".msg = "Use scikit_build_core._compat.importlib.resources instead."
+"importlib_resources".msg = "Use scikit_build_core._compat.importlib.resources instead."
+
 [tool.ruff.lint.per-file-ignores]
-"test/python/**" = ["T20", "ANN", "D"]
+"test/python/**" = ["T20", "ANN"]
 "docs/**" = ["T20"]
 "noxfile.py" = ["T20", "TID251"]
-"*.pyi" = ["D"]  # pydocstyle
+"*.pyi" = ["D418", "PYI021"]  # pydocstyle
 "*.ipynb" = [
     "D",    # pydocstyle
     "E402", # Allow imports to appear anywhere in Jupyter notebooks
     "I002", # Allow missing `from __future__ import annotations` import
 ]
-
-[tool.ruff.lint.flake8-annotations]
-allow-star-arg-any = true
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
