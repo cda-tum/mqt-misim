@@ -13,6 +13,7 @@
 #include <vector>
 
 namespace py = pybind11;
+using namespace py::literals;
 
 using Instruction  = std::tuple<std::string, bool, std::vector<int>, std::string, std::vector<int>, py::object, std::tuple<std::vector<dd::QuantumRegister>, std::vector<dd::Control::Type>>>;
 using Circuit      = std::vector<Instruction>;
@@ -692,6 +693,5 @@ py::list stateVectorSimulation(py::object& circ, py::object& noiseModel) {
 }
 
 PYBIND11_MODULE(pymisim, m) {
-    m.doc() = "Example module"; // Optional module docstring
-    m.def("state_vector_simulation", &stateVectorSimulation, "state_vector_simulation");
+    m.def("state_vector_simulation", &stateVectorSimulation, "circuit"_a, "noise_model"_a);
 }
