@@ -1,3 +1,7 @@
+> [!WARNING]
+> As of May 2024, this repository is no longer actively maintained. All code has been directly integrated into [MQT Qudits](https://github.com/cda-tum/mqt-qudits).
+> Development is expected to continue there. No new contributions will be accepted here.
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-misim/ci.yml?branch=main&logo=github&style=flat-square)](https://github.com/cda-tum/mqt-misim/actions?query=workflow%3A%22CI%22)
 [![Codecov](https://img.shields.io/codecov/c/github/cda-tum/mqt-misim/main?label=codecov&logo=codecov&style=flat-square)](https://codecov.io/gh/cda-tum/mqt-misim)
